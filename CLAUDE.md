@@ -40,6 +40,14 @@
 - **案件切り替え時は `/clear` を叩く**: 別案件の文脈を混ぜない
 - **長いセッションでは `/usage` でコンテキスト消費を確認**: 必要に応じて `/clear` または `/compact` する
 
+## dotfiles運用（git管理・複数PC同期 / 2026-07-30制定）
+- この CLAUDE.md・settings.json・主要スキルの**正本は `~/claude-dotfiles`**（github.com/fukaishi-nsk/claude-dotfiles・プライベート）。`~/.claude/` 配下はシンボリックリンク
+- **編集は必ず正本パス（~/claude-dotfiles/...）へ**。Editツールはsymlink越しの書き込みを拒否する
+- 正本を編集したら**その場で commit＋push**（別PCとの同期漏れ防止）。逆に、dotfiles配下を編集する前には `git pull` で他PCの変更を取り込む
+- 別PCの初期設定は2コマンドだけ: `git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles` → `~/claude-dotfiles/setup.sh`（既存ファイルは.bakに退避してsymlinkを張る）
+- 新しいスキルを作る時は、正本を `~/claude-dotfiles/skills/<名前>/SKILL.md` に置き、`~/.claude/skills/<名前>/SKILL.md` からsymlinkする（setup.shが別PCでも同じ構成を再現する）
+- ⚠️ プロジェクトメモリ（~/.claude/projects/*/memory）は**PCローカルで同期されない**。全PC・全案件で使いたい知見はCLAUDE.mdかスキルに昇格させる
+
 ## ブラウザ操作の方針（2026-07-27制定）
 - **ブラウザ操作はagent-browserでまずやる**（Homebrew導入済み・Codexと共用。使う前に `agent-browser skills get core` を読む）
 - ログイン状態が必要な操作は `--profile Default`（実Chromeセッションのテンポラリコピー方式・close時自動削除で安全。Gmail添付DLまでend-to-end検証済み）

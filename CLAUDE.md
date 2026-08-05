@@ -47,6 +47,9 @@
 - 別PCの初期設定は2コマンドだけ: `git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles` → `~/claude-dotfiles/setup.sh`（既存ファイルは.bakに退避してsymlinkを張る）
 - 新しいスキルを作る時は、正本を `~/claude-dotfiles/skills/<名前>/SKILL.md` に置き、`~/.claude/skills/<名前>/SKILL.md` からsymlinkする（setup.shが別PCでも同じ構成を再現する）
 - ⚠️ プロジェクトメモリ（~/.claude/projects/*/memory）は**PCローカルで同期されない**。全PC・全案件で使いたい知見はCLAUDE.mdかスキルに昇格させる
+- **2台体制（2026-08-05〜）**: 常時稼働のMac mini（ユーザー名 `fukaishi_macmini`）が `claude remote-control` 母艦として稼働中。dotfiles・スキル・ローカルMCP（notion/grok）はMacBookと同一構成
+- 2台体制では pull→編集→即push が生命線（特にemail-draft継続学習は両機で発生する）。片方で編集したら**必ずその場でpush**、作業開始時は**必ずpull**
+- プロジェクトメモリの一括移植が必要な時はzip→マイドライブ方式（2026-08-05実施済み。配置先では `-Users-<ユーザー名>-` のフォルダ名リネーム必須）
 
 ## ブラウザ操作の方針（2026-07-27制定）
 - **ブラウザ操作はagent-browserでまずやる**（Homebrew導入済み・Codexと共用。使う前に `agent-browser skills get core` を読む）

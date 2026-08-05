@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>島津製作所 生成AI研究プロジェクト ご提案 | Nスケッチ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --slide-w: 1920px;
+  --slide-h: 1080px;
+
+  /* Color (TMS Default / 白基調) */
+  --bg: #FFFFFF;
+  --text: #000000;
+  --text-50: rgba(0, 0, 0, 0.5);
+  --text-25: rgba(0, 0, 0, 0.25);
+  --text-10: rgba(0, 0, 0, 0.1);
+  --surface-5: rgba(0, 0, 0, 0.05);
+  --line: #D5D5D5;
+  --gradient-dark: linear-gradient(180deg, #62656a 0%, #91969c 100%);
+  --gradient-light: linear-gradient(0deg, #b1b3b9 0%, #d8dae2 100%);
+
+  /* Font */
+  --font-sans: 'Inter', 'Noto Sans JP', sans-serif;
+
+  /* Typography Scale (TMS Core 2.0 準拠) */
+  --h1: 100px;   --h1-lh: 112px;
+  --h2: 60px;    --h2-lh: 68px;
+  --h4: 34px;    --h4-lh: 42px;
+  --h5: 28px;    --h5-lh: 32px;
+  --h6: 24px;    --h6-lh: 30px;
+  --xl: 20px;    --xl-lh: 26px;
+  --md: 16px;    --md-lh: 20px;
+  --sm: 18px;    --sm-lh: 22px;
+  --xs: 12px;    --xs-lh: 16px;
+
+  --pad-x: 44px;
+  --pad-y: 40px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background: #0a0a0a;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "palt";
+  overflow: hidden;
+  height: 100vh;
+}
+
+.stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+.deck {
+  position: relative;
+  width: var(--slide-w);
+  height: var(--slide-h);
+  transform-origin: center center;
+}
+
+.slide {
+  position: absolute; inset: 0;
+  width: var(--slide-w); height: var(--slide-h);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 500;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s var(--ease-out), visibility 0.4s var(--ease-out);
+}
+.slide.active { opacity: 1; visibility: visible; }
+
+.body-pad {
+  width: 100%; height: 100%;
+  padding: var(--pad-y) var(--pad-x);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   COMMON: PageHeader Variants
+   ============================================ */
+/* Type1: Caption + Title + Subtitle (H2 縦並び) */
+.page-header-type1 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 2px;
+  width: 1760px;
+}
+.page-header-type1 .caption {
+  font-size: var(--xl);
+  line-height: var(--xl-lh);
+  color: var(--text-50);
+}
+.page-header-type1 .heading {
+  font-size: var(--h2);
+  line-height: var(--h2-lh);
+  letter-spacing: -0.03em;
+}
+.page-header-type1 .heading .title { color: var(--text); }
+.page-header-type1 .heading .subtitle { color: var(--text-50); }
+
+/* ============================================
+   SLIDE 1: COVER
+   ============================================ */
+.cover .body-pad { justify-content: space-between; }
+.cover-header {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+.cover-title {
+  font-size: var(--h1);
+  line-height: var(--h1-lh);
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.cover-footer {
+  font-size: var(--xl);
+  line-height: var(--xl-lh);
+  color: var(--text);
+  display: flex; flex-direction: column;
+}
+
+/* ============================================
+   SLIDE 2: TOC
+   ============================================ */
+.toc .body-pad { justify-content: flex-start; }
+.toc-list {
+  display: flex; flex-direction: column;
+  font-size: var(--h1); line-height: var(--h1-lh);
+  letter-spacing: -0.02em;
+}
+.toc-item { display: flex; gap: 20px; align-items: baseline; }
+.toc-num { min-width: 130px; color: var(--text-50); }
+.toc-title { flex: 1; color: var(--text); }
+
+/* ============================================
+   SLIDE 3: 背景と目的 (Page 55 / 3×2 TextBlock grid)
+   ============================================ */
+.context .body-pad { gap: 68px; justify-content: flex-start; }
+.text-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 100px;
+  row-gap: 100px;
+  width: 100%;
+}
+.text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  font-size: var(--h6);
+  line-height: var(--h6-lh);
+}
+.text-block .title { color: var(--text); }
+.text-block .desc { color: var(--text-50); white-space: pre-line; }
+
+/* ============================================
+   SLIDE 4: アプローチ (Page 50 / Left text + Right 2×3 card grid)
+   ============================================ */
+.approach .body-pad {
+  flex-direction: row;
+  gap: 24px;
+  align-items: stretch;
+}
+.approach-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+.approach-paragraph {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  width: 380px;
+}
+.badge-row { display: flex; gap: 10px; }
+.badge {
+  padding: 14px 24px;
+  border-radius: 99px;
+  font-size: var(--md);
+  line-height: var(--md-lh);
+  text-align: center;
+  color: #fff;
+  white-space: nowrap;
+}
+.badge.style1 { background: var(--gradient-dark); }
+.badge.style2 {
+  background: var(--gradient-light);
+}
+.approach-text {
+  font-size: var(--xl);
+  line-height: var(--xl-lh);
+  color: var(--text-50);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;  /* paragraph 間の空白 */
+}
+.approach-note {
+  font-size: var(--md);
+  line-height: var(--md-lh);
+  color: var(--text-25);
+  margin-top: 12px;
+  max-width: 480px;
+}
+.approach-cards {
+  width: 1200px;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 24px;
+  height: 1000px;
+}
+.text-card {
+  background: var(--surface-5);
+  border-radius: 15px;
+  padding: 28px 28px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+}
+.text-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.text-card .category {
+  font-size: var(--xl);
+  line-height: var(--xl-lh);
+  color: var(--text-25);
+}
+.text-card .title {
+  font-size: var(--h4);
+  line-height: var(--h4-lh);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.text-card .desc {
+  font-size: var(--xl);
+  line-height: var(--xl-lh);
+  color: var(--text-50);
+}
+
+/* ============================================
+   SLIDE 5: TIMELINE (Gantt)
+   ============================================ */
+.timeline .body-pad { justify-content: space-between; }
+.timeline-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-top: 1px solid var(--line);
+}
+.timeline-row {
+  display: grid;
+  grid-template-columns: 392px 1fr 1fr 1fr 1fr;
+  height: 48px;
+  border-bottom: 1px solid var(--line);
+}
+.timeline-row.shade .timeline-cell { background: var(--surface-5); }
+.timeline-cell {
+  display: flex;
+  align-items: center;
+  padding: 13px 16px;
+  font-size: var(--sm);
+  line-height: var(--sm-lh);
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.timeline-cell:last-child { border-right: 0; }
+.timeline-cell.label-cell {
+  justify-content: flex-start;
+  background: #fff;
+}
+.timeline-row.shade .timeline-cell.label-cell { background: var(--surface-5); }
+.timeline-cell.month {
+  justify-content: center;
+  color: var(--text);
+}
+.gantt-bar {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  background: var(--text);
+  border-radius: 2px;
+}
+.timeline-foot {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+.timeline-foot-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.timeline-foot-item .label {
+  font-size: var(--sm);
+  line-height: var(--sm-lh);
+  color: var(--text);
+}
+.timeline-foot-item .desc {
+  font-size: var(--md);
+  line-height: var(--md-lh);
+  color: var(--text-50);
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.slide-nav {
+  position: fixed;
+  bottom: 16px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 1000;
+}
+.slide-nav button {
+  background: none; border: 0; color: inherit;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.slide-nav button:hover { background: rgba(255, 255, 255, 0.1); }
+.progress-bar {
+  width: 160px; height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px; overflow: hidden;
+}
+.progress-bar .fill {
+  height: 100%; background: rgba(255, 255, 255, 0.7);
+  border-radius: 1px;
+  transition: width 0.4s var(--ease-out);
+}
+.page-num {
+  min-width: 56px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   PRINT / PDF EXPORT
+   ============================================ */
+@page {
+  size: 1920px 1080px;
+  margin: 0;
+}
+@media print {
+  html, body {
+    background: #fff !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  .stage {
+    position: static !important;
+    display: block !important;
+  }
+  .deck {
+    position: static !important;
+    transform: none !important;
+    width: 1920px !important;
+    height: auto !important;
+  }
+  .slide {
+    position: relative !important;
+    width: 1920px !important;
+    height: 1080px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    page-break-after: always;
+    break-after: page;
+    transition: none !important;
+  }
+  .slide:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+  .slide-nav { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="deck">
+
+    <!-- ==================== 1. Cover ==================== -->
+    <section class="slide cover active">
+      <div class="body-pad">
+        <div class="cover-header">
+          <div class="cover-title">プロダクトデザインへの<br>生成AI活用 検証プロジェクト</div>
+        </div>
+        <div class="cover-footer">
+          <div>Nスケッチ</div>
+          <div>2026.05</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. TOC ==================== -->
+    <section class="slide toc">
+      <div class="body-pad">
+        <div class="toc-list">
+          <div class="toc-item"><span class="toc-num">01</span><span class="toc-title">背景と目的</span></div>
+          <div class="toc-item"><span class="toc-num">02</span><span class="toc-title">アプローチ</span></div>
+          <div class="toc-item"><span class="toc-num">03</span><span class="toc-title">スケジュール</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. 背景と目的 (Page 55 layout) ==================== -->
+    <section class="slide context">
+      <div class="body-pad">
+        <div class="page-header-type1">
+          <div class="caption">01 | Background</div>
+          <div class="heading">
+            <div class="title">背景と目的</div>
+            <div class="subtitle">生成AIの現在地を、プロダクトデザインの現場で見極める</div>
+          </div>
+        </div>
+
+        <div class="text-grid">
+          <!-- Row 1 -->
+          <div class="text-block">
+            <div class="title">背景</div>
+            <div class="desc">生成AI／LLMの発展は日進月歩。3か月前とは状況が大きく変わる中、自社製品デザインへの活用可能性を探る必要がある。</div>
+          </div>
+          <div class="text-block">
+            <div class="title">課題</div>
+            <div class="desc">「どの工程で生成AIが効くのか、現段階でどこまで実用に乗るのか」が、社内の知見だけでは見えにくい。実検証ベースで現状を把握する体制が必要。</div>
+          </div>
+          <div class="text-block">
+            <div class="title">本プロジェクトの目的</div>
+            <div class="desc">「現段階で、生成AIがプロダクトデザインのどの工程に、どこまで活かせるのか」を、実検証ベースで明らかにする。</div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="text-block">
+            <div class="title">期待される成果</div>
+            <div class="desc">4ヶ月の伴走を通じて、社内で生成AI活用の判断ができる知見と目利き力が、組織に蓄積されている状態を目指します。</div>
+          </div>
+          <div class="text-block">
+            <div class="title">Nスケッチの役割</div>
+            <div class="desc">生成AIテクニカルアドバイザーとして、ディスカッション・実検証・知見共有のサイクルを月2回程度のペースで回します。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. アプローチ (Page 50 layout) ==================== -->
+    <section class="slide approach">
+      <div class="body-pad">
+        <div class="approach-left">
+          <div class="page-header-type1" style="width: auto;">
+            <div class="caption">02 | Approach</div>
+            <div class="heading">
+              <div class="title">アプローチ</div>
+              <div class="subtitle">伴走型 × 実検証</div>
+            </div>
+            <p class="approach-note">※テーマは現段階の候補です。実際の検討テーマは、ディスカッションで一緒に決めます。</p>
+          </div>
+        </div>
+
+        <div class="approach-cards">
+          <div class="text-card">
+            <div class="text-card-head">
+              <div class="category">Theme A</div>
+              <div class="title">アフォーダンス評価</div>
+            </div>
+            <div class="desc">造形が伝える「回す／引く／押す」をAIに推測させ、操作の分かりやすさをスコアとフィードバックで可視化する。</div>
+          </div>
+          <div class="text-card">
+            <div class="text-card-head">
+              <div class="category">Theme B</div>
+              <div class="title">ブランド適合判定</div>
+            </div>
+            <div class="desc">既存島津製品をAIに学ばせ、新規デザイン案が島津のブランドトーンに沿っているかを判定・コメントさせる。</div>
+          </div>
+          <div class="text-card">
+            <div class="text-card-head">
+              <div class="category">Theme C</div>
+              <div class="title">多軸スコアリング</div>
+            </div>
+            <div class="desc">島津が大切にする評価軸（直感性／一貫性／質感など）をAIに教え、デザインを複数軸で採点・改善点を提示させる。</div>
+          </div>
+          <div class="text-card">
+            <div class="text-card-head">
+              <div class="category">Theme D</div>
+              <div class="title">ユーザー視点の擬似評価</div>
+            </div>
+            <div class="desc">「専門家」「初めて触れる人」など属性別のロールをAIに設定し、それぞれの視点で操作性・分かりやすさを評価する。</div>
+          </div>
+          <div class="text-card">
+            <div class="text-card-head">
+              <div class="category">Theme E</div>
+              <div class="title">競合・参考との比較</div>
+            </div>
+            <div class="desc">競合製品や参考デザインとの差分・優位性を、AIに視点別で分析・指摘させ、議論の起点をつくる。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 5. Timeline (Gantt) ==================== -->
+    <section class="slide timeline">
+      <div class="body-pad">
+        <div class="page-header-type1">
+          <div class="caption">03 | Schedule</div>
+          <div class="heading">
+            <div class="title">スケジュール（仮）</div>
+            <div class="subtitle">6月〜9月／月2回程度MTG</div>
+          </div>
+        </div>
+
+        <div class="timeline-table">
+          <div class="timeline-row header">
+            <div class="timeline-cell label-cell"></div>
+            <div class="timeline-cell month">6月</div>
+            <div class="timeline-cell month">7月</div>
+            <div class="timeline-cell month">8月</div>
+            <div class="timeline-cell month">9月</div>
+          </div>
+          <div class="timeline-row shade">
+            <div class="timeline-cell label-cell">テーマ設定／キックオフ</div>
+            <div class="timeline-cell" style="grid-column: 2 / 3; position: relative;">
+              <div class="gantt-bar" style="left: 8px; right: 8px;"></div>
+            </div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell"></div>
+          </div>
+          <div class="timeline-row">
+            <div class="timeline-cell label-cell">検証フェーズ A（評価系）</div>
+            <div class="timeline-cell" style="grid-column: 2 / 4; position: relative;">
+              <div class="gantt-bar" style="left: 50%; right: 0;"></div>
+            </div>
+            <div class="timeline-cell" style="position: relative;">
+              <div class="gantt-bar" style="left: 0; right: 50%;"></div>
+            </div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell"></div>
+          </div>
+          <div class="timeline-row shade">
+            <div class="timeline-cell label-cell">検証フェーズ B（生成系）</div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell" style="grid-column: 4 / 6; position: relative;">
+              <div class="gantt-bar" style="left: 8px; right: 50%;"></div>
+            </div>
+            <div class="timeline-cell"></div>
+          </div>
+          <div class="timeline-row">
+            <div class="timeline-cell label-cell">総括</div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell"></div>
+            <div class="timeline-cell" style="position: relative;">
+              <div class="gantt-bar" style="left: 8px; right: 8px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-foot">
+          <div class="timeline-foot-item">
+            <div class="label">月2回程度MTG</div>
+            <div class="desc">ディスカッション・検証共有を月2回程度のペースで実施します。</div>
+          </div>
+          <div class="timeline-foot-item">
+            <div class="label">並走体制</div>
+            <div class="desc">Nスケッチ側・島津側双方でAIを動かし、知見を蓄積します。</div>
+          </div>
+          <div class="timeline-foot-item">
+            <div class="label">柔軟なテーマ</div>
+            <div class="desc">議論を元にテーマを更新。新モデル登場時は即時取り込み。</div>
+          </div>
+          <div class="timeline-foot-item">
+            <div class="label">ラフ共有</div>
+            <div class="desc">完成品より、議論を進めるための叩き台を中心に共有します。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<nav class="slide-nav">
+  <button class="prev" aria-label="前へ">‹</button>
+  <div class="progress-bar"><div class="fill"></div></div>
+  <span class="page-num"></span>
+  <button class="next" aria-label="次へ">›</button>
+</nav>
+
+<script>
+(function() {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let cur = 0;
+
+  const fill = document.querySelector('.progress-bar .fill');
+  const num = document.querySelector('.page-num');
+  const prev = document.querySelector('.prev');
+  const next = document.querySelector('.next');
+  const deck = document.querySelector('.deck');
+
+  function show(i) {
+    cur = Math.max(0, Math.min(total - 1, i));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === cur));
+    fill.style.width = `${((cur + 1) / total) * 100}%`;
+    num.textContent = `${cur + 1} / ${total}`;
+  }
+
+  function fit() {
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    deck.style.transform = `scale(${s})`;
+  }
+
+  prev.addEventListener('click', () => show(cur - 1));
+  next.addEventListener('click', () => show(cur + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(cur - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+  });
+
+  window.addEventListener('resize', fit);
+  fit();
+  show(0);
+})();
+</script>
+
+</body>
+</html>

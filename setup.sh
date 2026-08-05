@@ -24,7 +24,7 @@ link_file() {
     echo "  ⚠️  既存ファイルをバックアップ: $dest → ${dest}.bak"
     mv "$dest" "${dest}.bak"
   fi
-  ln -sf "$src" "$dest"
+  ln -sfh "$src" "$dest"
   echo "  ✅ $dest → $src"
 }
 
@@ -38,7 +38,7 @@ for skill_dir in "$DOTFILES_DIR/skills"/*/; do
     skill_name=$(basename "$skill_dir")
     mkdir -p "$CLAUDE_DIR/skills/$skill_name"
     for file in "$skill_dir"*; do
-      if [ -f "$file" ]; then
+      if [ -f "$file" ] || [ -d "$file" ]; then
         link_file "$file" "$CLAUDE_DIR/skills/$skill_name/$(basename "$file")"
       fi
     done

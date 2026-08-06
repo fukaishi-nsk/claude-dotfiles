@@ -49,9 +49,9 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
    - `String.fromCharCode.apply` は引数上限があるので**for文で回す**（applyは使わない）
 
 4. **結合してデコード＋検証**：各 `.b64` はJSON文字列なので前後の `"` を剥がしてから連結→`base64.b64decode`。
-   **サイズがSlack表示のKB表記と一致すること**（例 368.9KB → 377,797 B）と**JPEGマジック `ffd8`** を必ず確認する
+   **サイズがSlack表示のKB表記と一致すること**（例 368.9KB → 377,797 B）と**ファイル種別のマジックバイト**（JPEG=`ffd8` / PNG=`89504e47`）を必ず確認する
 
-5. **格納**：スクラッチパッド→検証→顧客フォルダへ `cp`。Nanco顧客なら `00_File_from/YYMMDD_LINE_話者_HHMM_内容.jpg`（既存の命名例に合わせる）。Driveマウントに置いたら**Drive API側でファイルID・サイズ一致を実体確認**してからリンクを配る
+5. **格納**：スクラッチパッド→検証→顧客フォルダへ `cp`。Nanco顧客なら `00_File_from/YYMMDD_LINE_話者_HHMM_内容.jpg`（既存の命名例に合わせる）。**会議中の画面共有スクショなら `06_Recording/YYMMDD_会議名/` フォルダに `YYMMDD_HHMM_会議スクショN.png`**（APAで2026-08-06実証、PNG 2.7MB/3.2MBで手順そのまま成功）。Driveマウントに置いたら**Drive API側でファイルID・サイズ一致を実体確認**してからリンクを配る
 
 6. **後始末**：`agent-browser --profile Default close`／中間 `.b64` は消す
 

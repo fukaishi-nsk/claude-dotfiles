@@ -60,6 +60,17 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 - 添付手順そのものは [[reference_linear_attachment_upload]]（prepare→60秒内PUT→finalize）
 - ⚠ **`create_attachment_from_upload` は添付リンク行を作るだけで、本文には画像が表示されない**。人が見て「貼られていない」と感じるのはこれ。**イシュー本文に `![説明](assetUrl)` を書いて埋め込む**こと（保存されるとLinear側が署名付きURLに書き換える＝認識された証拠）
 - 完了報告は **APIの200やレスポンスではなく、実際の画面表示を見てから**。API成功＝ユーザーに見えている、ではない（→ [[feedback_verify_at_message_level]]）
+- **その目視確認のやり方（2026-08-06 実証）**：
+  1. `linear.app/<team>/issue/<ID>` を直接開くと **Slackと同型の壁**「Link opened in the Linear app」で止まる（`bodyLen` が146程度で本文が来ない）。DOMから `Open here instead` を含む `a,button` を探して `click()` すると本体が開く
+  2. さらに **agent-browser のプロファイルがLinear未ログインのことがある**（ログイン画面が出る）。ログイン操作はAIがやらない＝ユーザーに実Chromeでログインしてもらい、**次の `open` で新しいプロファイルコピーに反映される**
+  3. 開けたら次で機械判定できる。添付行だけなのか本文にレンダリング済みなのかが確実に分かる
+  ```js
+  [...document.querySelectorAll("img")]
+    .filter(i => i.src.includes("uploads.linear.app") && i.naturalWidth > 400)
+    .map(i => ({w: i.naturalWidth, h: i.naturalHeight, complete: i.complete}))
+  // 原寸が返り complete:true なら本文に表示されている（添付サムネは192x192程度で別物）
+  ```
+  ※ SPAの描画待ちは `setInterval` で「本文テキスト＋画像」が揃うまでポーリングし、Promiseで返すと1コマンドで済む
 
 ## 落とし穴
 

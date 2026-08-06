@@ -135,8 +135,10 @@ user-invocable: true
 - **対象**: 顧客からの機能要望、バグ/不具合、姉崎さん（や社内）の口頭コミット（→ [[project_anezaki_verbal_commitments]] に基づき期日付きで拾う）、運用設計の宿題など。⚠**創作禁止**＝文字起こしに出たものだけ。無ければ「候補なし」でよい。
 - **粒度/命名**: `[顧客名][エリア] 説明`（→ [[user_linear_issue_naming]]）。各候補に **種別（要望/バグ/口頭コミット）・発言根拠（誰の何という発言か）・（あれば）期日** を添える。実装中/製品横断の大玉（例: API・移行など）は「既存イシューの可能性大」と注記して分ける。
 - **⚠ 起票はしない（リストまで）**: 外部書き込み（`save_issue`）は**承認後**に行う（→ [[feedback_confirm_before_external_writes.md]]）。無人モードでは候補提示で止め、対話モードでも「起票していいか」を確認してから作る。
-- **重複チェック不可の明記**: このLinear MCPコネクタは issue検索/一覧を持たず**重複チェックが自動化できない**（→ [[reference_nanco_linear_team]]）。候補には既存重複があり得る旨を明記し、取捨・起票は人／週次nanco定例（→ [[feedback_nanco_linear_triage]]）に委ねる。
-- 起票する場合の作法（承認後）: `team='nanco'`、**No priority**（priority=0）、期日はコミット分のみ、本文に出典（会議録）と発言根拠を残す。
+- **重複チェックは実施する**（2026-08-06訂正・以前の「検索不可」は解消済み）: このLinear MCPコネクタは `list_issues`（`query`/`team`/`state` 等）を**持つ**ので、候補を出したら起票前にキーワード検索して既存を洗う（→ [[reference_nanco_linear_team]]）。「棚卸し」等の一般語は複数キーワードで絞る。ヒットした類似は起票時に `relatedTo` で接続し、**統合するか切り出すかの最終判断は人／週次nanco定例**（→ [[feedback_nanco_linear_triage]]）に委ねる。
+- 起票する場合の作法（承認後）: `team='nanco'`、**No priority**（priority=0）、期日はコミット分のみ、本文に出典（会議録）と発言根拠を残す。**起票順は発言時刻順**（番号は振り直せないため → [[feedback_linear_issue_chronological_order]]）。
+- **期日は「顧客の当日」ではなく前日に置く**（2026-08-06学習）: 「8/8に棚卸しするのでそれまでに」という依頼の期日は 8/8 ではなく **8/7**。当日リリースでは間に合わない。顧客イベント日を聞いたら常に前日へ倒し、その理由を本文に書く。
+- 根拠画像がある場合は Linear添付＋本文への `![](assetUrl)` 埋め込みまでやる（添付しただけでは本文に出ない → [[slack-file-dl]] / [[reference_linear_attachment_upload]]）。
 
 ### Step 7: 報告（Slack `#log_fukaishi`）
 処理が終わったら Slack `#log_fukaishi` に投稿（Slack MCPの送信ツールを使用。channel_id=`C03119VSJGK`）。

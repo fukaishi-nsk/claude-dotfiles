@@ -15,6 +15,7 @@ echo ""
 # ~/.claude/ がなければ作る
 mkdir -p "$CLAUDE_DIR"
 mkdir -p "$CLAUDE_DIR/skills"
+mkdir -p "$CLAUDE_DIR/scheduled-tasks"
 
 # バックアップ＆リンク関数
 link_file() {
@@ -45,5 +46,20 @@ for skill_dir in "$DOTFILES_DIR/skills"/*/; do
   fi
 done
 
+# scheduled-tasks/ 配下をリンク（定期実行タスクの手順書）
+for task_dir in "$DOTFILES_DIR/scheduled-tasks"/*/; do
+  if [ -d "$task_dir" ]; then
+    task_name=$(basename "$task_dir")
+    mkdir -p "$CLAUDE_DIR/scheduled-tasks/$task_name"
+    for file in "$task_dir"*; do
+      if [ -f "$file" ] || [ -d "$file" ]; then
+        link_file "$file" "$CLAUDE_DIR/scheduled-tasks/$task_name/$(basename "$file")"
+      fi
+    done
+  fi
+done
+
 echo ""
 echo "🎉 セットアップ完了！Claude Code を再起動してください。"
+echo "   ※ scheduled-tasks は手順書のみ同期されます。スケジュール自体（実行時刻の登録）は"
+echo "      PCごとに /schedule または scheduled-tasks コネクタで別途登録してください。"

@@ -51,9 +51,18 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 4. **結合してデコード＋検証**：各 `.b64` はJSON文字列なので前後の `"` を剥がしてから連結→`base64.b64decode`。
    **サイズがSlack表示のKB表記と一致すること**（例 368.9KB → 377,797 B）と**ファイル種別のマジックバイト**（JPEG=`ffd8` / PNG=`89504e47`）を必ず確認する
 
-5. **格納**：スクラッチパッド→検証→顧客フォルダへ `cp`。Nanco顧客なら `00_File_from/YYMMDD_LINE_話者_HHMM_内容.jpg`（既存の命名例に合わせる）。**会議中の画面共有スクショなら `06_Recording/YYMMDD_会議名/` フォルダに `YYMMDD_HHMM_会議スクショN.png`**（APAで2026-08-06実証、PNG 2.7MB/3.2MBで手順そのまま成功）。Driveマウントに置いたら**Drive API側でファイルID・サイズ一致を実体確認**してからリンクを配る
+5. **格納**：スクラッチパッド→検証→顧客フォルダへ `cp`。Nanco顧客なら `00_File_from/YYMMDD_LINE_話者_HHMM_内容.jpg`（既存の命名例に合わせる）。**会議中の画面共有スクショなら `06_Recording/YYMMDD_会議名/` フォルダに `YYMMDD_HHMM_会議スクショN.png`**（APAで2026-08-06実証、PNG 2.7MB/3.2MBで手順そのまま成功）。**さらに会議スクショは必ずその会議のNotion議事録ページにも画像として貼る**（深石さん指示 2026-08-07「これからも」→下記「Notion議事録ページへの埋め込み」）。Driveマウントに置いたら**Drive API側でファイルID・サイズ一致を実体確認**してからリンクを配る
 
 6. **後始末**：`agent-browser --profile Default close`／中間 `.b64` は消す
+
+## Notion議事録ページへの埋め込み（会議スクショは必須・2026-08-07 深石さん指示「これからも」）
+
+会議スクショはDrive格納に加えて、**その会議のNotion議事録ページ（MTG・議事録DB＝1会議1ページ）に画像として埋め込む**。NotionコネクタMCPで実証済み（artience 2026-08-07・PNG 750KB×3枚）：
+
+1. `notion-create-file-upload {filename: "….png"}` → `upload_url`＋`authorization`ヘッダが返る（**5分で失効・1ファイルごとに発行**）
+2. `curl -sS -X POST <upload_url> -H "authorization: Bearer …" -F "file=@<path>;type=image/png"` → レスポンスの `status:"uploaded"` と `content_length` が元ファイルのバイト数と一致することを確認
+3. `notion-update-page`（insert_content・position end）で `<image src="file-upload://<file_upload_id>"></image>` を挿入。直前にキャプション行（撮影時刻＋内容の1行）。複数枚は「## 会議スクショ」セクションにまとめる
+4. **fetchでページを再取得し、`file-upload://` が実URL（prod-files-secure…）の画像ブロックに変わったことを確認してから完了報告**（API 200≠ユーザーに見えている）
 
 ## Linearへ添付する場合の必須事項
 

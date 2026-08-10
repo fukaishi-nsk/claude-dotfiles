@@ -67,7 +67,7 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
 - **2026-08-10に本番稼働開始（dryRun=false・深石さん承認済み）**。初回の実送信予定は8/24(月)9:05。
 - Worker v3デプロイ済み（wrangler認証済み・PUSH_TOKEN設定済み）。E2Eテスト完了＝テストグループ実送信・Slackミラー・認証/allowlist拒否とも確認済み。
 - デプロイ用コードの正本: Mac mini `~/line-group-relay/`。`npx wrangler deploy` はBash許可リスト登録済み（settings.json）＝Claudeが実行可。ただしコード変更時は内容説明→デプロイの順を守る。
-- ⚠ Drive `カスタマー/_LINE取込ボット_提案/` への v3 反映は**Mac miniマウントのEDEADLKで未完**（要再試行。Drive MCPのdownloadは可・createは重複を生むため不可）。
+- Drive `カスタマー/_LINE取込ボット_提案/` への v3 反映済み（2026-08-10）。⚠Mac miniのマウントではこのフォルダの**古いファイルがdataless（実体未取得）でcat/cp/EditがEDEADLK**になる。新規書き込みは通るので、更新は「rm→cp」で置換し、直後にDrive MCPでサーバー側のfileSize/createdTimeを実体確認する（旧ファイルはDriveゴミ箱に30日残る）。
 - routine: claude.ai `trig_019rsCYZsREZMBcAyqfpMxvQ`（bridge環境カスタマー・平日09:05/13:05 JST）。削除は https://claude.ai/code/routines から。
 - LINE通数: グループ宛プッシュは**グループ人数分カウント**（LINE公式仕様）。そら≒9人×月2〜4回＝月18〜36通で、
   コミュニケーションプラン無料枠200通/月に収まる。横展開時は再計算すること。

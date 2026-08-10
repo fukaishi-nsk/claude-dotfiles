@@ -46,6 +46,7 @@
 - 正本を編集したら**その場で commit＋push**（別PCとの同期漏れ防止）。逆に、dotfiles配下を編集する前には `git pull` で他PCの変更を取り込む
 - 別PCの初期設定は2コマンドだけ: `git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles` → `~/claude-dotfiles/setup.sh`（既存ファイルは.bakに退避してsymlinkを張る）
 - 新しいスキルを作る時は、正本を `~/claude-dotfiles/skills/<名前>/SKILL.md` に置き、`~/.claude/skills/<名前>/SKILL.md` からsymlinkする（setup.shが別PCでも同じ構成を再現する）
+- **Codexにも共有したいスキル**（2026-08-10〜）: setup.sh の `CODEX_SHARED_SKILLS` にスキル名を追加すると `~/.codex/skills/` へ**実ファイルコピー**される（⚠symlinkはCodexがスキルとして認識しない・検証済み）。正本を編集したら setup.sh 再実行でコピー更新。初例＝notta-check
 - **定期実行タスクの手順書も同じ扱い**（2026-08-06〜）: 正本は `~/claude-dotfiles/scheduled-tasks/<名前>/SKILL.md`、`~/.claude/scheduled-tasks/<名前>/SKILL.md` からsymlink。⚠同期されるのは**手順書だけ**で、**スケジュール登録（実行時刻）はPCごとに別途必要**（どちらのPCで走らせるかは意図して決める＝二重実行に注意）
 - ⚠️ プロジェクトメモリ（~/.claude/projects/*/memory）は**PCローカルで同期されない**。全PC・全案件で使いたい知見はCLAUDE.mdかスキルに昇格させる
 - **2台体制（2026-08-05〜）**: 常時稼働のMac mini（ユーザー名 `fukaishi_macmini`）が `claude remote-control` 母艦として稼働中。dotfiles・スキル・ローカルMCP（notion/grok）はMacBookと同一構成

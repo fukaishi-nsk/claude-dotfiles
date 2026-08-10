@@ -1,0 +1,25 @@
+---
+name: notta-check
+description: 会議の文字起こし（Notta）の確認・回収方法。「会議終わった」「nottaから持ってきて」「文字起こしある？」と言われたら必ず使用。Notta_Inboxの場所・命名規則・着弾遅延・案件フォルダへの仕分け先を記載。
+---
+
+# Notta文字起こしの確認・回収（NSK全案件共通）
+
+会議の文字起こしは Notta → Zapier(v2) → Googleドライブの
+`~/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/Notta_Inbox/`
+に自動保存される（NSKワークスペース全案件共通の受け皿）。
+
+## 確認手順
+
+1. `Notta_Inbox` を見る。保存はNottaのタイトルそのまま・拡張子なし（中身はテキスト）
+2. 着弾は会議終了から数分〜数十分遅れ（Teams会議も対応。終了2分後の実績あり）。無ければ時間を置いて再確認する
+3. 該当ファイルを各案件フォルダの `06_Recording/YYMMDD_会議名.txt` へ移動・リネームする
+4. 案件固有の後続処理（Notion議事録・KB反映など）は各案件のナレッジベース・プロジェクトメモリに従う
+
+## フォールバック
+
+- ログイン状態のブラウザで app.notta.ai を開いて本文を取得する（agent-browser --profile Default を想定。Nottaでの動作は未検証）
+
+## 注意
+
+- ⚠️ Nottaの話者ラベルは誤ることがある（実績: 別人の発言が藤波さん名義になった例あり）。文脈と矛盾する発言は話者を断定せず「〜と思われる」で記録する

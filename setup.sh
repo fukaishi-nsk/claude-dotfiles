@@ -59,7 +59,27 @@ for task_dir in "$DOTFILES_DIR/scheduled-tasks"/*/; do
   fi
 done
 
+# Codex共有スキル: 指定したスキルだけ ~/.codex/skills/ にもコピーする（Claude/Codexで同じ知見を使う）
+# ※ 全スキルは共有しない（Claude専用スキルがCodexのskillsコンテキスト予算を圧迫するため）
+# ※ symlinkはCodexがスキルとして認識しないため実ファイルコピー（2026-08-10 codex execで検証済み）
+#    → 正本（skills/配下）を編集したら setup.sh を再実行してコピーを更新すること
+CODEX_SHARED_SKILLS=(notta-check)
+if [ -d "$HOME/.codex" ]; then
+  mkdir -p "$HOME/.codex/skills"
+  for skill_name in "${CODEX_SHARED_SKILLS[@]}"; do
+    src_dir="$DOTFILES_DIR/skills/$skill_name"
+    if [ -d "$src_dir" ]; then
+      dest_dir="$HOME/.codex/skills/$skill_name"
+      rm -rf "$dest_dir"
+      cp -R "$src_dir" "$dest_dir"
+      echo "  ✅ $dest_dir ← $src_dir（実ファイルコピー）"
+    fi
+  done
+fi
+
 echo ""
 echo "🎉 セットアップ完了！Claude Code を再起動してください。"
 echo "   ※ scheduled-tasks は手順書のみ同期されます。スケジュール自体（実行時刻の登録）は"
 echo "      PCごとに /schedule または scheduled-tasks コネクタで別途登録してください。"
+echo "   ※ Codex共有スキル（CODEX_SHARED_SKILLS）は実ファイルコピーです。"
+echo "      正本を編集したら setup.sh を再実行してコピーを更新してください。"

@@ -63,11 +63,11 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
 1. Worker v3（/pushエンドポイント）がデプロイ済みで、テストグループ宛のE2E送信が成功していること
 2. ドライラン予告の文面を深石さんが確認して `config.json` を `{"dryRun": false}` に変えること（＝これが送信承認）
 
-## セットアップ状況・引き継ぎ（2026-08-10時点）
-- Worker v3のコード: Mac mini `~/line-group-relay/`（worker.js構文チェック済み・wrangler.tomlにPUSH_GROUP_ALLOWLIST=そらグループ設定済み）
-- Drive正本 `カスタマー/_LINE取込ボット_提案/` への反映は**マウントのEDEADLKで未完**（要再試行）
-- **デプロイ未完**: Mac miniのwranglerが未認証。`npx wrangler login` はOAuth（人間の操作が必要）。
-  デプロイ手順: `cd ~/line-group-relay && npx wrangler login && npx wrangler deploy && cat ~/.claude/scheduled-tasks/sora-meet-link-share/.push_token | npx wrangler secret put PUSH_TOKEN`
-- デプロイ後のE2Eテスト: テストグループ（ボット在籍中）のgroupIdを一時的にPUSH_GROUP_ALLOWLISTへ足して送信確認→戻す
+## セットアップ状況・引き継ぎ
+- **2026-08-10に本番稼働開始（dryRun=false・深石さん承認済み）**。初回の実送信予定は8/24(月)9:05。
+- Worker v3デプロイ済み（wrangler認証済み・PUSH_TOKEN設定済み）。E2Eテスト完了＝テストグループ実送信・Slackミラー・認証/allowlist拒否とも確認済み。
+- デプロイ用コードの正本: Mac mini `~/line-group-relay/`。`npx wrangler deploy` はBash許可リスト登録済み（settings.json）＝Claudeが実行可。ただしコード変更時は内容説明→デプロイの順を守る。
+- ⚠ Drive `カスタマー/_LINE取込ボット_提案/` への v3 反映は**Mac miniマウントのEDEADLKで未完**（要再試行。Drive MCPのdownloadは可・createは重複を生むため不可）。
+- routine: claude.ai `trig_019rsCYZsREZMBcAyqfpMxvQ`（bridge環境カスタマー・平日09:05/13:05 JST）。削除は https://claude.ai/code/routines から。
 - LINE通数: グループ宛プッシュは**グループ人数分カウント**（LINE公式仕様）。そら≒9人×月2〜4回＝月18〜36通で、
   コミュニケーションプラン無料枠200通/月に収まる。横展開時は再計算すること。

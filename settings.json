@@ -4,8 +4,85 @@
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "permissions": {
+    "additionalDirectories": [
+      "/Users/fukaishi_macmini/.claude",
+      "/Users/fukaishi_macmini/claude-dotfiles",
+      "/Users/fukaishi_macmini/Downloads"
+    ],
     "allow": [
-      "Bash(npx wrangler deploy*)"
+      "Bash(npx wrangler deploy*)",
+
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(wc:*)",
+      "Bash(awk:*)",
+      "Bash(sed:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(date:*)",
+      "Bash(echo:*)",
+      "Bash(iconv:*)",
+      "Bash(python3:*)",
+      "Bash(jq:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git pull:*)",
+
+      "mcp__claude_ai_Google_Calendar__list_events",
+      "mcp__claude_ai_Google_Calendar__search_events",
+      "mcp__claude_ai_Google_Calendar__get_event",
+      "mcp__claude_ai_Google_Calendar__list_calendars",
+
+      "mcp__claude_ai_Google_Drive__search_files",
+      "mcp__claude_ai_Google_Drive__read_file_content",
+      "mcp__claude_ai_Google_Drive__download_file_content",
+      "mcp__claude_ai_Google_Drive__get_file_metadata",
+      "mcp__claude_ai_Google_Drive__list_recent_files",
+      "mcp__claude_ai_Google_Drive__create_file",
+
+      "mcp__claude_ai_Slack__slack_read_channel",
+      "mcp__claude_ai_Slack__slack_read_thread",
+      "mcp__claude_ai_Slack__slack_read_file",
+      "mcp__claude_ai_Slack__slack_search_channels",
+      "mcp__claude_ai_Slack__slack_search_users",
+      "mcp__claude_ai_Slack__slack_search_public",
+      "mcp__claude_ai_Slack__slack_read_user_profile",
+      "mcp__claude_ai_Slack__slack_send_message",
+
+      "mcp__claude_ai_Linear__list_issues",
+      "mcp__claude_ai_Linear__get_issue",
+      "mcp__claude_ai_Linear__list_comments",
+      "mcp__claude_ai_Linear__list_teams",
+      "mcp__claude_ai_Linear__list_users",
+      "mcp__claude_ai_Linear__save_issue",
+      "mcp__claude_ai_Linear__save_comment",
+      "mcp__claude_ai_Linear__prepare_attachment_upload",
+      "mcp__claude_ai_Linear__create_attachment_from_upload",
+
+      "mcp__claude_ai_Gmail__search_threads",
+      "mcp__claude_ai_Gmail__get_thread",
+      "mcp__claude_ai_Gmail__get_message",
+      "mcp__claude_ai_Gmail__list_drafts",
+
+      "mcp__notion__notion-search",
+      "mcp__notion__notion-fetch",
+      "mcp__notion__notion-query-data-sources",
+      "mcp__notion__notion-get-users",
+
+      "mcp__claude_ai_nanco__whoami",
+      "mcp__claude_ai_nanco__search_items",
+      "mcp__claude_ai_nanco__get_item",
+      "mcp__claude_ai_nanco__list_folders",
+      "mcp__claude_ai_nanco__get_folder_tree",
+      "mcp__claude_ai_nanco__get_stock_history",
+
+      "WebSearch"
     ]
   },
   "hooks": {

@@ -15,6 +15,8 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 - Meetの成果物＝`会議名 - YYYY MM DD HH:MM JST - Gemini によるメモ.gdoc`（Geminiメモ＋文字起こしリンク）や `〜Recording`（録画）
 - `.gdoc` は175バイトのポインタファイル。`cat` して `doc_id` を取り、**Google Drive MCPの `read_file_content`（fileId=doc_id）で本文を取得**できる（Geminiメモ＋全文文字起こしが1ドキュメントに入っている）
 - Geminiメモの話者ラベルもNotta同様に誤りうる。文脈と矛盾する発言は断定しない
+- 使い分けの原則（2026-08-12 深石さん）: **Nスケッチ主催＝Google Meet**（文字起こし・録画はMeet Recordingsへ）／**クライアント主催・クライアント都合＝Nottaを参加させる**（Notta_Inboxへ着弾）
+- **同じ会議が両方に記録されることがある**。実例: `260810_[湯本]相談`・`GSI棚卸し_260803_*` はNotta_Inboxの.txtとMeet Recordings側の同名.gdocの両方にある。逆に社内のN朝会の文字起こしがNotta_Inbox側に着弾している例もある → 見つからない・判断に迷うときは両方を確認する
 
 ## 確認手順
 

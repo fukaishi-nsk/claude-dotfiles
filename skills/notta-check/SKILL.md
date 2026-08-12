@@ -9,6 +9,13 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 `~/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/Notta_Inbox/`
 に自動保存される（NSKワークスペース全案件共通の受け皿）。
 
+## ⚠️ 先にMeet Recordingsを確認する会議（2026-08-12 深石さん指示）
+
+**Google Meetの会議（N朝会などの社内定例・Meet開催の顧客MTG）は、まず `My Drive/Meet Recordings/` を確認**し、無かったらNottaを見る、の順にする。
+- Meetの成果物＝`会議名 - YYYY MM DD HH:MM JST - Gemini によるメモ.gdoc`（Geminiメモ＋文字起こしリンク）や `〜Recording`（録画）
+- `.gdoc` は175バイトのポインタファイル。`cat` して `doc_id` を取り、**Google Drive MCPの `read_file_content`（fileId=doc_id）で本文を取得**できる（Geminiメモ＋全文文字起こしが1ドキュメントに入っている）
+- Geminiメモの話者ラベルもNotta同様に誤りうる。文脈と矛盾する発言は断定しない
+
 ## 確認手順
 
 1. `Notta_Inbox` を見る。着弾は `Nottaタイトル.txt`（2026-08-10にZap側で `.txt` 付与を実装済み。それ以前の旧ファイルは拡張子なし）

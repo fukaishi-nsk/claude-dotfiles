@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.nsketch.notta-inbox-datestamp</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__HOME__/claude-dotfiles/launchd/notta-inbox-datestamp/datestamp.sh</string>
+    </array>
+    <key>WatchPaths</key>
+    <array>
+        <string>__HOME__/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/Notta_Inbox</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StartInterval</key>
+    <integer>3600</integer>
+    <key>StandardOutPath</key>
+    <string>__HOME__/Library/Logs/notta-inbox-datestamp.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/Library/Logs/notta-inbox-datestamp.log</string>
+</dict>
+</plist>

@@ -81,6 +81,16 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
   ```
   ※ SPAの描画待ちは `setInterval` で「本文テキスト＋画像」が揃うまでポーリングし、Promiseで返すと1コマンドで済む
 
+## Slack Connect（外部ワークスペースの人の投稿ファイル）の場合（2026-08-12 GRID案件で実証）
+
+共有チャンネルで**外部組織のユーザーが上げたファイルは、チームIDが相手ワークスペースのもの**になる（GRID＝`T31C46MV5`）。自社ID（`T08ML4BM5-<FILE_ID>`）でfiles-priを叩くと認証済みでも「リクエストされたファイルが見つかりませんでした」になる。ハマったらまずこれを疑う：
+
+1. **正しいチームIDはスレッドDOMから拾う**：スレッド付きパーマリンク（`/messages/<CH>/p<ts>?thread_ts=<親ts>&cid=<CH>`）で開き、`img[src]`・`a[href]` から `files-tmb/T…-F…-hash/` または `files-pri/T…-F…/` を探す（遅延ロードなので該当メッセージが描画されている必要あり）
+2. **日本語ファイル名はサニタイズ名でないと404**：files-priのパスは元名のUTF-8**バイト数ぶんのアンダースコア**になる（`生産計画.png`→`____________.png`＝12バイト分）。encodeURIComponentした日本語名はNG
+3. **app.slack.comからのクロスオリジンfetchが `Failed to fetch` で落ちるケースがある**（2026-08-12時点）。回避策＝**タブ自体を files-pri URLへ遷移**（files-origin.slack.com にリダイレクトされ画像が表示される）→ その同一オリジンで `fetch(location.href,{credentials:"include"})` → チャンク取り出し。⚠遷移するとヘルパーは消えるので**ファイルごとに再注入**
+4. `eval` に**トップレベル `await` は書けない**（SyntaxError）。Promiseを返せば自動awaitされる
+5. チャンクは**120000バイト**（base64 160000文字・`--max-output 200000`内）でも欠損なし＝60000比でコール数半減（5ファイル計9.4MBで全ファイルバイト一致を確認）
+
 ## 落とし穴
 
 - LINE転写ボット経由の画像は **2026-08-04 18時以降の投稿のみ**Slackに存在する。それ以前はLINE実機から（→ [[reference_line_desktop_image_capture]]）

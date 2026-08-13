@@ -8,12 +8,12 @@ description: Gmailメールの添付ファイルをagent-browserで自動ダウ�
 ## 前提
 
 - Gmailコネクタ（MCP）には添付ダウンロード機能が**ない**（get_messageで添付メタデータまで）。回収はagent-browserで行う
-- agent-browserはHomebrew導入済み・全プロジェクト共通（v0.33.0固定運用）。このセッションで初めて使うなら先に `agent-browser skills get core` を読む
+- agent-browserはHomebrew導入済み・全プロジェクト共通（v0.34.0固定運用・Mac側2026-08-13動作確認済み）。このセッションで初めて使うなら先に `agent-browser skills get core` を読む
 - ⚠️ `--profile Default` を**全コマンドに毎回**付ける（実Chromeログイン状態のテンポラリコピー方式・close時自動削除。付け忘れると別セッションのabout:blankに飛び「Access is denied」でハマる）
 
 ## Windows機での前提差分（2026-07-30制定・Win機でend-to-end実証済み）
 
-- 導入はnpmで固定バージョン: `npm install -g agent-browser@0.33.0`（HomebrewはMacのみ）
+- 導入はnpmで固定バージョン: `npm install -g agent-browser@0.34.0`（HomebrewはMacのみ。⚠Win機での0.34.0は未検証＝更新時はGmail添付DLの動作確認をしてから。確認まで0.33.0のままでも可）
 - ⚠️ Windows機では `--profile Default` 方式（実Chromeのテンポラリコピー）は**使えない**。Windows版Chromeはcookieをデバイス/プロファイルに暗号的に紐付けるため、コピー先ではログインが引き継がれずサインインページに飛ばされる（`--session --restore` の状態復元も同じ理由で「Signed out」扱いになる。2026-07-30実測）
 - 代わりに**専用の永続プロファイル**を全コマンドに毎回付ける: `--profile "C:/Users/nsketch/.agent-browser/profiles/gmail"`（2026-07-30にGmailログイン済み・closeしてもログインは残る）
 - ログインが切れていたら（openの結果がaccounts.google.comになったら）: `--headed` を付けて開き直し、**見えるウィンドウでユーザー本人にログインしてもらう**。デフォルトはheadlessでウィンドウが存在しない点に注意（メールアドレス欄までは `fill` で代行してよい。パスワード以降は本人）

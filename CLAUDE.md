@@ -58,7 +58,8 @@
 - ログイン状態が必要な操作は `--profile Default`（実Chromeセッションのテンポラリコピー方式・close時自動削除で安全。Gmail添付DLまでend-to-end検証済み）
 - ⚠️ **`--profile` は全コマンドに毎回付ける**（付け忘れると別セッションのabout:blankに飛び「Access is denied」でハマる）
 - 実Chrome（claude-in-chrome）を使うのは例外時のみ: ①1Password連携が要る作業（freee等） ②ユーザーと同じ画面を見ながらの作業
-- バージョンはv0.33.0で固定運用。アップデートは動作確認してから（Vercel Labsの実験リポジトリのため）
+- バージョンはv0.34.0で固定運用（2026-08-13更新・動作確認済み: --profileログイン再利用/set viewport/screenshot/upload）。アップデートは動作確認してから（Vercel Labsの実験リポジトリのため）
+- 縦長ページの全項目スクショは `set viewport 1280 3400` → 素の `screenshot` が最良（内部スクロールUIには--fullが効かないため）
 
 ## 作業レポート（必須）
 3ステップ以上のタスク完了時、必ず報告：達成度% / 残スライス数 / 次のアクション / 方針ズレ

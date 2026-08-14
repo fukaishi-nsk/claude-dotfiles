@@ -6,22 +6,27 @@ CLAUDE.md・settings.json・主要スキルをここで一元管理し、複数P
 
 ## 新しいPCでのセットアップ
 
-前提: GitHub認証（`gh auth login` またはSSH鍵）が済んでいること。
+人間がやるのは2つだけ: **①Claude Codeをインストールしてログイン ②下のプロンプトを丸ごとコピペ**。残りはClaude Codeが実行する。
 
-```bash
-git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles
-~/claude-dotfiles/setup.sh
+```
+新PCにclaude-dotfilesをセットアップして。手順:
+1. GitHub認証を確認（gh auth status）。未認証なら gh auth login を案内して私に操作させて
+2. git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles
+3. ~/claude-dotfiles/setup.sh を実行（既存ファイルは.bakに退避されるので安全）
+4. 検証: readlink ~/.claude/CLAUDE.md が正本を指すこと、~/.claude/skills/*/SKILL.md がsymlinkであること
+5. 前提ツールの確認: agent-browserが無ければHomebrewで導入を提案（v0.34.0）。Gmailログイン済みChromeの有無も確認
+6. README.mdの「setup.shが同期しないもの」を読んで、このPCで追加対応が要るものを私に一覧で報告
+7. 完了したらClaude Codeの再起動を私に促す
 ```
 
-- `setup.sh` は `~/.claude/CLAUDE.md`・`~/.claude/settings.json`・`~/.claude/skills/*/SKILL.md` に正本へのsymlinkを張る
-- そのPCに既存の設定ファイルがあれば `.bak` に退避される（上書き消去はされない）
-- 実行後、Claude Codeを再起動する
+以降はSessionStartフック（settings.jsonに同梱）がセッション開始ごとに自動でpull＋setup.shを走らせる。**pushだけは手動**（編集したらその場でcommit＋push）。
 
-### セットアップ後の検証（Claude Codeにやらせる）
+### setup.shが同期しないもの（新PCで個別対応）
 
-1. `readlink ~/.claude/CLAUDE.md` が `~/claude-dotfiles/CLAUDE.md` を指すこと
-2. `~/.claude/skills/*/SKILL.md` が正本へのsymlinkであること
-3. 新しいセッションでCLAUDE.mdの内容が読み込まれ、`/email-draft` `/gmail-attachment-dl` 等のスキルが認識されること
+- **前提ツール**: agent-browser（Homebrew・v0.34.0）、Gmailログイン済みの実Chrome
+- **ローカルMCP**（notion/grok）: `claude mcp` で個別登録
+- **スケジュール登録**: 手順書は同期されるが実行時刻の登録はPCごと。**他PCとの二重実行に注意**
+- **プロジェクトメモリ**（`~/.claude/projects/*/memory`）: 同期されない。必要ならzip→マイドライブ方式（フォルダ名の `-Users-<ユーザー名>-` リネーム必須）
 
 ## 運用ルール（正本はCLAUDE.mdの「dotfiles運用」セクション）
 
@@ -34,7 +39,7 @@ git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles
 
 | スキル | 前提 |
 |---|---|
-| gmail-attachment-dl | agent-browser（メインPCはHomebrew導入・**v0.33.0固定運用**）＋ Gmailログイン済みの実Chrome（`--profile Default`で参照） |
+| gmail-attachment-dl | agent-browser（メインPCはHomebrew導入・**v0.34.0固定運用**）＋ Gmailログイン済みの実Chrome（`--profile Default`で参照） |
 | email-draft | Gmailコネクタ（claude.ai側の接続なのでPC非依存） |
 
 新しいPCで前提ツールが無い場合は、Claude Codeが導入を提案してから作業に入ること。

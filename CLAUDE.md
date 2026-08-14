@@ -39,6 +39,7 @@
 ## 運用ルール
 - **案件切り替え時は `/clear` を叩く**: 別案件の文脈を混ぜない
 - **長いセッションでは `/usage` でコンテキスト消費を確認**: 必要に応じて `/clear` または `/compact` する
+- **`.env` の読み書きは両方OK**（2026-08-15制定）: APIキーの追記・編集をClaudeが直接行ってよい。ただし既存の値を消さない・上書き前に現状を読むこと
 
 ## dotfiles運用（git管理・複数PC同期 / 2026-07-30制定）
 - この CLAUDE.md・settings.json・主要スキルの**正本は `~/claude-dotfiles`**（github.com/fukaishi-nsk/claude-dotfiles・プライベート）。`~/.claude/` 配下はシンボリックリンク

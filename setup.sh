@@ -7,6 +7,19 @@ set -e
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 CLAUDE_DIR="$HOME/.claude"
 
+# OS判定: macOS(BSD ln) と Windows Git Bash(GNU ln) でsymlinkの張り方が違う
+case "$(uname -s)" in
+  Darwin) OS_KIND=mac ;;
+  MINGW*|MSYS*|CYGWIN*) OS_KIND=windows ;;
+  *) OS_KIND=linux ;;
+esac
+
+# Windows: MSYSのlnはデフォルトで「コピー」を作ってしまうため、NTFSの本物のsymlinkを強制する
+# （要 Developer Mode。無効だとlnが失敗し、link_file内の検証で止まる）
+if [ "$OS_KIND" = windows ]; then
+  export MSYS=winsymlinks:nativestrict
+fi
+
 echo "📦 Claude Code dotfiles をセットアップします"
 echo "   ソース: $DOTFILES_DIR"
 echo "   ターゲット: $CLAUDE_DIR"
@@ -25,7 +38,17 @@ link_file() {
     echo "  ⚠️  既存ファイルをバックアップ: $dest → ${dest}.bak"
     mv "$dest" "${dest}.bak"
   fi
-  ln -sfh "$src" "$dest"
+  if [ "$OS_KIND" = mac ]; then
+    ln -sfh "$src" "$dest"  # BSD ln: -h でsymlink自身を置き換え
+  else
+    ln -sfn "$src" "$dest"  # GNU ln: -n が BSD の -h 相当
+  fi
+  # symlink作成が黙ってコピーにフォールバックしていないか検証（Windowsで起こりうる）
+  if [ ! -L "$dest" ]; then
+    echo "  ❌ symlinkを作成できませんでした: $dest"
+    echo "     Windowsの場合: 設定 > システム > 開発者向け で「開発者モード」を有効にして再実行してください"
+    exit 1
+  fi
   echo "  ✅ $dest → $src"
 }
 

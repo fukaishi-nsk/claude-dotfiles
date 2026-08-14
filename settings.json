@@ -5,9 +5,9 @@
   },
   "permissions": {
     "additionalDirectories": [
-      "/Users/fukaishi_macmini/.claude",
-      "/Users/fukaishi_macmini/claude-dotfiles",
-      "/Users/fukaishi_macmini/Downloads"
+      "~/.claude",
+      "~/claude-dotfiles",
+      "~/Downloads"
     ],
     "allow": [
       "Bash(npx wrangler deploy*)",
@@ -104,7 +104,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude Code が確認を待っています\" with title \"Claude Code\" sound name \"Submarine\"'"
+            "command": "if command -v osascript >/dev/null 2>&1; then osascript -e 'display notification \"Claude Code が確認を待っています\" with title \"Claude Code\" sound name \"Submarine\"'; else powershell.exe -NoProfile -Command \"Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; \\$n = New-Object System.Windows.Forms.NotifyIcon; \\$n.Icon = [System.Drawing.SystemIcons]::Information; \\$n.Visible = \\$true; \\$n.ShowBalloonTip(4000, 'Claude Code', 'Claude Code is waiting for your confirmation', 'Info'); Start-Sleep 5; \\$n.Dispose()\" >/dev/null 2>&1; fi"
           }
         ]
       }

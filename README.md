@@ -23,7 +23,7 @@ CLAUDE.md・settings.json・主要スキルをここで一元管理し、複数P
 
 ### setup.shが同期しないもの（新PCで個別対応）
 
-- **前提ツール**: agent-browser（Homebrew・v0.34.0）、Gmailログイン済みの実Chrome
+- **前提ツール**: agent-browser（Mac=Homebrew / Win=npm＋Node・v0.34.0固定）、Gmailログイン済みの実Chrome（Winは初回に専用永続プロファイルへ本人ログインが必要＝gmail-attachment-dlスキルのWindows差分参照）
 - **ローカルMCP**（notion/grok）: `claude mcp` で個別登録
 - **スケジュール登録**: 手順書は同期されるが実行時刻の登録はPCごと。**他PCとの二重実行に注意**
 - **プロジェクトメモリ**（`~/.claude/projects/*/memory`）: 同期されない。必要ならzip→マイドライブ方式（フォルダ名の `-Users-<ユーザー名>-` リネーム必須）
@@ -39,7 +39,7 @@ CLAUDE.md・settings.json・主要スキルをここで一元管理し、複数P
 
 | スキル | 前提 |
 |---|---|
-| gmail-attachment-dl | agent-browser（メインPCはHomebrew導入・**v0.34.0固定運用**）＋ Gmailログイン済みの実Chrome（`--profile Default`で参照） |
+| gmail-attachment-dl | agent-browser **v0.34.0固定運用**（Mac=Homebrew / Win=npm）＋ Gmailログイン状態（Mac=`--profile Default`で実Chrome参照 / Win=専用永続プロファイル`$HOME/.agent-browser/profiles/gmail`に初回のみ本人ログイン） |
 | email-draft | Gmailコネクタ（claude.ai側の接続なのでPC非依存） |
 
 新しいPCで前提ツールが無い場合は、Claude Codeが導入を提案してから作業に入ること。

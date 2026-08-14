@@ -13,9 +13,10 @@ description: Gmailメールの添付ファイルをagent-browserで自動ダウ�
 
 ## Windows機での前提差分（2026-07-30制定・Win機でend-to-end実証済み）
 
-- 導入はnpmで固定バージョン: `npm install -g agent-browser@0.34.0`（HomebrewはMacのみ。⚠Win機での0.34.0は未検証＝更新時はGmail添付DLの動作確認をしてから。確認まで0.33.0のままでも可）
-- ⚠️ Windows機では `--profile Default` 方式（実Chromeのテンポラリコピー）は**使えない**。Windows版Chromeはcookieをデバイス/プロファイルに暗号的に紐付けるため、コピー先ではログインが引き継がれずサインインページに飛ばされる（`--session --restore` の状態復元も同じ理由で「Signed out」扱いになる。2026-07-30実測）
-- 代わりに**専用の永続プロファイル**を全コマンドに毎回付ける: `--profile "C:/Users/nsketch/.agent-browser/profiles/gmail"`（2026-07-30にGmailログイン済み・closeしてもログインは残る）
+- 導入はnpmで固定バージョン: `npm install -g --allow-scripts=agent-browser agent-browser@0.34.0`（HomebrewはMacのみ・公式docsにもWin用インストーラは無くnpmが正規ルート: agent-browser.dev/installation）。⚠npm 11以降は`--allow-scripts`を付けないとpostinstall＝ネイティブバイナリ取得が黙ってブロックされる。Node未導入なら先に`winget install OpenJS.NodeJS.LTS`。実Chromeが入っていれば`agent-browser install`（Chrome for Testing取得）は不要＝実Chromeを自動検出して使う
+- 0.34.0はWin機でも検証済み（2026-08-14 sinse機: npm導入・実Chrome自動検出・永続プロファイルのログイン持続・open/get/closeを確認。添付DL手順は下記＝nsketch機実証済みの型のまま）
+- ⚠️ Windows機では `--profile Default` 方式（実Chromeのテンポラリコピー）は**使えない**。Windows版Chromeはcookieをデバイス/プロファイルに暗号的に紐付けるため、コピー先ではログインが引き継がれずサインインページに飛ばされる（`--session --restore` の状態復元も同じ理由で「Signed out」扱いになる。2026-07-30実測。原因はChrome 127+の**App-Bound Encryption**＝Cookie暗号鍵がUser Dataの正規パスに紐付き、コピー先では復号不能。2026-08-14特定）
+- 代わりに**専用の永続プロファイル**を全コマンドに毎回付ける: `--profile "$HOME/.agent-browser/profiles/gmail"`（⚠ユーザー名がPCごとに違うため$HOMEで書くこと。同一パスで使い続ける限り暗号化は自己整合するので、closeしてもログインは残る。ログイン済み: nsketch機2026-07-30・sinse機2026-08-14）
 - ログインが切れていたら（openの結果がaccounts.google.comになったら）: `--headed` を付けて開き直し、**見えるウィンドウでユーザー本人にログインしてもらう**。デフォルトはheadlessでウィンドウが存在しない点に注意（メールアドレス欄までは `fill` で代行してよい。パスワード以降は本人）
 - `open` が「os error 10060」でタイムアウトする時は残骸デーモンが原因: `agent-browser close --all` で掃除してから再試行
 

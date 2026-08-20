@@ -58,6 +58,7 @@
 - **ブラウザ操作はagent-browserでまずやる**（Homebrew導入済み・Codexと共用。使う前に `agent-browser skills get core` を読む）
 - ログイン状態が必要な操作は、**Macは `--profile Default`**（実Chromeのテンポラリコピー方式・close時自動削除で安全。Gmail添付DLまでend-to-end検証済み）／**Windowsは専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"`**（コピー方式はChromeのApp-Bound Encryptionで不成立。詳細はgmail-attachment-dlスキルのWindows差分）
 - ⚠️ **`--profile` は全コマンドに毎回付ける**（付け忘れると別セッションのabout:blankに飛び「Access is denied」でハマる）
+- ⚠️ **Windows機では、ブラウザを(再)起動させるコマンドだけ `Start-Process -WindowStyle Hidden` でデタッチ実行**（Claude等のシェルツールから直接叩くと、spawnされたChromeがstdoutを継承しChrome終了までブロック＝「ハング」に見える。0.33/0.34両方で実測 2026-08-20 nsketch機）。起動済みブラウザへのコマンドは普通に叩ける。型は「デタッチで裸の`open`→通常の`navigate`」。詳細はgmail-attachment-dlスキルのWindows差分
 - 実Chrome（claude-in-chrome）を使うのは例外時のみ: ①1Password連携が要る作業（freee等） ②ユーザーと同じ画面を見ながらの作業
 - バージョンはv0.34.0で固定運用（2026-08-13更新・動作確認済み: --profileログイン再利用/set viewport/screenshot/upload）。アップデートは動作確認してから（Vercel Labsの実験リポジトリのため）
 - 縦長ページの全項目スクショは `set viewport 1280 3400` → 素の `screenshot` が最良（内部スクロールUIには--fullが効かないため）

@@ -19,6 +19,13 @@ description: Gmailメールの添付ファイルをagent-browserで自動ダウ�
 - 代わりに**専用の永続プロファイル**を全コマンドに毎回付ける: `--profile "$HOME/.agent-browser/profiles/gmail"`（⚠ユーザー名がPCごとに違うため$HOMEで書くこと。同一パスで使い続ける限り暗号化は自己整合するので、closeしてもログインは残る。ログイン済み: nsketch機2026-07-30・sinse機2026-08-14）
 - ログインが切れていたら（openの結果がaccounts.google.comになったら）: `--headed` を付けて開き直し、**見えるウィンドウでユーザー本人にログインしてもらう**。デフォルトはheadlessでウィンドウが存在しない点に注意（メールアドレス欄までは `fill` で代行してよい。パスワード以降は本人）
 - `open` が「os error 10060」でタイムアウトする時は残骸デーモンが原因: `agent-browser close --all` で掃除してから再試行
+- ⚠️ **ブラウザを(再)起動させるコマンドはデタッチ実行が必須**（2026-08-20 nsketch機で0.33/0.34両方実測）。Claude等のシェルツールから直接叩くと、spawnされたChromeがstdoutハンドルを継承し、**Chromeが生きている限りパイプにEOFが来ず、CLIが完走してもツール側は永久ブロック**（＝「ハング」に見える。Chromeをkillした瞬間に出力が届くことで実証済）。型:
+  ```powershell
+  Start-Process -WindowStyle Hidden -FilePath "$env:APPDATA\npm\agent-browser.cmd" -ArgumentList 'open','--profile',"$env:USERPROFILE\.agent-browser\profiles\gmail",'--headed'
+  ```
+  → 数秒待って、以後の `navigate`/`snapshot`/`get`/`download` 等は**普通に叩いて即返る**（起動済みブラウザへのコマンドはspawnしないため）。`close` 後に再度開く時も同じくデタッチから
+- 「A daemon ... started concurrently with different daemon configuration. Retry」や「os error 10061」が消えない時は、close --allでも残るnodeデーモンをkill: `Get-CimInstance Win32_Process -Filter "Name='node.exe'" | ? { $_.CommandLine -like '*agent-browser*' } | % { Stop-Process -Id $_.ProcessId -Force }`
+- アクティブタブがChrome内蔵Geminiパネル(glic)だと `open`/`navigate` が `ERR_BLOCKED_BY_CLIENT` になる → `tab new <url>` で新規タブに開く（このプロファイルはglicタブが自動で開くことがある）
 
 ## 手順（2026-07-27・07-28にend-to-end実証済み）
 

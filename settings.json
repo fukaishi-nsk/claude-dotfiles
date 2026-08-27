@@ -38,10 +38,14 @@
       "mcp__claude_ai_Google_Calendar__search_events",
       "mcp__claude_ai_Google_Calendar__get_event",
       "mcp__claude_ai_Google_Calendar__list_calendars",
+      "mcp__claude_ai_Google_Calendar__create_event",
+      "mcp__claude_ai_Google_Calendar__update_event",
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__list_events",
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__search_events",
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__get_event",
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__list_calendars",
+      "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__create_event",
+      "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__update_event",
 
       "mcp__claude_ai_Google_Drive__*",
       "mcp__ee298b58-2aba-4c0a-ad95-dbb33d87313f__*",
@@ -98,6 +102,8 @@
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__list_folders",
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__get_folder_tree",
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__get_stock_history",
+
+      "mcp__scheduled-tasks__list_scheduled_tasks",
 
       "WebSearch"
     ],

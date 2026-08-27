@@ -1,6 +1,6 @@
 ---
 name: nanco-meeting-import
-description: 平日18:00にnanco顧客会議録をカレンダー起点で自動取込→KB差分案をSlack #log_fukaishi に報告（無人モード）
+description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をSlack #log_fukaishi に報告（無人・権限セーフ版 2026-08-27再作成）
 ---
 
 目的: Nスケッチの「nanco（在庫管理SaaS）」顧客会議の文字起こしを自動取込し、KB更新の差分案を作ってSlackに報告する。これは無人モードの定期実行（平日夕方）。
@@ -8,6 +8,24 @@ description: 平日18:00にnanco顧客会議録をカレンダー起点で自動
 詳細仕様は ~/.claude/skills/import-meeting/SKILL.md に従う（このスケジュール実行は同じMac上＝ローカルなので、skill・各MCPコネクタ・共有ドライブにアクセスできる）。以下は自己完結のための要点再掲。
 
 【実行モード】無人モード（応答する人間がいない）。ブロックする質問はせず、判断できない案件は Slack #log_fukaishi に保留質問を投げて、確実なものだけ処理する。KB本体・顧客マスタは書き換えない（差分案を出すだけ）。創作禁止＝文字起こしに無いことは書かない。
+
+【🔒 権限セーフ運用（このルーティンの生命線・2026-08-27再作成の理由）】
+無人実行では権限確認プロンプトが出た瞬間に実行が停止し、以降の全工程が失われる（実例: 2026-08-26夜の実行は `crontab -l` を含むBash複合コマンドの権限確認で停止）。よって**許可リスト内のツール・コマンドだけで完遂する**こと。
+
+- 使ってよいMCPツール（settings.json の allow と同期・2026-08-27時点）:
+  - Slack: 全ツール可 ／ Google Drive: 全ツール可
+  - Googleカレンダー: list_events / search_events / get_event / list_calendars ＋ create_event / update_event（作成・変更は承認済み返信への対応時のみ）。**delete_event は禁止**
+  - Linear: list_issues / get_issue / list_comments / list_teams / list_users / save_issue / save_comment / prepare_attachment_upload / create_attachment_from_upload（save系は本タスク内ルールどおり承認後のみ）
+  - Gmail: search_threads / get_thread / get_message / list_drafts（読み取りのみ。**下書き作成・送信・転送は禁止**）
+  - Notion: notion-search / notion-fetch / notion-query-data-sources / notion-get-users（読み取りのみ）
+  - nanco: whoami / search_items / get_item / list_folders / get_folder_tree / get_stock_history（読み取りのみ）
+  - scheduled-tasks: list_scheduled_tasks のみ（**登録・変更・削除は無人では禁止**）
+- Bashは次のコマンドだけ: ls / cat / head / tail / find / grep / rg / wc / awk / sed / stat / file / date / echo / iconv / python3 / jq / git status / git diff / git log / git pull
+  - **禁止の代表例: crontab / mkdir / mv / cp / rm / curl / open / npm / git add / git commit / git push**（1つでも混ぜた瞬間に権限確認で全体が止まる）
+  - 複合コマンドは許可コマンド同士でも最小限に。先頭に `cd` を挟まない。ファイルの作成・移動が要る場合は python3（shutil等）か Drive MCP を使う
+  - 巨大なtool-result退避ファイルの読解は python3 のスライス読みでよい（許可済み）
+- dotfiles・settings.json・スケジュール登録の変更、メール送信・下書き、削除系操作（delete_event / trash系 / delete_item 等）は**無人実行では一切やらない**。必要だと判断したら実行せず、Slack報告の「⚠️権限スキップ」欄に「何をしようとして・なぜ必要か」を書いて人に回す
+- それでも想定外の権限確認に行き当たったら、**その1操作だけを諦めて先へ進み**、同じく「⚠️権限スキップ」欄に記録する（ルーティン全体を道連れにしない）
 
 【手順】
 0. **返信の取り込み（双方向）**: 実行冒頭に Slack #log_fukaishi（channel_id `C03119VSJGK`）の直近(~20件・スレッド含む)を読み、前回までの保留質問への深石さんの返信（「①OK」「○○作成して」等の明確な承認）があれば、その新規顧客のフォルダ作成＋取込＋（新規なら）総合AIプロファイル生成を今回の実行で行い、当該スレッドに「✅ご返信を受けて取込みました」と報告する。曖昧・否定・無返信は実行しない。
@@ -41,6 +59,6 @@ description: 平日18:00にnanco顧客会議録をカレンダー起点で自動
    - 🚨 **起票は例外なく重複チェックしてから**。「自分が候補として出した」「承認をもらった」は確認済みの意味ではない
    - 参照: [[feedback_verify_status_at_source]] / [[feedback_verify_at_message_level]]
 
-6. Slack #log_fukaishi に報告: 取込件数・顧客名・配置先パス／KB差分案（「未反映の案」と明記）／**Linearイシュー候補（未起票・スレッドへ）**／保留にしたもの（顧客特定不可・新規顧客の作成可否）。**保留（要対応）がある回は本文冒頭に `<@U02PBGQ62BB>`（fukaishi）メンションを付ける**。親メッセージはサマリだけ（要返信→取込→スキップの順）・詳細（KB差分案・イシュー候補）はスレッド返信(thread_ts)に逃がす。保留には返信方法（例「①OK」＝作成して取込）を明記。新着が無ければ投稿しなくてよい。
+6. Slack #log_fukaishi に報告: 取込件数・顧客名・配置先パス／KB差分案（「未反映の案」と明記）／**Linearイシュー候補（未起票・スレッドへ）**／保留にしたもの（顧客特定不可・新規顧客の作成可否）／**⚠️権限スキップ（あれば）＝権限確認が必要で見送った操作とその理由**。**保留（要対応）がある回は本文冒頭に `<@U02PBGQ62BB>`（fukaishi）メンションを付ける**。親メッセージはサマリだけ（要返信→取込→スキップの順）・詳細（KB差分案・イシュー候補）はスレッド返信(thread_ts)に逃がす。保留には返信方法（例「①OK」＝作成して取込）を明記。新着が無ければ投稿しなくてよい。
 
 【成功基準】当日のnanco顧客会議が 06_Recording に重複なく取り込まれ、Slack #log_fukaishi に結果（または保留質問）が出ること。迷うものは取り込まず Slack に回す。

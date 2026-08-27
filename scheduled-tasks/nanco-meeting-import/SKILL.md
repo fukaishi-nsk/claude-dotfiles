@@ -20,7 +20,7 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
   - Notion: notion-search / notion-fetch / notion-query-data-sources / notion-get-users（読み取りのみ）
   - nanco: whoami / search_items / get_item / list_folders / get_folder_tree / get_stock_history（読み取りのみ）
   - scheduled-tasks: list_scheduled_tasks のみ（**登録・変更・削除は無人では禁止**）
-- Bashは次のコマンドだけ: ls / cat / head / tail / find / grep / rg / wc / awk / sed / stat / file / date / echo / iconv / python3 / jq / git status / git diff / git log / git pull
+- Bashは次のコマンドだけ: ls / cat / head / tail / find / grep / rg / wc / awk / sed / stat / file / date / echo / iconv / python3 / jq / git status / git diff / git log / git pull / agent-browser（5.8のOAM直読み専用。chat.line.biz以外のサイトを開かない・sleepで粘らない）
   - **禁止の代表例: crontab / mkdir / mv / cp / rm / curl / open / npm / git add / git commit / git push**（1つでも混ぜた瞬間に権限確認で全体が止まる）
   - 複合コマンドは許可コマンド同士でも最小限に。先頭に `cd` を挟まない。ファイルの作成・移動が要る場合は python3（shutil等）か Drive MCP を使う
   - 巨大なtool-result退避ファイルの読解は python3 のスライス読みでよい（許可済み）
@@ -52,6 +52,19 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
      - 判別は **ファイル名**で行う。`【M月D日の更新まとめ】…` 以外のタイトルが付いた Slackbot 投稿は**すべて `slack_read_file` で開く**（投稿時刻もヒント＝ダイジェストは毎朝9:00台に集中し、それ以外の時刻の Slackbot 投稿は顧客メールを疑う）
      - 顧客メールを見つけたら **Gmail側でも該当スレッドを照会し、`UNREAD` か・以降に送信メッセージがあるかを実体確認**してから「未返信」と報告する（Slack転写だけで断定しない → [[feedback_verify_at_message_level]]）
      - 実例: 2026-08-07 20:17 `Re: 【nanco】無料お試し期間の延長について（プラユスフィール様）` ＝ 小岸さまからのBETA入出荷の仕様質問3点。土日を挟み3日間、未返信のまま埋もれていた
+5.8. **GREENING OAM直読み（毎回・2026-08-27追加）**: 「在庫nanco⇔GREENING」グループは、GREENING側メンバー（会社用LINE=LINE WORKSとみられる「Unknown」表示の2名）の発言に**LINEからWebhookが配信されず、Slackに転写されない**（姉崎さん・深石さんなどLINEユーザーの発言は従来どおり転写される）。そのためこのグループだけ chat.line.biz（LINE OAM）を直接読む。経緯: `カスタマー/_LINE取込ボット_提案/不具合調査_20260827_GREENING転写欠落.md`
+   - 手順（agent-browserは**全コマンドに `--profile Default` を毎回付ける**・実チェックは読み取りのみで送信しない）:
+     1. `agent-browser --profile Default open https://chat.line.biz/` → `agent-browser --profile Default wait --load networkidle`
+     2. `agent-browser --profile Default snapshot -i` でチャット一覧を出し、「在庫nanco⇔GREENING」を `click @eN` で開いて `snapshot` で本文を読む
+     3. 前回実行（前営業日夕方）以降の新着のうち、**送信者が「Unknown」の発言**を拾う（名前付き送信者の分はline-relayがSlack転写済み＝二重報告しない）
+     4. 拾った発言は日時＋全文をSlack報告のLINE巡回欄に **「GREENING OAM直読み（Slack転写外）」** と明記して載せる。新着ゼロなら「GREENING OAM直読み: 新着なし（最終メッセージ: <日時>）」と最終メッセージ時刻を根拠付きで書く
+     5. 終わったら `agent-browser --profile Default close`（失敗しても無視してよい）
+   - 🚨 **認証・障害で止まらないためのルール（このステップの生命線）**:
+     - 開いた画面が**ログイン画面**（メールアドレス/パスワード入力・アカウント選択・reCAPTCHA等）だったら、**ログイン操作・認証情報入力・CAPTCHA操作を絶対にしない**。この工程だけを打ち切り、報告に「⚠️OAM要再ログイン（chat.line.bizのセッション切れ。深石さんがChromeで chat.line.biz を開いて再ログインすれば次回から復活）」と書いて先へ進む
+     - agent-browserコマンドがエラーまたは権限拒否になったら**リトライは1回まで**。それでも失敗したらこの工程を打ち切り「⚠️権限スキップ」欄に記録して先へ進む（ルーティン全体を道連れにしない）
+     - 応答待ちで粘らない（sleep連打・ポーリング禁止）。ハング気味なら打ち切り→報告
+   - GREENING以外のグループでも「Unknown」送信者を見つけたら、同様にOAMで読んだ上で「新たなWebhook欠落グループの疑い」として報告に挙げる
+
 5.9. **報告を書く前の必須確認（2026-08-24追加・この日5件の誤報を出した反省）**
    - 🚨 **持ち越し項目は、報告文を書く前に必ず一次情報を引き直す。前回の自分のSlack報告からのコピーは禁止**。Linearイシューは `get_issue` で `status` と `completedAt` の実値を見て、報告に添える。2026-08-24は NANCO-1883 を「In Review・期日超過・5回目の持ち越し」と書いたが **4日前(8/20 11:37)に Done 済み**だった＝Linearを一度も引かずに8/19の自分の報告を引き写していた
    - 🚨 **「未起票」と書く前に `list_issues` で検索する**。同日に「②プラユスフィールの請求分割は未起票」と報告して起票したが、**NANCO-2051 として既に起票済み**（しかも既存の方が詳しかった）→ NANCO-2077 は Duplicate 処理になった

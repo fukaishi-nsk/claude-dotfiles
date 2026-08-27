@@ -33,6 +33,7 @@
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git pull:*)",
+      "Bash(agent-browser:*)",
 
       "mcp__claude_ai_Google_Calendar__list_events",
       "mcp__claude_ai_Google_Calendar__search_events",

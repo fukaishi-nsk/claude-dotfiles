@@ -34,7 +34,7 @@ cd ~/claude-dotfiles && git pull && bash launchd/notta-inbox-datestamp/install.s
 - 同じ `mv` を**対話シェル（Claudeセッションのbash）から実行すると定着する**。差はプロセス文脈のみ＝File Provider が launchd 起動プロセスの書き込みを同期対象にしない挙動と推測（TCC関連の可能性・根本原因は未特定）
 - 定時実行（StartInterval）はそもそもログに痕跡が無い（mvが失敗を返している可能性。mv失敗時はログされない設計だった）
 
-**当面の運用**: 日付なしファイルは notta-check スキルの手順どおり**セッション内で手動改名**する。恒久対策の候補: ①scheduled-tasks（Claude定期実行）に日付付与を組み込む（対話シェル文脈なので定着する見込み） ②Drive APIで改名するスクリプトに変更（File Provider を経由しない） ③本ジョブの廃止。→ 深石さんの判断待ち
+**恒久対策=②Drive API改名を実施済み（2026-08-28・深石さん承認）**: **GAS版へ移行**（正本: `gas/notta-inbox-datestamp/`・fukaishiアカウントのApps Scriptで毎時実行・テスト改名の定着まで検証済み）。本launchdジョブは撤去操作が未承認のため**Mac miniでロードされたまま並走中**（mvは巻き戻るだけで実害なし）。GAS版の安定確認後、下記「解除」手順での撤去を推奨。
 
 ## 解除
 

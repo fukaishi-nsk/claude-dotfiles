@@ -29,12 +29,12 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
   - Gmail: search_threads / get_thread / get_message / list_drafts（読み取りのみ。**下書き作成・送信・転送は禁止**）
   - Notion: notion-search / notion-fetch / notion-query-data-sources / notion-get-users（読み取りのみ）
   - nanco: whoami / search_items / get_item / list_folders / get_folder_tree / get_stock_history（読み取りのみ）
-  - scheduled-tasks: list_scheduled_tasks のみ（登録・変更・削除は **deny 済み**＝叩いても拒否されるだけ）
+  - scheduled-tasks: list_scheduled_tasks のみ使用可。登録・変更（create/update）は2026-08-28夕にallow化されたが**本タスクでは使用禁止**。削除（delete）は **deny 済み**＝叩いても拒否されるだけ
 - **🛑 `ask` に置かれている＝踏むと無人実行が止まるもの（絶対に踏まない）**
   - Gmail の **送信・返信・転送**（`send_message` / `reply` / `forward`）。※**下書き作成 `create_draft` は allow 済み**（下書きは送信ではないため。ただし本ルーティンでは作らない）
   - nanco 在庫の**書き込み系**（`adjust_stock` / `bulk_create_items` / `bulk_update_items` / `archive_items` / `merge_items` / `reconcile_items`）
 - **🚫 `deny` に置かれている＝拒否されるだけ・止まらない（踏んでも先へ進めばよい）**
-  - `rm` / `sudo` / `git push --force` / **`crontab`**、scheduled-task の登録・変更・削除
+  - `rm` / `sudo` / `git push --force` / **`crontab`**、scheduled-task の削除（登録・変更create/updateは2026-08-28夕からallow＝denyではないが、本タスクでは使わない）
   - 削除系MCP（`delete_item` / `delete_folder` / `delete_event` / `delete_comment` / `trash_message` / `trash_thread` / `trash_file` / `mark_*_spam`）
 - Bashは次のコマンドだけ: ls / cat / head / tail / find / grep / rg / wc / awk / sed / stat / file / date / echo / iconv / python3 / jq / git status / git diff / git log / git pull / agent-browser（5.8のOAM直読み専用。chat.line.biz以外のサイトを開かない・sleepで粘らない）
   - 🚨 **python3 は必ず `python3 -c "…"` の1行形式で呼ぶ。heredoc（`python3 - <<'EOF'`）は禁止**＝allowのマッチから漏れて止まる（2026-08-27の停止原因）

@@ -112,6 +112,8 @@
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__get_stock_history",
 
       "mcp__scheduled-tasks__list_scheduled_tasks",
+      "mcp__scheduled-tasks__create_scheduled_task",
+      "mcp__scheduled-tasks__update_scheduled_task",
 
       "WebSearch"
     ],
@@ -132,9 +134,6 @@
       "Bash(sudo:*)",
       "Bash(git push --force:*)",
       "Bash(crontab:*)",
-
-      "mcp__*__create_scheduled_task",
-      "mcp__*__update_scheduled_task",
 
       "mcp__*__delete_item",
       "mcp__*__delete_folder",

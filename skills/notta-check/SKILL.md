@@ -17,6 +17,7 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 - Geminiメモの話者ラベルもNotta同様に誤りうる。文脈と矛盾する発言は断定しない
 - 使い分けの原則（2026-08-12 深石さん）: **Nスケッチ主催＝Google Meet**（文字起こし・録画はMeet Recordingsへ）／**クライアント主催・クライアント都合＝Nottaを参加させる**（Notta_Inboxへ着弾）
 - **同じ会議が両方に記録されることがある**。実例: `260810_[湯本]相談`・`GSI棚卸し_260803_*` はNotta_Inboxの.txtとMeet Recordings側の同名.gdocの両方にある。逆に社内のN朝会の文字起こしがNotta_Inbox側に着弾している例もある → 見つからない・判断に迷うときは両方を確認する
+- **`会議名 - YYYY-MM-DD HH:MM:SS.gdoc`（秒までのタイムスタンプ形式）もMeet Recordingsに着弾する**（2026-08-28 島津第五回で確認）。これはGeminiメモとは別物で、**Notta形式（⏰日時・分数・実名話者）の文字起こしDoc**。**Teams会議でも生成され**、Notta_Inboxの.txtより早い（実例: 会議終了5分後にgdoc着弾、.txtは1時間後も未着）。読み方は同じ（catでdoc_id→read_file_content）。Notta_Inboxに.txtが無くてもこちらに全文があることがある
 
 ## ⚠️ 探し方の鉄則（2026-08-28 島津第四回の見落としから）
 

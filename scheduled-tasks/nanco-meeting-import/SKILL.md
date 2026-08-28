@@ -1,6 +1,6 @@
 ---
 name: nanco-meeting-import
-description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をSlack #log_fukaishi に報告（無人・権限セーフ版 2026-08-27再作成）
+description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をSlack #log_fukaishi に報告（無人・権限セーフ版 2026-08-28改訂：defaultMode auto＋deny前提）
 ---
 
 目的: Nスケッチの「nanco（在庫管理SaaS）」顧客会議の文字起こしを自動取込し、KB更新の差分案を作ってSlackに報告する。これは無人モードの定期実行（平日夕方）。
@@ -9,8 +9,18 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
 
 【実行モード】無人モード（応答する人間がいない）。ブロックする質問はせず、判断できない案件は Slack #log_fukaishi に保留質問を投げて、確実なものだけ処理する。KB本体・顧客マスタは書き換えない（差分案を出すだけ）。創作禁止＝文字起こしに無いことは書かない。
 
-【🔒 権限セーフ運用（このルーティンの生命線・2026-08-27再作成の理由）】
-無人実行では権限確認プロンプトが出た瞬間に実行が停止し、以降の全工程が失われる（実例: 2026-08-26夜の実行は `crontab -l` を含むBash複合コマンドの権限確認で停止）。よって**許可リスト内のツール・コマンドだけで完遂する**こと。
+【🔒 権限セーフ運用（このルーティンの生命線・2026-08-28に構造ごと作り直し）】
+無人実行では権限確認プロンプトが出た瞬間に実行が停止し、以降の全工程が失われる。
+
+**停止の実績（すべて同じ死に方 `Tool permission request failed: AbortError`）**
+- 2026-08-25 18:06便 … 18:09に `crontab -l` を含む複合Bashで停止（開始3分）。Slack報告ゼロ
+- 2026-08-26 18:06便 … セッション記録なし＝**そもそも走っていない**（原因未特定）
+- 2026-08-27 18:06便 … `python3 - <<'EOF'`（**heredoc**）で停止。翌日に人が手動再開
+
+**2026-08-27に「手順書でコマンドを禁止する」対策をしたが効かなかった。** 真因は手順書ではなく設定層で、`permissions.defaultMode` が未設定＝**新規セッション（＝毎回の定期実行）が「手動」モードで開始**し、許可リストのマッチ漏れ1件がそのまま全体停止になっていた。2026-08-28に `"defaultMode": "auto"` を入れ、危険操作は `deny` でハード固定した。以下はその新しい前提に合わせた運用ルール。
+
+**🚨 いちばん大事な原則: 無人で「止まる」のは `ask` に当たった時だけ。`deny` は拒否されるだけで先へ進める。**
+だから**「絶対にやらせたくないもの」は ask ではなく deny に置いてある**。無人実行のあなたは deny に当たっても慌てず、「⚠️権限スキップ」欄に記録して次へ進むこと。
 
 - 使ってよいMCPツール（settings.json の allow と同期・2026-08-27時点）:
   - Slack: 全ツール可 ／ Google Drive: 全ツール可
@@ -19,12 +29,21 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
   - Gmail: search_threads / get_thread / get_message / list_drafts（読み取りのみ。**下書き作成・送信・転送は禁止**）
   - Notion: notion-search / notion-fetch / notion-query-data-sources / notion-get-users（読み取りのみ）
   - nanco: whoami / search_items / get_item / list_folders / get_folder_tree / get_stock_history（読み取りのみ）
-  - scheduled-tasks: list_scheduled_tasks のみ（**登録・変更・削除は無人では禁止**）
+  - scheduled-tasks: list_scheduled_tasks のみ（登録・変更・削除は **deny 済み**＝叩いても拒否されるだけ）
+- **🛑 `ask` に置かれている＝踏むと無人実行が止まるもの（絶対に踏まない）**
+  - Gmail の **送信・返信・転送**（`send_message` / `reply` / `forward`）。※**下書き作成 `create_draft` は allow 済み**（下書きは送信ではないため。ただし本ルーティンでは作らない）
+  - nanco 在庫の**書き込み系**（`adjust_stock` / `bulk_create_items` / `bulk_update_items` / `archive_items` / `merge_items` / `reconcile_items`）
+- **🚫 `deny` に置かれている＝拒否されるだけ・止まらない（踏んでも先へ進めばよい）**
+  - `rm` / `sudo` / `git push --force` / **`crontab`**、scheduled-task の登録・変更・削除
+  - 削除系MCP（`delete_item` / `delete_folder` / `delete_event` / `delete_comment` / `trash_message` / `trash_thread` / `trash_file` / `mark_*_spam`）
 - Bashは次のコマンドだけ: ls / cat / head / tail / find / grep / rg / wc / awk / sed / stat / file / date / echo / iconv / python3 / jq / git status / git diff / git log / git pull / agent-browser（5.8のOAM直読み専用。chat.line.biz以外のサイトを開かない・sleepで粘らない）
-  - **禁止の代表例: crontab / mkdir / mv / cp / rm / curl / open / npm / git add / git commit / git push**（1つでも混ぜた瞬間に権限確認で全体が止まる）
-  - 複合コマンドは許可コマンド同士でも最小限に。先頭に `cd` を挟まない。ファイルの作成・移動が要る場合は python3（shutil等）か Drive MCP を使う
+  - 🚨 **python3 は必ず `python3 -c "…"` の1行形式で呼ぶ。heredoc（`python3 - <<'EOF'`）は禁止**＝allowのマッチから漏れて止まる（2026-08-27の停止原因）
+  - 🚨 **複合コマンド（`;` や `&&` で繋ぐ）を作らない。1コマンド1呼び出し。** 許可コマンド同士でも、1つでも許可外が混ざると全体が巻き添えになる（2026-08-25の停止原因は、許可コマンド2つに `crontab -l` を継ぎ足した1行だった）
+  - 先頭に `cd` を挟まない。ファイルの作成・移動が要る場合は python3（shutil等）か Drive MCP を使う
   - 巨大なtool-result退避ファイルの読解は python3 のスライス読みでよい（許可済み）
-- dotfiles・settings.json・スケジュール登録の変更、メール送信・下書き、削除系操作（delete_event / trash系 / delete_item 等）は**無人実行では一切やらない**。必要だと判断したら実行せず、Slack報告の「⚠️権限スキップ」欄に「何をしようとして・なぜ必要か」を書いて人に回す
+  - ⚠ **auto モードでも「許可リストにあるのに分類器に止められる」ことがある**（2026-08-28実測: `python3 -c` で settings.json を json.load して権限設定を出力→ブロック）。**権限設定そのものを読む・書く操作は無人では一切やらない**。他の用途で分類器に止められたら、その1操作を諦めて先へ進む
+- dotfilesの編集、settings.json の閲覧・変更、メール送信、削除系操作は**無人実行では一切やらない**。必要だと判断したら実行せず、Slack報告の「⚠️権限スキップ」欄に「何をしようとして・なぜ必要か」を書いて人に回す
+- **自分のタスク以外の面倒を見に行かない**（2026-08-25の停止はこれが発端＝そら植物園のMeetリンク自動送信タスクの状態を調べに行って `crontab -l` を踏んだ）。他タスクの不調に気づいたら、**調査せず「気づき」として1行Slackに書くだけ**にする
 - それでも想定外の権限確認に行き当たったら、**その1操作だけを諦めて先へ進み**、同じく「⚠️権限スキップ」欄に記録する（ルーティン全体を道連れにしない）
 
 【手順】
@@ -50,6 +69,13 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
    - ⚠ 毎朝9時前後にSlackbot経由で届く `【M月D日の更新まとめ】◯◯ | nanco`（no-reply@nanco.io発・顧客ワークスペースごとに十数通のHTML添付）は**プロダクトの日次自動配信＝顧客の声ではない**。新着として開かない・カウントしない（2026-08-06 Mac miniテスト実行で判明）
    - 🚨 **ただし「Slackbot＝ダイジェスト」と決め打ちしないこと**（2026-08-10に危うく顧客メールを取り逃した）。**support@nanco.io 宛の本物の顧客メールも、同じ Slackbot 投稿＋HTMLファイル添付の形でこのチャンネルに届く**（support@→Slack転送は2026-07-13に復旧済み）。line-relay の投稿だけ見ていると丸ごと見落とす
      - 判別は **ファイル名**で行う。`【M月D日の更新まとめ】…` 以外のタイトルが付いた Slackbot 投稿は**すべて `slack_read_file` で開く**（投稿時刻もヒント＝ダイジェストは毎朝9:00台に集中し、それ以外の時刻の Slackbot 投稿は顧客メールを疑う）
+     - 📘 **実務レシピ（毎回同じ壁に当たるので手順を固定する・2026-08-28確立）**
+       1. チャンネルはまず `response_format:"concise"` ＋ `limit:100` で読む（詳細形式は25件で6万字を超えてツール上限に当たる）
+       2. ファイルIDとタイトルが要る範囲だけ、あらためて **detailed ＋ `limit:15`** で読み直す
+       3. 顧客メールHTML（250KB超）は `slack_read_file` が上限超過でファイル退避される。**退避ファイルからのテキスト抽出は下記の1行で行う**（heredocを書かないこと）:
+          `python3 -c "import re,html; p='<退避パス>'; d=open(p,encoding='utf-8',errors='replace').read(); d=re.sub(r'(?is)<(script|style|head)[^>]*>.*?</\1>',' ',d); t=html.unescape(re.sub(r'(?s)<[^>]+>',' ',d)); print('\n'.join([l.strip() for l in t.split('\n') if l.strip()])[:4000])"`
+          → 先頭に `To/Cc/from/subject` のJSONヘッダが出るので、**送信者がこちら側か顧客側か**をそこで判定する（こちらの送信控えも同じ形で流れてくる）
+       4. LINE転写の画像は `slack_read_file` に file_id を渡せば**そのまま画像として見える**（base64を自分でデコードしない）
      - 顧客メールを見つけたら **Gmail側でも該当スレッドを照会し、`UNREAD` か・以降に送信メッセージがあるかを実体確認**してから「未返信」と報告する（Slack転写だけで断定しない → [[feedback_verify_at_message_level]]）
      - 実例: 2026-08-07 20:17 `Re: 【nanco】無料お試し期間の延長について（プラユスフィール様）` ＝ 小岸さまからのBETA入出荷の仕様質問3点。土日を挟み3日間、未返信のまま埋もれていた
 5.8. **GREENING OAM直読み（毎回・2026-08-27追加）**: 「在庫nanco⇔GREENING」グループは、GREENING側メンバー（会社用LINE=LINE WORKSとみられる「Unknown」表示の2名）の発言に**LINEからWebhookが配信されず、Slackに転写されない**（姉崎さん・深石さんなどLINEユーザーの発言は従来どおり転写される）。そのためこのグループだけ chat.line.biz（LINE OAM）を直接読む。経緯: `カスタマー/_LINE取込ボット_提案/不具合調査_20260827_GREENING転写欠落.md`

@@ -78,10 +78,16 @@
       "mcp__claude_ai_Gmail__get_thread",
       "mcp__claude_ai_Gmail__get_message",
       "mcp__claude_ai_Gmail__list_drafts",
+      "mcp__claude_ai_Gmail__get_draft",
+      "mcp__claude_ai_Gmail__create_draft",
+      "mcp__claude_ai_Gmail__update_draft",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__search_threads",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__get_thread",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__get_message",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__list_drafts",
+      "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__get_draft",
+      "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__create_draft",
+      "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__update_draft",
 
       "mcp__notion__notion-search",
       "mcp__notion__notion-fetch",
@@ -118,19 +124,17 @@
       "mcp__*__reconcile_items",
 
       "mcp__*__send_message",
-      "mcp__*__create_draft",
-      "mcp__*__update_draft",
       "mcp__*__reply",
-      "mcp__*__forward",
-
-      "Bash(crontab:*)",
-      "mcp__*__create_scheduled_task",
-      "mcp__*__update_scheduled_task"
+      "mcp__*__forward"
     ],
     "deny": [
       "Bash(rm:*)",
       "Bash(sudo:*)",
       "Bash(git push --force:*)",
+      "Bash(crontab:*)",
+
+      "mcp__*__create_scheduled_task",
+      "mcp__*__update_scheduled_task",
 
       "mcp__*__delete_item",
       "mcp__*__delete_folder",

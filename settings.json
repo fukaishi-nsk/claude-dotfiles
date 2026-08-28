@@ -4,6 +4,7 @@
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "permissions": {
+    "defaultMode": "auto",
     "additionalDirectories": [
       "~/.claude",
       "~/claude-dotfiles",
@@ -109,20 +110,38 @@
       "WebSearch"
     ],
     "ask": [
-      "mcp__*__delete_item",
-      "mcp__*__delete_folder",
       "mcp__*__adjust_stock",
       "mcp__*__bulk_create_items",
       "mcp__*__bulk_update_items",
       "mcp__*__archive_items",
       "mcp__*__merge_items",
       "mcp__*__reconcile_items",
+
+      "mcp__*__send_message",
+      "mcp__*__create_draft",
+      "mcp__*__update_draft",
+      "mcp__*__reply",
+      "mcp__*__forward",
+
+      "Bash(crontab:*)",
+      "mcp__*__create_scheduled_task",
+      "mcp__*__update_scheduled_task"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(sudo:*)",
+      "Bash(git push --force:*)",
+
+      "mcp__*__delete_item",
+      "mcp__*__delete_folder",
+      "mcp__*__delete_event",
+      "mcp__*__delete_comment",
+      "mcp__*__delete_scheduled_task",
       "mcp__*__trash_message",
       "mcp__*__trash_thread",
+      "mcp__*__trash_file",
       "mcp__*__mark_message_spam",
-      "mcp__*__mark_thread_spam",
-      "mcp__*__delete_event",
-      "mcp__*__delete_comment"
+      "mcp__*__mark_thread_spam"
     ]
   },
   "hooks": {

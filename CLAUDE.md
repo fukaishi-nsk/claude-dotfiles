@@ -45,6 +45,7 @@
 - この CLAUDE.md・settings.json・主要スキルの**正本は `~/claude-dotfiles`**（github.com/fukaishi-nsk/claude-dotfiles・プライベート）。`~/.claude/` 配下はシンボリックリンク
 - **編集は必ず正本パス（~/claude-dotfiles/...）へ**。Editツールはsymlink越しの書き込みを拒否する
 - 正本を編集したら**その場で commit＋push**（別PCとの同期漏れ防止）。逆に、dotfiles配下を編集する前には `git pull` で他PCの変更を取り込む
+- **セッション起動時にdotfilesは自動pullされる**（settings.jsonのSessionStartフック・2026-08-14導入・両機有効）: 毎起動で `git pull`＋`setup.sh` 再実行が走る（失敗時は警告表示のみ・起動は止めない）。手動pullが要るのは「長時間セッション中に他PCがpushした分の追い取り込み」と「編集直前の念押し」だけ
 - 別PCの初期設定は2コマンドだけ: `git clone https://github.com/fukaishi-nsk/claude-dotfiles.git ~/claude-dotfiles` → `~/claude-dotfiles/setup.sh`（既存ファイルは.bakに退避してsymlinkを張る）
 - 新しいスキルを作る時は、正本を `~/claude-dotfiles/skills/<名前>/SKILL.md` に置き、`~/.claude/skills/<名前>/SKILL.md` からsymlinkする（setup.shが別PCでも同じ構成を再現する）
 - **Codexにも共有したいスキル**（2026-08-10〜）: setup.sh の `CODEX_SHARED_SKILLS` にスキル名を追加すると `~/.codex/skills/` へ**実ファイルコピー**される（⚠symlinkはCodexがスキルとして認識しない・検証済み）。正本を編集したら setup.sh 再実行でコピー更新。初例＝notta-check

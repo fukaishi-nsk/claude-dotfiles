@@ -1,9 +1,9 @@
 ---
 name: teams-mention-check
-description: artienceのTeams(ADKテナント)@メンションを毎日17時に直読みし、新着を原文のまま・メッセージリンク付きでSlack #2602_artience へ転写する（メール通知カバー率4割→10割化・2026-08-28制定）
+description: artienceのTeams(ADKテナント)@メンションを毎朝9時に直読みし、新着を古い順・原文のまま・メッセージリンク付きでSlack #2602_artience へ転写する（メール通知カバー率4割→10割化・2026-08-28制定）
 ---
 
-目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「巡回は1日1回でよい」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」（すべて2026-08-28）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md。
+目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md。
 
 【実行モード】無人。ブロックする質問はしない。創作禁止＝フィードに無い情報を書かない・**原文を一字も改変しない**（@メンション名の羅列も原文の一部としてそのまま）。判断できない事象は Slack #log_fukaishi（C03119VSJGK）に報告して保留。
 
@@ -43,15 +43,15 @@ description: artienceのTeams(ADKテナント)@メンションを毎日17時に�
    c. epochミリ秒をJSTに変換し、rowの表示時刻（HH:MM/日付）と一致するものが対象メッセージの msgId。スレッドビュー最上部（ルート投稿）のidが parentId。判別できない場合はリンク無しで転写し「（リンク取得失敗）」と付記（リンク欠落を理由に転写を止めない）。
    d. チャンネル名→threadId定数でリンク組み立て。
    e. 次の新着のためにフィードへ戻る（「メンション」を再クリックすればよい）。
-7. 新着あり → `#2602_artience`（C0ANA7AHVRB）へ1回の投稿にまとめて転写。**本文は原文そのまま**（要約・省略・言い換え禁止。snapshotのrow全文を使い、改行は読みやすく保つ）:
+7. 新着あり → `#2602_artience`（C0ANA7AHVRB）へ1回の投稿にまとめて転写。**並び順は古い順（時系列昇順）＝フィードの逆順**。**本文は原文そのまま**（要約・省略・言い換え禁止。snapshotのrow全文を使い、改行は読みやすく保つ）:
    ```
    📣 Teams新着メンション 2件（artience）
 
-   ▪️ 8/28 16:08 松田　理沙子｜WEB関連＞0807 FB
+   ▪️ 8/28 15:47 watanabe｜WEB関連＞0807 FB
    > （ここに原文全文）
    🔗 https://teams.microsoft.com/l/message/…
 
-   ▪️ 8/28 15:47 watanabe｜WEB関連＞0807 FB
+   ▪️ 8/28 16:08 松田　理沙子｜WEB関連＞0807 FB
    > （原文全文）
    🔗 …
    ```
@@ -62,10 +62,10 @@ description: artienceのTeams(ADKテナント)@メンションを毎日17時に�
    `AGENT_BROWSER_SESSION=teams-mention-check agent-browser close --profile Default`（テンポラリプロファイルを削除してディスクを回収）。
 
 【既知の副作用・制約（2026-08-28時点）】
-- 巡回がTeamsのアクティビティを既読化しうるが、1日1回なので影響は限定的＝Teamsの通知メール（即時・約4割）は概ね温存される。**運用の整理: メール＝即時の速報（部分）／本タスク17時巡回＝全量保証（最大約24時間遅れ）**。
+- 巡回がTeamsのアクティビティを既読化しうるが、1日1回なので影響は限定的＝Teamsの通知メール（即時・約4割）は概ね温存される。**運用の整理: メール＝即時の速報（部分）／本タスク毎朝9時巡回＝全量保証（前日9時以降の分を翌朝までに確実に転写）**。
 - 対象はADKテナント（artience）のみ。TANGRAM（NECテナント）は対象外＝従来どおりメール頼み。
 - Chromeプロファイル（約2.1GB）を毎回テンポラリコピーする（1日1回）。
 - 実ChromeのTeamsゲストセッションが失効すると読めない（手順3で検知し赤報告。深石さんがMac miniの実ChromeでTeamsを開き直せば復旧）。
 - 深リンクはTeams標準のランチャー画面（「Webアプリを使用/アプリで開く」）を1枚挟む＝通知メールのリンクと同じ挙動で正常。
 
-【登録状況】2026-08-28 Mac mini（fukaishi_macmini）に cron `0 17 * * *`（毎日17:00 JST）で登録。**MacBook側には登録しない**（二重実行防止）。正本は ~/claude-dotfiles/scheduled-tasks/teams-mention-check/SKILL.md。⚠️~/.claude側のSKILL.mdは**symlinkではなく実ファイルコピー**（スケジューラのpath検査がsymlinkを「path traversal」として拒否するため・2026-08-28発覚）。正本を編集したら `cp` で~/.claude側へ同期すること。初回シード＝2026-08-28（seededBefore=2026-08-28、8/28当日分6件はseen投入済み・#2602_artienceへ転写済み）。
+【登録状況】2026-08-28 Mac mini（fukaishi_macmini）に cron `0 9 * * *`（毎朝9:00 JST）で登録（当初17時→深石さん指示で朝9時へ変更）。**MacBook側には登録しない**（二重実行防止）。正本は ~/claude-dotfiles/scheduled-tasks/teams-mention-check/SKILL.md。⚠️~/.claude側のSKILL.mdは**symlinkではなく実ファイルコピー**（スケジューラのpath検査がsymlinkを「path traversal」として拒否するため・2026-08-28発覚）。正本を編集したら `cp` で~/.claude側へ同期すること。初回シード＝2026-08-28（seededBefore=2026-08-28、8/28当日16:08分までの6件はseen投入済み・#2602_artienceへ転写済み）。

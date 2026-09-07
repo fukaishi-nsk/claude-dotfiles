@@ -16,7 +16,7 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
   形式: {"seen": ["<指紋>", ...], "seededBefore": "YYYY-MM-DD", "lastHeartbeat": "YYYY-MM-DD"} ／ seenは最新60件まで保持（古いものから捨てる）
   指紋の形式: `M/D|発言者|本文の空白・改行を除いた先頭40文字`（⚠️時刻は指紋に入れない＝今日の投稿はHH:MM表示だが翌日以降M/D表示に変わり指紋が揺れるため）
 - ブラウザ: agent-browserを**全コマンド** `AGENT_BROWSER_SESSION=teams-mention-check` プレフィックス＋ `--profile "$HOME/.agent-browser/profiles/gmail"` フラグ付きで実行（専用永続プロファイル方式・2026-09-07〜。専用セッション名により、深石さんや他タスクの agent-browser 既定セッションと衝突しない）。⚠️どちらか片方でも付け忘れると別セッションに飛んで「Access is denied」等でハマる。
-- 🚫 旧方式 `--profile Default`（実Chromeプロファイルのテンポラリコピー起動）は原則使わない＝コピー起動がそのPCの実ChromeのGoogleログインを失効させる（2026-09-07特定）。⚠️専用プロファイルは**PCごとに作成＋本人ログインが必要**。`$HOME/.agent-browser/profiles/gmail` が無いPC（Mac miniは2026-09-07時点で未作成・本人ログイン未実施）では暫定で旧方式 `--profile Default` を使ってよいが、その回の報告に「⚠️専用プロファイル未作成（Mac miniで本人ログインが必要）」を1行添える。専用プロファイルがあるのに開いた結果がサインインページなら、この工程は打ち切って「⚠️セッション失効（要: 本人ログイン）」を #log_fukaishi に報告する。
+- 🚫 旧方式 `--profile Default`（実Chromeプロファイルのテンポラリコピー起動）は原則使わない＝コピー起動がそのPCの実ChromeのGoogleログインを失効させる（2026-09-07特定）。⚠️専用プロファイルは**PCごとに作成＋本人ログインが必要**。`$HOME/.agent-browser/profiles/gmail` が無いPC（Mac mini 2026-09-07 ログイン済み（Google/Teams/LINE OAM））では暫定で旧方式 `--profile Default` を使ってよいが、その回の報告に「⚠️専用プロファイル未作成（Mac miniで本人ログインが必要）」を1行添える。専用プロファイルがあるのに開いた結果がサインインページなら、この工程は打ち切って「⚠️セッション失効（要: 本人ログイン）」を #log_fukaishi に報告する。
 - Teamsリンク定数（2026-08-28に通知メール実物＋DOM照合で確定・リンク着地検証済み）:
   - tenantId（ADK）: `d2456032-f373-4f8d-908c-3b899f0f6097`
   - WEB関連 threadId: `19:7beea823cb6a4c4bb6c805c299711669@thread.tacv2`

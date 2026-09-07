@@ -131,9 +131,27 @@ if [ -d "$HOME/.codex" ]; then
   done
 fi
 
+# Codex共通指示（AGENTS.md）: 正本 codex/AGENTS.md を ~/.codex/AGENTS.md へ実ファイルコピーする（2026-09-07〜）
+# ※ skills と同じく symlink は避ける。ローカルが正本と異なる（空でない）場合は .local-<日時>.bak に退避してから上書き
+if [ -d "$HOME/.codex" ] && [ -f "$DOTFILES_DIR/codex/AGENTS.md" ]; then
+  dest="$HOME/.codex/AGENTS.md"
+  if [ -L "$dest" ]; then
+    rm -f "$dest"
+  fi
+  if [ -f "$dest" ] && [ -s "$dest" ] && ! cmp -s "$DOTFILES_DIR/codex/AGENTS.md" "$dest"; then
+    bak="${dest}.local-$(date +%Y%m%d-%H%M).bak"
+    cp -p "$dest" "$bak"
+    echo "  ⚠️  ローカル編集を退避: $bak"
+  fi
+  if [ ! -f "$dest" ] || ! cmp -s "$DOTFILES_DIR/codex/AGENTS.md" "$dest"; then
+    cp -p "$DOTFILES_DIR/codex/AGENTS.md" "$dest"
+    echo "  ✅ $dest ← $DOTFILES_DIR/codex/AGENTS.md（実ファイルコピー）"
+  fi
+fi
+
 echo ""
 echo "🎉 セットアップ完了！Claude Code を再起動してください。"
 echo "   ※ scheduled-tasks は手順書のみ「実ファイルコピー」で同期されます（symlink禁止・2026-09-07〜）。"
 echo "      スケジュール自体（実行時刻の登録）は PCごとに /schedule または scheduled-tasks コネクタで別途登録してください。"
-echo "   ※ Codex共有スキル（CODEX_SHARED_SKILLS）は実ファイルコピーです。"
+echo "   ※ Codex共有スキル（CODEX_SHARED_SKILLS）と Codex共通指示（codex/AGENTS.md）は実ファイルコピーです。"
 echo "      正本を編集したら setup.sh を再実行してコピーを更新してください。"

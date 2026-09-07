@@ -69,24 +69,45 @@ for skill_dir in "$DOTFILES_DIR/skills"/*/; do
   fi
 done
 
-# scheduled-tasks/ 配下をリンク（定期実行タスクの手順書）
-# ⚠ PCローカルで「実ファイルのまま置きたい」タスクは、そのタスクの
-#    ~/.claude/scheduled-tasks/<名前>/.local-realfile を置くとリンクをスキップする。
-#    理由: scheduled-tasks の登録・更新ツールが symlink 越しの書き込みを拒否するため、
-#    そのPCでスケジュール登録しているタスクは実ファイルでないと update できない。
-#    （2026-09-07 追加。それまでは毎SessionStartのsetup.shが実ファイルをsymlinkに戻していた）
+# scheduled-tasks/ 配下は「実ファイルコピー」で同期する（定期実行タスクの手順書）
+# 🚫 symlink は禁止（2026-09-07 に方式変更）。理由:
+#    Claude デスクトップアプリのスケジューラが symlink の SKILL.md を
+#    「symlink detected before open; refusing to open」で拒否し、lastRunAt だけ刻んで
+#    セッションを起こさない＝サイレント停止する。claude-code 2.1.258 が入った
+#    2026-09-03 09:01 から発生し、9/3〜9/7 の nanco-meeting-import / teams-mention-check /
+#    sora-meet-link-share が全便沈黙した（~/Library/Logs/Claude/main.log で確認）。
+#    それまでの setup.sh は毎 SessionStart に実ファイルを symlink へ戻していたため、
+#    手で実ファイル化しても次のセッションで元に戻り、原因が見えにくかった。
+#    （加えて scheduled-tasks の登録・更新ツールも symlink 越しの書き込みを拒否する）
+# 運用:
+#    ・正本は dotfiles。編集は必ず正本へ。setup.sh が毎 SessionStart にここへコピーして追従する
+#    ・ローカルが正本と異なる実ファイルだった場合は SKILL.md.local-<日時>.bak に退避してから上書き
+#      （update_scheduled_task 等でローカルを直接編集した内容を黙って消さないため）
+#    ・旧 .local-realfile マーカーは不要になった（残っていても無害）
 for task_dir in "$DOTFILES_DIR/scheduled-tasks"/*/; do
   if [ -d "$task_dir" ]; then
     task_name=$(basename "$task_dir")
     dest_task_dir="$CLAUDE_DIR/scheduled-tasks/$task_name"
     mkdir -p "$dest_task_dir"
-    if [ -f "$dest_task_dir/.local-realfile" ]; then
-      echo "  ⏭️  $dest_task_dir はスキップ（.local-realfile ＝ このPCでは実ファイル運用）"
-      continue
-    fi
     for file in "$task_dir"*; do
-      if [ -f "$file" ] || [ -d "$file" ]; then
-        link_file "$file" "$dest_task_dir/$(basename "$file")"
+      dest="$dest_task_dir/$(basename "$file")"
+      if [ -L "$dest" ]; then
+        rm -f "$dest"   # 旧 symlink は撤去してから実ファイルを置く
+      fi
+      if [ -d "$file" ]; then
+        rm -rf "$dest"
+        cp -R "$file" "$dest"
+        echo "  ✅ $dest ← $file（ディレクトリを実ファイルコピー）"
+      elif [ -f "$file" ]; then
+        if [ -f "$dest" ] && ! cmp -s "$file" "$dest"; then
+          bak="${dest}.local-$(date +%Y%m%d-%H%M).bak"
+          cp -p "$dest" "$bak"
+          echo "  ⚠️  ローカル編集を退避: $bak"
+        fi
+        if [ ! -f "$dest" ] || ! cmp -s "$file" "$dest"; then
+          cp -p "$file" "$dest"
+          echo "  ✅ $dest ← $file（実ファイルコピー）"
+        fi
       fi
     done
   fi
@@ -112,7 +133,7 @@ fi
 
 echo ""
 echo "🎉 セットアップ完了！Claude Code を再起動してください。"
-echo "   ※ scheduled-tasks は手順書のみ同期されます。スケジュール自体（実行時刻の登録）は"
-echo "      PCごとに /schedule または scheduled-tasks コネクタで別途登録してください。"
+echo "   ※ scheduled-tasks は手順書のみ「実ファイルコピー」で同期されます（symlink禁止・2026-09-07〜）。"
+echo "      スケジュール自体（実行時刻の登録）は PCごとに /schedule または scheduled-tasks コネクタで別途登録してください。"
 echo "   ※ Codex共有スキル（CODEX_SHARED_SKILLS）は実ファイルコピーです。"
 echo "      正本を編集したら setup.sh を再実行してコピーを更新してください。"

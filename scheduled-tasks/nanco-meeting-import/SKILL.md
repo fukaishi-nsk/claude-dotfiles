@@ -14,8 +14,9 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
 
 **停止の実績（すべて同じ死に方 `Tool permission request failed: AbortError`）**
 - 2026-08-25 18:06便 … 18:09に `crontab -l` を含む複合Bashで停止（開始3分）。Slack報告ゼロ
-- 2026-08-26 18:06便 … セッション記録なし＝**そもそも走っていない**（原因未特定）
+- 2026-08-26 18:06便 … セッション記録なし＝**そもそも走っていない**（原因未特定。`main1.log` に 8/26 の `Spawning` 記録自体がなく発火していない＝下記 9/3〜 の symlink 拒否とは別原因）
 - 2026-08-27 18:06便 … `python3 - <<'EOF'`（**heredoc**）で停止。翌日に人が手動再開
+- 2026-09-03・09-04・09-07 の18:06便 … **3便連続で沈黙**（`lastRunAt` は刻まれるがセッションが起きない・Slack報告ゼロ）。これは権限の問題ではなく **「SKILL.md が読めない」問題**。真因＝ Claude デスクトップアプリのスケジューラが **symlink の SKILL.md を拒否**する（`~/Library/Logs/Claude/main.log`: `[CCDScheduledTasks] Failed to read task file for nanco-meeting-import: symlink detected before open; refusing to open`）。claude-code 2.1.258 が入った **2026-09-03 09:01:31** の直後から発生（9/2 18:06便までは `Confirmed task run`）。setup.sh が毎 SessionStart に SKILL.md を symlink へ戻していたため、手で実ファイル化しても次のセッションで元に戻り原因が見えにくかった。**2026-09-07 に setup.sh を「scheduled-tasks は実ファイルコピー」方式へ変更して解消**（同日 10:28 に実ファイル化した sora-meet-link-share は 11:12・13:12便で `Confirmed task run` を確認済み）。⚠ この手順書の中身をいくら直しても防げない種類の停止。**沈黙したらまず `main.log` の `[CCDScheduledTasks]` 行を見る**
 
 **2026-08-27に「手順書でコマンドを禁止する」対策をしたが効かなかった。** 真因は手順書ではなく設定層で、`permissions.defaultMode` が未設定＝**新規セッション（＝毎回の定期実行）が「手動」モードで開始**し、許可リストのマッチ漏れ1件がそのまま全体停止になっていた。2026-08-28に `"defaultMode": "auto"` を入れ、危険操作は `deny` でハード固定した。以下はその新しい前提に合わせた運用ルール。
 

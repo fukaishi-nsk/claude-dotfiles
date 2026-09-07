@@ -81,7 +81,7 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
      - 実例: 2026-08-07 20:17 `Re: 【nanco】無料お試し期間の延長について（プラユスフィール様）` ＝ 小岸さまからのBETA入出荷の仕様質問3点。土日を挟み3日間、未返信のまま埋もれていた
 5.8. **GREENING OAM直読み（毎回・2026-08-27追加）**: 「在庫nanco⇔GREENING」グループは、GREENING側メンバー（会社用LINE=LINE WORKSとみられる「Unknown」表示の2名）の発言に**LINEからWebhookが配信されず、Slackに転写されない**（姉崎さん・深石さんなどLINEユーザーの発言は従来どおり転写される）。そのためこのグループだけ chat.line.biz（LINE OAM）を直接読む。経緯: `カスタマー/_LINE取込ボット_提案/不具合調査_20260827_GREENING転写欠落.md`
    - 手順（agent-browserは**全コマンドに専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を毎回付ける**・実チェックは読み取りのみで送信しない）:
-     - ⚠️2026-09-07〜専用永続プロファイル方式。旧 `--profile Default`（実Chromeコピー起動）はそのPCの実Chromeのログインを失効させるため原則廃止。`$HOME/.agent-browser/profiles/gmail` が無いPC（Mac mini 2026-09-07 ログイン済み（Google/Teams/LINE OAM））では暫定で旧方式 `--profile Default` を使ってよいが、その回の報告に「⚠️専用プロファイル未作成（Mac miniで本人ログインが必要）」を1行添える。専用プロファイルがあるのに開いた結果がサインインページなら、この工程は打ち切って「⚠️セッション失効（要: 本人ログイン）」を #log_fukaishi に報告する（この工程は「⚠️権限スキップ」欄に記録して先へ進む）
+     - ⚠️2026-09-07〜専用永続プロファイル方式。旧 `--profile Default`（実Chromeコピー起動）はそのPCの実Chromeのログインを失効させるため廃止（フォールバックもしない）。MacBook・Mac miniとも2026-09-07にログイン済み（Mac mini=Google/Teams/LINE OAM）。`$HOME/.agent-browser/profiles/gmail` が無いPCで走った場合や、開いた結果がLINEのサインインページだった場合は、この工程を打ち切って「⚠️専用プロファイル未設定またはセッション失効（要: 専用プロファイルへの本人ログイン）」を「⚠️権限スキップ」欄に記録して先へ進む
      1. `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" open https://chat.line.biz/` → `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" wait --load networkidle`
      2. `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" snapshot -i` でチャット一覧を出し、「在庫nanco⇔GREENING」を `click @eN` で開いて `snapshot` で本文を読む
      3. 前回実行（前営業日夕方）以降の新着のうち、**送信者が「Unknown」の発言**を拾う（名前付き送信者の分はline-relayがSlack転写済み＝二重報告しない）

@@ -57,7 +57,7 @@
 
 ## ブラウザ操作の方針（2026-07-27制定）
 - **ブラウザ操作はagent-browserでまずやる**（Homebrew導入済み・Codexと共用。使う前に `agent-browser skills get core` を読む）
-- ログイン状態が必要な操作は、**Mac/Windows共通で専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"`** を全コマンドに付ける（PCごとに初回のみ `--headed` で開いて本人がログイン。Mac=2026-09-07・Win nsketch機=2026-07-30・sinse機=2026-08-14。Mac mini 2026-09-07 ログイン済み（Google/Teams/LINE OAM））。**`--profile Default`（実Chromeプロファイルのコピー起動）は禁止**（2026-09-07特定: コピー側と実Chromeが同じGoogleセッションCookieを持つため、コピー起動の1〜5分後に実Chromeのログインが失効＝「Chromeで再ログインさせられる」の原因。Winでは元々App-Bound Encryptionで不成立）。⚠️ `~/.agent-browser/config.json` に `"profile"` の既定値を書かない（`--profile` 無しの全起動に効いてしまう。7/27〜9/7はDefaultが書かれていて全起動がコピー起動だった）。詳細はgmail-attachment-dlスキル
+- ログイン状態が必要な操作は、**Mac/Windows共通で専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"`** を全コマンドに付ける（PCごとに初回のみ `--headed` で開いて本人がログイン。MacBook=2026-09-07 Google/Slack/Notta/LINE OAM・Mac mini=2026-09-07 Google/Teams/LINE OAM・Win nsketch機=2026-07-30・sinse機=2026-08-14）。**`--profile Default`（実Chromeプロファイルのコピー起動）は禁止**（2026-09-07特定: コピー側と実Chromeが同じGoogleセッションCookieを持つため、コピー起動の1〜5分後に実Chromeのログインが失効＝「Chromeで再ログインさせられる」の原因。Winでは元々App-Bound Encryptionで不成立）。⚠️ `~/.agent-browser/config.json` に `"profile"` の既定値を書かない（`--profile` 無しの全起動に効いてしまう。7/27〜9/7はDefaultが書かれていて全起動がコピー起動だった）。詳細はgmail-attachment-dlスキル
 - ⚠️ **`--profile` は全コマンドに毎回付ける**（付け忘れると別セッションのabout:blankに飛び「Access is denied」でハマる）
 - ⚠️ **Windows機では、ブラウザを(再)起動させるコマンドだけ `Start-Process -WindowStyle Hidden` でデタッチ実行**（Claude等のシェルツールから直接叩くと、spawnされたChromeがstdoutを継承しChrome終了までブロック＝「ハング」に見える。0.33/0.34両方で実測 2026-08-20 nsketch機）。起動済みブラウザへのコマンドは普通に叩ける。型は「デタッチで裸の`open`→通常の`navigate`」。詳細はgmail-attachment-dlスキルのWindows差分
 - 実Chrome（claude-in-chrome）を使うのは例外時のみ: ①1Password連携が要る作業（freee等） ②ユーザーと同じ画面を見ながらの作業

@@ -38,7 +38,7 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 
 ## フォールバック
 
-- ログイン状態のブラウザで app.notta.ai を開いて本文を取得する（agent-browser --profile Default を想定。Nottaでの動作は未検証）
+- ログイン状態のブラウザで app.notta.ai を開いて本文を取得する（agent-browser の専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を想定。このプロファイルでのNottaログインは未実施・動作未検証。旧 `--profile Default` は2026-09-07廃止）
 
 ## 注意
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 SP="$(cd "$(dirname "$0")" && pwd)"
 U="$1"
-AB="agent-browser --profile Default"
+AB="agent-browser --profile $HOME/.agent-browser/profiles/gmail"
 $AB open "https://app.nanco.io/GloL-DSaWg/item/$U" >/dev/null 2>&1
 $AB wait --load networkidle >/dev/null 2>&1
 sleep 1

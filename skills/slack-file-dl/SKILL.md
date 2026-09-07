@@ -19,9 +19,9 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 
 ## 正解の手順（実証済み・原本バイト一致）
 
-1. **Slack Web版を認証済みで開く**（`--profile Default` は毎回付ける。→ [[gmail-attachment-dl]] と同じ運用）
+1. **Slack Web版を認証済みで開く**（専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を毎回付ける。→ [[gmail-attachment-dl]] と同じ運用。このプロファイルでSlackに未ログインなら `--headed` で開いて本人にログインしてもらう。旧 `--profile Default` は実Chromeを失効させるため2026-09-07廃止）
    ```
-   agent-browser --profile Default open "https://nsketchinc.slack.com/messages/<CHANNEL_ID>/p<ts_no_dot>"
+   agent-browser --profile "$HOME/.agent-browser/profiles/gmail" open "https://nsketchinc.slack.com/messages/<CHANNEL_ID>/p<ts_no_dot>"
    ```
    - `/archives/...` や `/files/...` は**デスクトップアプリ誘導ページで止まる**。`/messages/...` 形式だと `app.slack.com/client/<TEAM_ID>/<CHANNEL_ID>` に着地してWeb版が開く
    - TEAM_IDはこの着地URLから拾える（Nスケッチは `T08ML4BM5`）
@@ -41,7 +41,7 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
    i=0; s=0
    while [ $s -lt $N ]; do
      e=$((s+60000)); [ $e -gt $N ] && e=$N
-     agent-browser --profile Default --max-output 200000 eval "window.__chunk($s,$e)" > "$S/p_$i.b64" 2>/dev/null
+     agent-browser --profile "$HOME/.agent-browser/profiles/gmail" --max-output 200000 eval "window.__chunk($s,$e)" > "$S/p_$i.b64" 2>/dev/null
      i=$((i+1)); s=$e
    done
    ```
@@ -53,7 +53,7 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 
 5. **格納**：スクラッチパッド→検証→顧客フォルダへ `cp`。Nanco顧客なら `00_File_from/YYMMDD_LINE_話者_HHMM_内容.jpg`（既存の命名例に合わせる）。**会議中の画面共有スクショなら `06_Recording/YYMMDD_会議名/` フォルダに `YYMMDD_HHMM_会議スクショN.png`**（APAで2026-08-06実証、PNG 2.7MB/3.2MBで手順そのまま成功）。**さらに会議スクショは必ずその会議のNotion議事録ページにも画像として貼る**（深石さん指示 2026-08-07「これからも」→下記「Notion議事録ページへの埋め込み」）。Driveマウントに置いたら**Drive API側でファイルID・サイズ一致を実体確認**してからリンクを配る
 
-6. **後始末**：`agent-browser --profile Default close`／中間 `.b64` は消す
+6. **後始末**：`agent-browser --profile "$HOME/.agent-browser/profiles/gmail" close`／中間 `.b64` は消す
 
 ## Notion議事録ページへの埋め込み（会議スクショは必須・2026-08-07 深石さん指示「これからも」）
 

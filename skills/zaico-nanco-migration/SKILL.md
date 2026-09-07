@@ -9,9 +9,9 @@ description: そら植物園のzaico→nanco増分移行（N番号レンジ・�
 
 ## 環境・道具（前提）
 
-- **zaico**: web.zaico.co.jp・そら植物園株式会社・フルプラン。ログインは実Chrome（1Password「そら植物園在庫」）→ agent-browser `--profile Default` で再利用。**APIトークンはアカウント設定画面（ユーザー「仕入れ２」）に常時表示**（再生成ボタンは押さない）
+- **zaico**: web.zaico.co.jp・そら植物園株式会社・フルプラン。ログインは agent-browser の専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` に本人が一度だけ行う（`--headed` で開き、1Password「そら植物園在庫」で入力。旧 `--profile Default`＝実Chromeコピー方式は2026-09-07廃止）。**APIトークンはアカウント設定画面（ユーザー「仕入れ２」）に常時表示**（再生成ボタンは押さない）
 - **nanco本番**: `app.nanco.io/kZfEOK`（そら植物園）／テスト: `app.nanco.io/GloL-DSaWg`（8/4本番コピー・アイテム数無制限・別ワークスペース）。どちらも実Chromeログイン済み
-- **nanco MCPの接続先はGSIテスト環境**（`GSI_棚卸しテスト_2607`/HP0AOV・OAuth）。そら本番には繋がっていないので既定は**全部agent-browser**（`--profile Default`を全コマンドに）
+- **nanco MCPの接続先はGSIテスト環境**（`GSI_棚卸しテスト_2607`/HP0AOV・OAuth）。そら本番には繋がっていないので既定は**全部agent-browser**（`--profile "$HOME/.agent-browser/profiles/gmail"`を全コマンドに）
   - 大量件数・面倒な依頼が来たら**MCPをそら本番へ繋ぎ替えるのを検討**（過去にOAuthでkZfEOKに接続した実績あり）。`bulk_create_items`ならデータ＋属性（N番号・キーワード・備考）を1コールで登録でき、**一時フォルダ方式もフォルダ移動も不要**（目的フォルダに直接作成。「複数候補」判定はCSVインポート特有の問題）＝データ工程の約9分がほぼゼロになる
   - ⚠トレードオフ: MCPは本番へ直接書き込みでCSVインポートの**プレビュー安全弁（新規N件/複数候補0件）が無い**。一時フォルダに作成→API検証→移動、で担保する
   - ⚠**写真はMCP不可**（ext/v1に画像アップロード口が無い・NANCO-1640がIn Review）。**NANCO-1640がDoneになったら要確認**＝URL指定方式（zaicoのS3 URLをそのまま渡す）が入れば写真工程11分も消えて全体が実質数分になる

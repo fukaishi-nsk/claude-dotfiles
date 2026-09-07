@@ -15,7 +15,8 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 - 状態ファイル: ~/.claude/scheduled-tasks/teams-mention-check/state.json（PCローカル・git管理しない）
   形式: {"seen": ["<指紋>", ...], "seededBefore": "YYYY-MM-DD", "lastHeartbeat": "YYYY-MM-DD"} ／ seenは最新60件まで保持（古いものから捨てる）
   指紋の形式: `M/D|発言者|本文の空白・改行を除いた先頭40文字`（⚠️時刻は指紋に入れない＝今日の投稿はHH:MM表示だが翌日以降M/D表示に変わり指紋が揺れるため）
-- ブラウザ: agent-browserを**全コマンド** `AGENT_BROWSER_SESSION=teams-mention-check` プレフィックス＋ `--profile Default` フラグ付きで実行（実Chromeプロファイルのテンポラリコピー方式。専用セッション名により、深石さんや他タスクの agent-browser 既定セッションと衝突しない）。⚠️どちらか片方でも付け忘れると別セッションに飛んで「Access is denied」等でハマる。
+- ブラウザ: agent-browserを**全コマンド** `AGENT_BROWSER_SESSION=teams-mention-check` プレフィックス＋ `--profile "$HOME/.agent-browser/profiles/gmail"` フラグ付きで実行（専用永続プロファイル方式・2026-09-07〜。専用セッション名により、深石さんや他タスクの agent-browser 既定セッションと衝突しない）。⚠️どちらか片方でも付け忘れると別セッションに飛んで「Access is denied」等でハマる。
+- 🚫 旧方式 `--profile Default`（実Chromeプロファイルのテンポラリコピー起動）は原則使わない＝コピー起動がそのPCの実ChromeのGoogleログインを失効させる（2026-09-07特定）。⚠️専用プロファイルは**PCごとに作成＋本人ログインが必要**。`$HOME/.agent-browser/profiles/gmail` が無いPC（Mac miniは2026-09-07時点で未作成・本人ログイン未実施）では暫定で旧方式 `--profile Default` を使ってよいが、その回の報告に「⚠️専用プロファイル未作成（Mac miniで本人ログインが必要）」を1行添える。専用プロファイルがあるのに開いた結果がサインインページなら、この工程は打ち切って「⚠️セッション失効（要: 本人ログイン）」を #log_fukaishi に報告する。
 - Teamsリンク定数（2026-08-28に通知メール実物＋DOM照合で確定・リンク着地検証済み）:
   - tenantId（ADK）: `d2456032-f373-4f8d-908c-3b899f0f6097`
   - WEB関連 threadId: `19:7beea823cb6a4c4bb6c805c299711669@thread.tacv2`
@@ -26,10 +27,10 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 【手順】
 1. state.json をReadで読む（無い・壊れている場合は {"seen": [], "seededBefore": "", "lastHeartbeat": ""} として開始し、その旨を最後の報告に含める）。
 2. Teamsを開く:
-   `AGENT_BROWSER_SESSION=teams-mention-check agent-browser open "https://teams.microsoft.com" --profile Default`
-   → `… agent-browser wait --load networkidle --timeout 30000 --profile Default`
+   `AGENT_BROWSER_SESSION=teams-mention-check agent-browser open "https://teams.microsoft.com" --profile "$HOME/.agent-browser/profiles/gmail"`
+   → `… agent-browser wait --load networkidle --timeout 30000 --profile "$HOME/.agent-browser/profiles/gmail"`
    ※サインインリダイレクト（login.microsoftonline.com）に飛んでもサイレントSSOで自動通過する（2026-08-28実証）。通過後のURLは teams.microsoft.com/v2 または teams.cloud.microsoft のどちらでもよい。
-3. `… agent-browser snapshot -i --profile Default` でツリーを取得し:
+3. `… agent-browser snapshot -i --profile "$HOME/.agent-browser/profiles/gmail"` でツリーを取得し:
    - 🔴 パスワード入力欄・「サインイン方法の選択」等が出て自動で先に進まない場合＝セッション失効。#log_fukaishi に「🔴 teams-mention-check: Teamsセッション切れ。Mac miniの実ChromeでTeamsに再ログインしてください」を投稿して終了（state更新しない）。
    - 左ペイン「クイック ビュー」＞「メンション」のtreeitem refを特定してclick → wait --load networkidle → 再度 snapshot -i。
 4. **フィードの読み取りはsnapshotのrow要素から行う**（`get text body`は長文を「…」で省略するが、snapshotのrow/gridcellには全文が入る・2026-08-28実証）。各row＝[未読有無, チャンネル, スレッド名, 「発言者: 本文全文」, 時刻]。時刻は今日分がHH:MM、それ以前がMM/DD。`date` で今日の日付を取り、HH:MMは今日の日付に正規化する。
@@ -39,7 +40,7 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
    - それ以外は指紋化して seen と照合。機械一致しなくても、**同一と思われる投稿は再通知しない**（40文字の切り位置ズレ等の表記ゆれは常識判断で吸収する。誤った再通知はチャンネルのノイズになる）。
 6. **新着それぞれについてメッセージリンクを構築**（新着が無ければスキップ）:
    a. そのrowをclick → wait → スレッドビュー（右ペイン）が開く。
-   b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>e.id))" --profile Default` でid一覧（`timestamp-<epochミリ秒>`）を取得。
+   b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>e.id))" --profile "$HOME/.agent-browser/profiles/gmail"` でid一覧（`timestamp-<epochミリ秒>`）を取得。
    c. epochミリ秒をJSTに変換し、rowの表示時刻（HH:MM/日付）と一致するものが対象メッセージの msgId。スレッドビュー最上部（ルート投稿）のidが parentId。判別できない場合はリンク無しで転写し「（リンク取得失敗）」と付記（リンク欠落を理由に転写を止めない）。
    d. チャンネル名→threadId定数でリンク組み立て。
    e. 次の新着のためにフィードへ戻る（「メンション」を再クリックすればよい）。
@@ -59,12 +60,12 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
    さらに PushNotification（1行: 「Teams新着メンションN件→#2602_artience」）を送る。失敗しても続行してよい。
 8. 新着なし → #2602_artience には何も投稿しない。ただし state.json の lastHeartbeat が今日でない場合のみ、#log_fukaishi へ「🫀 teams-mention-check 稼働中・新着なし（HH:MM時点）」を投稿し lastHeartbeat を今日に更新（サイレント死の検知用。sora-meet-link-shareが2026-08-10〜24に無登録のまま止まっていた事故の教訓）。
 9. 終了処理（エラーで途中終了する場合も必ず試みる）:
-   `AGENT_BROWSER_SESSION=teams-mention-check agent-browser close --profile Default`（テンポラリプロファイルを削除してディスクを回収）。
+   `AGENT_BROWSER_SESSION=teams-mention-check agent-browser close --profile "$HOME/.agent-browser/profiles/gmail"`（ログイン状態は専用プロファイルに残る）。
 
 【既知の副作用・制約（2026-08-28時点）】
 - 巡回がTeamsのアクティビティを既読化しうるが、1日1回なので影響は限定的＝Teamsの通知メール（即時・約4割）は概ね温存される。**運用の整理: メール＝即時の速報（部分）／本タスク毎朝9時巡回＝全量保証（前日9時以降の分を翌朝までに確実に転写）**。
 - 対象はADKテナント（artience）のみ。TANGRAM（NECテナント）は対象外＝従来どおりメール頼み。
-- Chromeプロファイル（約2.1GB）を毎回テンポラリコピーする（1日1回）。
+- 専用永続プロファイルを直接使うのでプロファイルのコピーは発生しない（旧方式の約2.1GBテンポラリコピーは2026-09-07に廃止）。
 - 実ChromeのTeamsゲストセッションが失効すると読めない（手順3で検知し赤報告。深石さんがMac miniの実ChromeでTeamsを開き直せば復旧）。
 - 深リンクはTeams標準のランチャー画面（「Webアプリを使用/アプリで開く」）を1枚挟む＝通知メールのリンクと同じ挙動で正常。
 - ⚠️**フィードrow末尾の日付は「編集日」を指すことがある**（2026-09-07実測: 9/3 20:19投稿の松田さんメッセージが「編集済み」のためフィード上は09/04表示）。転写する時刻は必ず手順6bの `[data-tid=timestamp]` のepochミリ秒で確定させる（rowの日付は新着判定の粗いふるいとしてのみ使う）。

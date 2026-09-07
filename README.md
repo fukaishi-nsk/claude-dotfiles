@@ -39,7 +39,7 @@ CLAUDE.md・settings.json・主要スキルをここで一元管理し、複数P
 
 | スキル | 前提 |
 |---|---|
-| gmail-attachment-dl | agent-browser **v0.34.0固定運用**（Mac=Homebrew / Win=npm）＋ Gmailログイン状態（Mac=`--profile Default`で実Chrome参照 / Win=専用永続プロファイル`$HOME/.agent-browser/profiles/gmail`に初回のみ本人ログイン） |
+| gmail-attachment-dl | agent-browser **v0.34.0固定運用**（Mac=Homebrew / Win=npm）＋ Gmailログイン状態（Mac/Win共通=専用永続プロファイル`$HOME/.agent-browser/profiles/gmail`に初回のみ本人ログイン。旧Mac方式`--profile Default`は実Chromeのログインを失効させるため2026-09-07に廃止） |
 | email-draft | Gmailコネクタ（claude.ai側の接続なのでPC非依存） |
 
 新しいPCで前提ツールが無い場合は、Claude Codeが導入を提案してから作業に入ること。

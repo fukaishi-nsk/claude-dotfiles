@@ -67,5 +67,8 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 - Chromeプロファイル（約2.1GB）を毎回テンポラリコピーする（1日1回）。
 - 実ChromeのTeamsゲストセッションが失効すると読めない（手順3で検知し赤報告。深石さんがMac miniの実ChromeでTeamsを開き直せば復旧）。
 - 深リンクはTeams標準のランチャー画面（「Webアプリを使用/アプリで開く」）を1枚挟む＝通知メールのリンクと同じ挙動で正常。
+- ⚠️**フィードrow末尾の日付は「編集日」を指すことがある**（2026-09-07実測: 9/3 20:19投稿の松田さんメッセージが「編集済み」のためフィード上は09/04表示）。転写する時刻は必ず手順6bの `[data-tid=timestamp]` のepochミリ秒で確定させる（rowの日付は新着判定の粗いふるいとしてのみ使う）。
+- ⚠️**agent-browserでTeamsを開くと初回はスプラッシュ（Teamsロゴ）のまま描画が止まることがある**（2026-09-07実測・数分待っても進まない）。同URLへ `navigate` し直すと描画される（着地は teams.cloud.microsoft でよい）。手順2で「クイック ビュー」がwaitで取れなければ、セッション失効と決めつける前に**まずnavigateで1回リロード**すること。
+- ⚠️**スケジューラ側のサイレント死**（2026-09-03〜09-07に発生）: `list_scheduled_tasks` の `lastRunAt` は毎日刻まれるのに**エージェントのセッションが起動していない**事象。state.json未更新・#log_fukaishiへの心拍なし・transcript不在で判定できる。Mac mini全体の事象（sora-meet-link-share / nanco-meeting-import も同時に停止）で根本原因は未特定。対策として `~/.claude/scheduled-tasks/teams-mention-check/.local-realfile` を設置し、毎SessionStartの setup.sh が SKILL.md を symlink へ戻すのを抑止済み（2026-09-07）。
 
 【登録状況】2026-08-28 Mac mini（fukaishi_macmini）に cron `0 9 * * *`（毎朝9:00 JST）で登録（当初17時→深石さん指示で朝9時へ変更）。**MacBook側には登録しない**（二重実行防止）。正本は ~/claude-dotfiles/scheduled-tasks/teams-mention-check/SKILL.md。⚠️~/.claude側のSKILL.mdは**symlinkではなく実ファイルコピー**（スケジューラのpath検査がsymlinkを「path traversal」として拒否するため・2026-08-28発覚）。正本を編集したら `cp` で~/.claude側へ同期すること。初回シード＝2026-08-28（seededBefore=2026-08-28、8/28当日16:08分までの6件はseen投入済み・#2602_artienceへ転写済み）。

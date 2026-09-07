@@ -4,15 +4,8 @@
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "permissions": {
-    "defaultMode": "auto",
-    "additionalDirectories": [
-      "~/.claude",
-      "~/claude-dotfiles",
-      "~/Downloads"
-    ],
     "allow": [
       "Bash(npx wrangler deploy*)",
-
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(head:*)",
@@ -35,7 +28,6 @@
       "Bash(git log:*)",
       "Bash(git pull:*)",
       "Bash(agent-browser:*)",
-
       "mcp__claude_ai_Google_Calendar__list_events",
       "mcp__claude_ai_Google_Calendar__search_events",
       "mcp__claude_ai_Google_Calendar__get_event",
@@ -48,13 +40,10 @@
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__list_calendars",
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__create_event",
       "mcp__9857284c-7ba5-44ca-b04f-c8fe3a1bd025__update_event",
-
       "mcp__claude_ai_Google_Drive__*",
       "mcp__ee298b58-2aba-4c0a-ad95-dbb33d87313f__*",
-
       "mcp__claude_ai_Slack__*",
       "mcp__f7486625-184c-4026-92cd-4f163868436f__*",
-
       "mcp__claude_ai_Linear__list_issues",
       "mcp__claude_ai_Linear__get_issue",
       "mcp__claude_ai_Linear__list_comments",
@@ -73,7 +62,6 @@
       "mcp__fddd83fc-16bc-4346-98b4-9757245401d0__save_comment",
       "mcp__fddd83fc-16bc-4346-98b4-9757245401d0__prepare_attachment_upload",
       "mcp__fddd83fc-16bc-4346-98b4-9757245401d0__create_attachment_from_upload",
-
       "mcp__claude_ai_Gmail__search_threads",
       "mcp__claude_ai_Gmail__get_thread",
       "mcp__claude_ai_Gmail__get_message",
@@ -88,7 +76,6 @@
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__get_draft",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__create_draft",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__update_draft",
-
       "mcp__notion__notion-search",
       "mcp__notion__notion-fetch",
       "mcp__notion__notion-query-data-sources",
@@ -97,7 +84,6 @@
       "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-fetch",
       "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-query-data-sources",
       "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-get-users",
-
       "mcp__claude_ai_nanco__whoami",
       "mcp__claude_ai_nanco__search_items",
       "mcp__claude_ai_nanco__get_item",
@@ -110,31 +96,16 @@
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__list_folders",
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__get_folder_tree",
       "mcp__eb22d7d2-5482-43c2-b643-36a4c0d2d8d0__get_stock_history",
-
       "mcp__scheduled-tasks__list_scheduled_tasks",
       "mcp__scheduled-tasks__create_scheduled_task",
       "mcp__scheduled-tasks__update_scheduled_task",
-
       "WebSearch"
-    ],
-    "ask": [
-      "mcp__*__adjust_stock",
-      "mcp__*__bulk_create_items",
-      "mcp__*__bulk_update_items",
-      "mcp__*__archive_items",
-      "mcp__*__merge_items",
-      "mcp__*__reconcile_items",
-
-      "mcp__*__send_message",
-      "mcp__*__reply",
-      "mcp__*__forward"
     ],
     "deny": [
       "Bash(rm:*)",
       "Bash(sudo:*)",
       "Bash(git push --force:*)",
       "Bash(crontab:*)",
-
       "mcp__*__delete_item",
       "mcp__*__delete_folder",
       "mcp__*__delete_event",
@@ -145,6 +116,23 @@
       "mcp__*__trash_file",
       "mcp__*__mark_message_spam",
       "mcp__*__mark_thread_spam"
+    ],
+    "ask": [
+      "mcp__*__adjust_stock",
+      "mcp__*__bulk_create_items",
+      "mcp__*__bulk_update_items",
+      "mcp__*__archive_items",
+      "mcp__*__merge_items",
+      "mcp__*__reconcile_items",
+      "mcp__*__send_message",
+      "mcp__*__reply",
+      "mcp__*__forward"
+    ],
+    "defaultMode": "auto",
+    "additionalDirectories": [
+      "~/.claude",
+      "~/claude-dotfiles",
+      "~/Downloads"
     ]
   },
   "hooks": {
@@ -154,8 +142,8 @@
         "hooks": [
           {
             "type": "command",
-            "timeout": 30,
-            "command": "{ git -C \"$HOME/claude-dotfiles\" pull --quiet && \"$HOME/claude-dotfiles/setup.sh\" >/dev/null 2>&1; } || echo '⚠️ dotfiles同期に失敗しました（コンフリクトの可能性）。ユーザーにこの旨を伝え、git -C ~/claude-dotfiles status での確認を促してください。'"
+            "command": "{ git -C \"$HOME/claude-dotfiles\" pull --quiet && \"$HOME/claude-dotfiles/setup.sh\" >/dev/null 2>&1; } || echo '⚠️ dotfiles同期に失敗しました（コンフリクトの可能性）。ユーザーにこの旨を伝え、git -C ~/claude-dotfiles status での確認を促してください。'",
+            "timeout": 30
           }
         ]
       }
@@ -184,6 +172,7 @@
       }
     }
   },
+  "skipWorkflowUsageWarning": true,
   "theme": "dark",
-  "skipWorkflowUsageWarning": true
+  "agentPushNotifEnabled": true
 }

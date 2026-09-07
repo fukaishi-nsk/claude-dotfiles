@@ -70,13 +70,23 @@ for skill_dir in "$DOTFILES_DIR/skills"/*/; do
 done
 
 # scheduled-tasks/ 配下をリンク（定期実行タスクの手順書）
+# ⚠ PCローカルで「実ファイルのまま置きたい」タスクは、そのタスクの
+#    ~/.claude/scheduled-tasks/<名前>/.local-realfile を置くとリンクをスキップする。
+#    理由: scheduled-tasks の登録・更新ツールが symlink 越しの書き込みを拒否するため、
+#    そのPCでスケジュール登録しているタスクは実ファイルでないと update できない。
+#    （2026-09-07 追加。それまでは毎SessionStartのsetup.shが実ファイルをsymlinkに戻していた）
 for task_dir in "$DOTFILES_DIR/scheduled-tasks"/*/; do
   if [ -d "$task_dir" ]; then
     task_name=$(basename "$task_dir")
-    mkdir -p "$CLAUDE_DIR/scheduled-tasks/$task_name"
+    dest_task_dir="$CLAUDE_DIR/scheduled-tasks/$task_name"
+    mkdir -p "$dest_task_dir"
+    if [ -f "$dest_task_dir/.local-realfile" ]; then
+      echo "  ⏭️  $dest_task_dir はスキップ（.local-realfile ＝ このPCでは実ファイル運用）"
+      continue
+    fi
     for file in "$task_dir"*; do
       if [ -f "$file" ] || [ -d "$file" ]; then
-        link_file "$file" "$CLAUDE_DIR/scheduled-tasks/$task_name/$(basename "$file")"
+        link_file "$file" "$dest_task_dir/$(basename "$file")"
       fi
     done
   fi

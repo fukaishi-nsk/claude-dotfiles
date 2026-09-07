@@ -11,7 +11,7 @@ description: Gmailメールの添付ファイルをagent-browserで自動ダウ�
 - agent-browserはHomebrew導入済み・全プロジェクト共通（v0.34.0固定運用・Mac側2026-08-13動作確認済み）。このセッションで初めて使うなら先に `agent-browser skills get core` を読む
 - ⚠️ 専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を**全コマンドに毎回**付ける（Mac/Windows共通・2026-09-07〜。付け忘れると別セッションのabout:blankに飛び「Access is denied」でハマる）
 - 🚫 旧Mac方式 `--profile Default`（実Chromeプロファイルのテンポラリコピー起動）は**使わない**。コピー側と実Chromeが同じGoogleセッションCookieを持ち、コピー起動の1〜5分後に実Chromeのログインが失効する（2026-09-07に「Chromeで再ログインさせられる」の原因として特定。9/7は再ログイン5回すべてがこれ）。`~/.agent-browser/config.json` に `"profile"` の既定値も書かない
-- 初回ログイン（PCごとに1回）: `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" --headed open "https://accounts.google.com/"` で見えるウィンドウを出し、**本人がログイン**する（メールアドレス欄までは代行可・パスワード以降は本人）。同じウィンドウでSlack等も先にログインしておくと後が楽。終わったら `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" close`。ログイン状態はプロファイルに残る
+- 初回ログイン（PCごとに1回）: `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" --headed open "https://accounts.google.com/"` で見えるウィンドウを出し、**本人がログイン**する（メールアドレス欄までは代行可・パスワード以降は本人）。同じウィンドウでSlack等も先にログインしておくと後が楽。終わったら `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" close`。ログイン状態はプロファイルに残る（Mac 2026-09-07: Google/Gmail・Slack・Notta・LINE公式アカウントマネージャー(chat.line.biz) ログイン済み・close後のヘッドレス再開でも維持を確認。zaicoは未ログイン）
 
 ## Windows機での前提差分（2026-07-30制定・Win機でend-to-end実証済み）
 

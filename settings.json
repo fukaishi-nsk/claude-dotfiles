@@ -142,7 +142,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "{ git -C \"$HOME/claude-dotfiles\" pull --quiet && \"$HOME/claude-dotfiles/setup.sh\" >/dev/null 2>&1; } || echo '⚠️ dotfiles同期に失敗しました（コンフリクトの可能性）。ユーザーにこの旨を伝え、git -C ~/claude-dotfiles status での確認を促してください。'",
+            "command": "bash \"$HOME/claude-dotfiles/sync.sh\"",
             "timeout": 30
           }
         ]

@@ -1,13 +1,13 @@
 ---
 name: teams-mention-check
-description: artienceのTeams(ADKテナント)@メンションを毎朝9時に直読みし、新着を古い順・原文のまま・メッセージリンク付きでSlack #2602_artience へ転写する（メール通知カバー率4割→10割化・2026-08-28制定）
+description: artienceのTeams(ADKテナント)@メンションを毎朝9時に直読みし、新着を古い順・原文のまま・メッセージリンク付きでSlack #2602_artience へ転写する（メール通知カバー率4割→10割化・2026-08-28制定）。新着の添付ファイルは 00_File_from へ保存する（2026-09-15〜）
 ---
 
-目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md。
+目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。**新着メッセージに添付ファイルがあれば案件フォルダの `00_File_from` に保存する**。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）、「（添付を）保存してほしい」（2026-09-15。9/3〜9/14の添付3点が未格納のまま溜まっていたのが発端）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md／teams-attachment-retrieval.md。
 
 【実行モード】無人。ブロックする質問はしない。創作禁止＝フィードに無い情報を書かない・**原文を一字も改変しない**（@メンション名の羅列も原文の一部としてそのまま）。判断できない事象は Slack #log_fukaishi（C03119VSJGK）に報告して保留。
 
-【権限セーフ】python3を使う場合は必ず `python3 -c "…"` の1行形式（heredoc禁止）。`sleep`は使わない（待機は `agent-browser wait`）。Gmailの送信・返信・転送、scheduled-tasksの登録・変更・削除、`rm`・`crontab` は叩かない。state.jsonの読み書きはRead/Writeツールで行う。
+【権限セーフ】python3を使う場合は必ず `python3 -c "…"` の1行形式（heredoc禁止）。`sleep`は使わない（待機は `agent-browser wait`）。Gmailの送信・返信・転送、scheduled-tasksの登録・変更・削除、`rm`・`crontab` は叩かない。state.jsonの読み書きはRead/Writeツールで行う。添付の回収では `curl`（Dropbox直DL）・`file`・`cp -n`・`cmp`・`unzip -n` は可。**00_File_from 内の既存ファイルを上書き・移動・削除しない**（`cp` は必ず `-n`、`mv` は使わない）。
 
 【定数】
 - 通知先（新着メンション転写）: Slack `#2602_artience` = C0ANA7AHVRB
@@ -15,6 +15,7 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 - 状態ファイル: ~/.claude/scheduled-tasks/teams-mention-check/state.json（PCローカル・git管理しない）
   形式: {"seen": ["<指紋>", ...], "seededBefore": "YYYY-MM-DD", "lastHeartbeat": "YYYY-MM-DD"} ／ seenは最新60件まで保持（古いものから捨てる）
   指紋の形式: `M/D|発言者|本文の空白・改行を除いた先頭40文字`（⚠️時刻は指紋に入れない＝今日の投稿はHH:MM表示だが翌日以降M/D表示に変わり指紋が揺れるため）
+- 添付の保存先: `$HOME/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/Shared drives/nsketch/2602_artience/00_File_from/` 直下（ファイル名はTeams上の名前そのまま）。ステージング＝そのセッションのscratchpad（無ければ `~/.claude/scheduled-tasks/teams-mention-check/dl/`）
 - ブラウザ: agent-browserを**全コマンド** `AGENT_BROWSER_SESSION=teams-mention-check` プレフィックス＋ `--profile "$HOME/.agent-browser/profiles/gmail"` フラグ付きで実行（専用永続プロファイル方式・2026-09-07〜。専用セッション名により、深石さんや他タスクの agent-browser 既定セッションと衝突しない）。⚠️どちらか片方でも付け忘れると別セッションに飛んで「Access is denied」等でハマる。
 - 🚫 旧方式 `--profile Default`（実Chromeプロファイルのテンポラリコピー起動）は原則使わない＝コピー起動がそのPCの実ChromeのGoogleログインを失効させる（2026-09-07特定）。⚠️専用プロファイルは**PCごとに作成＋本人ログインが必要**（MacBook・Mac miniとも2026-09-07にログイン済み。Mac mini=Google/Teams/LINE OAM）。万一 `$HOME/.agent-browser/profiles/gmail` が無いPCで走った場合は、巡回を打ち切って「⚠️専用プロファイル未作成（このPCで本人ログインが必要）」を #log_fukaishi に1行報告する（旧方式 `--profile Default` へのフォールバックはしない）。専用プロファイルがあるのに開いた結果がサインインページなら「⚠️セッション失効（要: 専用プロファイルへの本人再ログイン）」を報告して終了する。
 - Teamsリンク定数（2026-08-28に通知メール実物＋DOM照合で確定・リンク着地検証済み）:
@@ -39,27 +40,38 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
    - エントリの日付が state.json の `seededBefore` より前 → 無条件で既知扱い。
    - それ以外は指紋化して seen と照合。機械一致しなくても、**同一と思われる投稿は再通知しない**（40文字の切り位置ズレ等の表記ゆれは常識判断で吸収する。誤った再通知はチャンネルのノイズになる）。
 6. **新着それぞれについてメッセージリンクを構築**（新着が無ければスキップ）:
-   a. そのrowをclick → wait → スレッドビュー（右ペイン）が開く。
+   a. そのrowの**本文gridcell**をclick → wait → スレッドビュー（右ペイン）が開く（clickが「covered by」で弾かれたら既知の制約の項を参照）。
    b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>e.id))" --profile "$HOME/.agent-browser/profiles/gmail"` でid一覧（`timestamp-<epochミリ秒>`）を取得。
    c. epochミリ秒をJSTに変換し、rowの表示時刻（HH:MM/日付）と一致するものが対象メッセージの msgId。スレッドビュー最上部（ルート投稿）のidが parentId。判別できない場合はリンク無しで転写し「（リンク取得失敗）」と付記（リンク欠落を理由に転写を止めない）。
    d. チャンネル名→threadId定数でリンク組み立て。
-   e. 次の新着のためにフィードへ戻る（「メンション」を再クリックすればよい）。
-7. 新着あり → `#2602_artience`（C0ANA7AHVRB）へ1回の投稿にまとめて転写。**並び順は古い順（時系列昇順）＝フィードの逆順**。**本文は原文そのまま**（要約・省略・言い換え禁止。snapshotのrow全文を使い、改行は読みやすく保つ）:
+   e. **添付リンクを控える**: スレッドビューを snapshot -i し、対象メッセージ（`group "<発言者> …"` 配下＝対象メッセージのまとまり）にある `link "Link <ファイル名>"` の ref を拾って `… agent-browser get attr @ref href --profile …` でURLを取得し、ファイル名とセットで控える（同じスレッドの**他のメッセージの添付は拾わない**。対象外のルート投稿の添付も拾わない）。
+   f. 次の新着のためにフィードへ戻る（「メンション」を再クリックすればよい）。
+7. **添付の回収**（6eで控えた添付が無ければスキップ・2026-09-15追加）。**すべての新着について6が済んでから行う**（SharePointへ移動するとTeamsへ戻す手間が要るため）:
+   a. URL別の取り方（2026-09-15 実証）:
+      - **Dropbox ファイル共有**（`www.dropbox.com/scl/fi/…&dl=0`＝SHA watanabeさんの定番）: `dl=0` を `dl=1` に置き換えて `curl -sSL -o "<ステージング>/<ファイル名>" "<URL>"`（ログイン不要）。
+      - **Dropbox フォルダ共有**（`www.dropbox.com/scl/fo/…`）: `dl=1` で zip が落ちる → `<ステージング>/<フォルダ名>.zip` に保存 → `unzip -n "<zip>" -d "<00_File_from>/<フォルダ名>"`（⚠️未実証。失敗したら 7d の失敗扱い）。
+      - **ADKのOneDrive/SharePoint**（`*.sharepoint.com`＝児玉さん等ADK側の定番）: ゲストのログインが要るので agent-browser で `navigate "<URL>"`（`?e=xxxx` まで残せば後ろの xsdata 等は不要）→ wait --load networkidle → snapshot -i → menuitem「このファイルをデバイスにダウンロードする」の ref に対して `… agent-browser download @ref "<ステージング>/<ファイル名>" --profile …`。⚠️普通の click は ~/Downloads（Bashから読めない）に落ちるので**必ず download コマンド**。
+      - **上記以外**（Figma・Google Drive・一般Webページ等のリンク）は自動で落とさない＝Slack投稿に「📎 未回収（対象外リンク）: <リンク名>」と書くだけ。メッセージに直接貼られた画像（インライン画像）も対象外（未検討）。
+   b. 検証: `file` で種別を確認（PDF・Illustrator・ZIP・画像等ならOK。**HTML/テキストだったらログインページ等を掴んだ失敗**）・サイズ>0。PDFなら1ページ目をReadで目視し、投稿本文のファイル名・内容と矛盾しないか見る。
+   c. 格納: `cp -n` で 00_File_from へコピー → `cmp` で一致を確認。**同名ファイルが既にある場合**: cmpで同一なら「既に格納済み」扱い／中身が違えば上書きせず、#log_fukaishi に「⚠️同名別内容のため保留: <ファイル名>」と報告（別名の版を勝手に作らない）。
+   d. 1件の失敗で全体を止めない（転写が主目的）。失敗は手順8の該当メッセージに「📎 保存失敗: <ファイル名>（理由）」と書く。
+8. 新着あり → `#2602_artience`（C0ANA7AHVRB）へ1回の投稿にまとめて転写。**並び順は古い順（時系列昇順）＝フィードの逆順**。**本文は原文そのまま**（要約・省略・言い換え禁止。snapshotのrow全文を使い、改行は読みやすく保つ）。添付を扱ったメッセージには 🔗 の次の行に保存結果を1ファイル1行で書く:
    ```
    📣 Teams新着メンション 2件（artience）
 
    ▪️ 8/28 15:47 watanabe｜WEB関連＞0807 FB
    > （ここに原文全文）
    🔗 https://teams.microsoft.com/l/message/…
+   📎 保存: 00_File_from/artience_web_260914.pdf
 
    ▪️ 8/28 16:08 松田　理沙子｜WEB関連＞0807 FB
    > （原文全文）
    🔗 …
    ```
    投稿の成功を確認してから state.json の seen へ追記（Writeツール・最新60件維持）。
-   さらに PushNotification（1行: 「Teams新着メンションN件→#2602_artience」）を送る。失敗しても続行してよい。
-8. 新着なし → #2602_artience には何も投稿しない。ただし state.json の lastHeartbeat が今日でない場合のみ、#log_fukaishi へ「🫀 teams-mention-check 稼働中・新着なし（HH:MM時点）」を投稿し lastHeartbeat を今日に更新（サイレント死の検知用。sora-meet-link-shareが2026-08-10〜24に無登録のまま止まっていた事故の教訓）。
-9. 終了処理（エラーで途中終了する場合も必ず試みる）:
+   さらに PushNotification（1行: 「Teams新着メンションN件→#2602_artience」。添付を保存したら「（添付M件保存）」を付ける）を送る。失敗しても続行してよい。
+9. 新着なし → #2602_artience には何も投稿しない。ただし state.json の lastHeartbeat が今日でない場合のみ、#log_fukaishi へ「🫀 teams-mention-check 稼働中・新着なし（HH:MM時点）」を投稿し lastHeartbeat を今日に更新（サイレント死の検知用。sora-meet-link-shareが2026-08-10〜24に無登録のまま止まっていた事故の教訓）。
+10. 終了処理（エラーで途中終了する場合も必ず試みる。SharePointに移動したままでもよい）:
    `AGENT_BROWSER_SESSION=teams-mention-check agent-browser close --profile "$HOME/.agent-browser/profiles/gmail"`（ログイン状態は専用プロファイルに残る）。
 
 【既知の副作用・制約（2026-08-28時点）】
@@ -70,6 +82,8 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 - 深リンクはTeams標準のランチャー画面（「Webアプリを使用/アプリで開く」）を1枚挟む＝通知メールのリンクと同じ挙動で正常。
 - ⚠️**フィードrow末尾の日付は「編集日」を指すことがある**（2026-09-07実測: 9/3 20:19投稿の松田さんメッセージが「編集済み」のためフィード上は09/04表示）。転写する時刻は必ず手順6bの `[data-tid=timestamp]` のepochミリ秒で確定させる（rowの日付は新着判定の粗いふるいとしてのみ使う）。
 - ⚠️**agent-browserでTeamsを開くと初回はスプラッシュ（Teamsロゴ）のまま描画が止まることがある**（2026-09-07実測・数分待っても進まない）。同URLへ `navigate` し直すと描画される（着地は teams.cloud.microsoft でよい）。手順2で「クイック ビュー」がwaitで取れなければ、セッション失効と決めつける前に**まずnavigateで1回リロード**すること。
+- ⚠️**rowのclickが「covered by div」で弾かれる**: フィードがスクロールしていて対象rowが画面外・ヘッダーの下にあるのが主因（2026-09-15実測）。`… agent-browser scrollintoview @ref` → 再click。それでも弾かれたら **rowのref に `focus` → `press Enter`** で開ける（2026-09-15実証）。発言者アバターは連絡先カードが開く・日付セルはホバーで「Save this message」に化ける（押すとブックマークされる）ので押さない。
+- ⚠️ステージングに落としたファイルは `rm` 禁止のため残る（scratchpadはセッション単位なので実害なし。`~/.claude/scheduled-tasks/teams-mention-check/dl/` を使った場合は溜まるので、気になったら深石さんに削除を依頼）。
 - ⚠️**スケジューラ側のサイレント死**（2026-09-03〜09-07に発生）: `list_scheduled_tasks` の `lastRunAt` は毎日刻まれるのに**エージェントのセッションが起動していない**事象。state.json未更新・#log_fukaishiへの心拍なし・transcript不在で判定できる。Mac mini全体の事象（sora-meet-link-share / nanco-meeting-import も同時に停止）で根本原因は未特定。対策として `~/.claude/scheduled-tasks/teams-mention-check/.local-realfile` を設置し、毎SessionStartの setup.sh が SKILL.md を symlink へ戻すのを抑止済み（2026-09-07）。
 
-【登録状況】2026-08-28 Mac mini（fukaishi_macmini）に cron `0 9 * * *`（毎朝9:00 JST）で登録（当初17時→深石さん指示で朝9時へ変更）。**MacBook側には登録しない**（二重実行防止）。正本は ~/claude-dotfiles/scheduled-tasks/teams-mention-check/SKILL.md。⚠️~/.claude側のSKILL.mdは**symlinkではなく実ファイルコピー**（スケジューラのpath検査がsymlinkを「path traversal」として拒否するため・2026-08-28発覚）。正本を編集したら `cp` で~/.claude側へ同期すること。初回シード＝2026-08-28（seededBefore=2026-08-28、8/28当日16:08分までの6件はseen投入済み・#2602_artienceへ転写済み）。
+【登録状況】2026-08-28 Mac mini（fukaishi_macmini）に cron `0 9 * * *`（毎朝9:00 JST）で登録（当初17時→深石さん指示で朝9時へ変更）。**MacBook側には登録しない**（二重実行防止）。正本は ~/claude-dotfiles/scheduled-tasks/teams-mention-check/SKILL.md。⚠️~/.claude側のSKILL.mdは**symlinkではなく実ファイルコピー**（スケジューラのpath検査がsymlinkを「path traversal」として拒否するため・2026-08-28発覚）。正本を編集したら `cp` で~/.claude側へ同期すること。初回シード＝2026-08-28（seededBefore=2026-08-28、8/28当日16:08分までの6件はseen投入済み・#2602_artienceへ転写済み）。添付回収（手順6e・7）は2026-09-15追加。

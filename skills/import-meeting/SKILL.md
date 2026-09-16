@@ -111,6 +111,15 @@ user-invocable: true
    例: `在庫管理アプリnanco オンライン相談 (プラユスフィール株式会社 …) - 2026_06_09 16_58 JST - Gemini によるメモ.md`
 4. **配置**：`create_file` で配置先に作成。`textContent = <md本文>`, `contentMimeType = 'text/markdown'`, **`disableConversionToGoogleType = true`**（Google Docへ変換させず .md のまま置く）, `parentId = <配置先フォルダID>`, `title = <出力ファイル名>`。
 
+### Step 5.5: Notion面談ページの先頭に文字起こしリンクを貼る（毎回・2026-09-16〜）
+取込先の顧客に対応する **Notion「nanco営業データ」DBの面談ページ**（命名 `YYMMDD_nanco_会社名`。`notion-search` で日付＋社名で引く）を開き、**本文の先頭**に文字起こしへのDriveリンクを1ブロックだけ置く（ユーザー指示 2026-09-16「notionページの先頭に文字起こしファイルのリンク貼って。これからはそうしてください」）。
+- 型（callout 1行・`notion-update-page` の `insert_content` ＋ `position={"type":"start"}`）:
+  `<callout icon="📝">` の中に `**文字起こし全文**: [オンライン相談（相手氏名）YYYY-MM-DD HH:MM〜・Meet Transcript](<Transcript mdのviewUrl>) ／ [06_Recording フォルダ](<フォルダのviewUrl>)（Notta形式md・原本txtも同フォルダ）`
+- リンク先は **06_Recording に置いた Meet 標準 Transcript の md**（話者判断の正本）。Notta形式md・原本txt・グラレコ画像は「同フォルダにある」と括弧で一言触れるだけにする（URL羅列は読みにくい → [[feedback_notion_page_readability]]）。
+- URLは `search_files`／`get_file_metadata` が返す `viewUrl` をそのまま使う（IDを推測で組み立てない）。貼ったあとは `notion-fetch` で先頭ブロックを実体確認する（[[feedback_verify_at_message_level]]）。
+- 面談ページが見つからない／複数候補がある場合は勝手に作らず保留。対話モードはユーザーに確認、無人モードはSlackへ（ページ作成の型は [[feedback_nanco_customer_prep_notion_page]]）。
+- 既に先頭にDrive埋め込み（`<unknown url=… alt="drive"/>`）がある場合、その中身はAPIから読めない。二重貼りになり得るので、貼った上で「既存ブロックあり」と報告して残すか消すかを委ねる。
+
 ### Step 6: KB更新の「差分案」を作成（本体は書き換えない）
 1. 取込先顧客フォルダ内の **既存KBを探す**（顧客により名前が違う）：
    `02_Plan/プロジェクト概要_*.md` ／ `*総合AIプロファイル*.md` ／ `*AIプロファイル*.md` などを検索。

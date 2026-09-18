@@ -65,6 +65,13 @@
 - バージョンはv0.34.0で固定運用（2026-08-13更新・動作確認済み: --profileログイン再利用/set viewport/screenshot/upload）。アップデートは動作確認してから（Vercel Labsの実験リポジトリのため）
 - 縦長ページの全項目スクショは `set viewport 1280 3400` → 素の `screenshot` が最良（内部スクロールUIには--fullが効かないため）
 
+## 1Password CLI（op）の運用（2026-09-18制定）
+- MacBookに導入済み（`brew install --cask 1password-cli`＋アプリの設定→開発者→「1Password CLIと連携」ON）。Mac miniは未導入（dotfilesにBrewfileが無く同期されない・要別途install）
+- **opは必要な時だけ、1回のBash呼び出しにまとめて実行する**（複数の `op read` を1コマンドに並べる／`op run`・`op inject` で一括）。アプリ連携の認可は呼び出し元プロセス単位で、ClaudeのBashは毎回新プロセス＝**1コマンドごとにTouch IDダイアログが出る**（公式: 新ターミナルごとに再認可・10分無操作で失効・最長12h・アプリロックで全失効）。動作確認目的でopを叩かない（2026-09-18に検証で連発し「何回も出てくる」となった）
+- `op whoami` は連携下で常に「account is not signed in」を返す偽エラー。確認は `op user get --me` か `op vault list`
+- 連携ON直後に「not signed in」で他コマンドも通らない時は `op signin` を一度実行（承認はアプリ側でTouch ID）
+- 資格情報（トークン・パスワード）はClaudeが扱わない。サービスアカウントを使う場合の発行・保管は深石さん自身
+
 ## 作業レポート（必須）
 3ステップ以上のタスク完了時、必ず報告：達成度% / 残スライス数 / 次のアクション / 方針ズレ
 

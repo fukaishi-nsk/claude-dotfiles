@@ -71,6 +71,7 @@
 - `op whoami` は連携下で常に「account is not signed in」を返す偽エラー。確認は `op user get --me` か `op vault list`
 - 連携ON直後に「not signed in」で他コマンドも通らない時は `op signin` を一度実行（承認はアプリ側でTouch ID）
 - 資格情報（トークン・パスワード）はClaudeが扱わない。サービスアカウントを使う場合の発行・保管は深石さん自身
+- Codex からも使う（同内容を正本 codex/AGENTS.md に記載）。**Codex のサンドボックス内では 1Password アプリに接続不可**（2026-09-18 検証: workspace-write / network_access / network_proxy.unix_sockets の allow いずれも「couldn't connect」）→ Codex では op を含むコマンドをサンドボックス外実行（承認）で回す。ダイアログは「Allow Codex to get CLI access」
 
 ## 作業レポート（必須）
 3ステップ以上のタスク完了時、必ず報告：達成度% / 残スライス数 / 次のアクション / 方針ズレ

@@ -174,5 +174,6 @@
   },
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "switchModelsOnFlag": false
 }

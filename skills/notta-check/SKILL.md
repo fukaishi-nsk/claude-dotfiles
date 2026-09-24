@@ -9,15 +9,27 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 `~/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/Notta_Inbox/`
 に自動保存される（NSKワークスペース全案件共通の受け皿）。
 
-## ⚠️ 先にMeet Recordingsを確認する会議（2026-08-12 深石さん指示）
+## ⚠️ 先にGoogle Meetの成果物を確認する会議（2026-08-12 深石さん指示）
 
-**Google Meetの会議（N朝会などの社内定例・Meet開催の顧客MTG）は、まず `My Drive/Meet Recordings/` を確認**し、無かったらNottaを見る、の順にする。
-- Meetの成果物＝`会議名 - YYYY MM DD HH:MM JST - Gemini によるメモ.gdoc`（Geminiメモ＋文字起こしリンク）や `〜Recording`（録画）
-- `.gdoc` は175バイトのポインタファイル。`cat` して `doc_id` を取り、**Google Drive MCPの `read_file_content`（fileId=doc_id）で本文を取得**できる（Geminiメモ＋全文文字起こしが1ドキュメントに入っている）
+**Google Meetの会議（N朝会などの社内定例・Meet開催の顧客MTG）は、まず `My Drive/Google Meet/` の配下を確認**し、無かったらNottaを見る、の順にする。
+- **置き場所（2026-09-24 実物で確認。MacBook・Mac mini とも同じ構成）**:
+  - ⚠️ マイドライブ直下の `My Drive/Meet Recordings/` は**もう無い**。2026-08-26 に `My Drive/Google Meet/` が作られ、`Meet Recordings` はその配下にある（フォルダIDは従来と同じ `1FeGWMGQgOc6TsDNptpjQ7T-mYlv_Nhmd`）
+  - **定例** → `Google Meet/<会議名> (recurring)/`（例: `N朝会 (recurring)/`・`Nクリエイティブチェック (recurring)/`・`湯本電機_定例 (recurring)/`）
+  - **単発** → 1回ごとのフォルダ `Google Meet/<会議名> - YYYY MM DD HH:MM JST/`（例: `[artience]グーポン相談 - 2026 09 01 15:00 JST/`）。会議名の代わりに会議コードが名前のフォルダもある（例: `kei-etjw-dfx - 2026 09 18 10:59 JST/`）
+  - **`Google Meet/Meet Recordings/`** → 2026-08-25分までのGeminiメモ・録画（会議別フォルダができる前の分）と、下記の秒付きタイムスタンプgdoc（8/26以降もここに着弾し続けている）
+- 探し方の例（会議フォルダの中にサブフォルダは無い）:
+  ```bash
+  GM="$HOME/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/Google Meet"
+  find "$GM" -maxdepth 3 -mtime -2   # 直近2日の着弾。定例・単発・Meet Recordings をまとめて拾える
+  find "$GM" -maxdepth 2 \( -name "*N朝会*2026 09 18*" -o -name "*N朝会*2026-09-18*" \)   # 会議名＋日付。日付は「2026 09 18」と「2026-09-18」の2形式がある
+  ```
+- Meetの成果物＝`会議名 - YYYY MM DD HH:MM JST - Gemini によるメモ.gdoc`（Geminiメモ＋文字起こし）・`会議名 - YYYY MM DD HH:MM JST～Recording`（録画）・`会議名 - YYYY MM DD HH:MM JST～Transcript.gdoc`（Meetの文字起こし）。`～` は全角チルダ（U+FF5E）で波ダッシュ `〜` ではない → grep は `Recording$`・`Transcript\.gdoc$` のように末尾で当てる
+- **Geminiメモ・録画が無く `～Transcript.gdoc` だけの会議もある**（2026-09-24時点で11件: nancoオンライン相談・そら植物園の一部・会議コード名の会議など）。中身がほぼ空の例もある（9/10 `[湯本電機]インナー作業`）→ 下記の秒付きタイムスタンプgdoc・Notta_Inboxも見る
+- `.gdoc` は175バイトのポインタファイル。`cat` して `doc_id` を取り、**Google Drive MCPの `read_file_content`（fileId=doc_id）で本文を取得**できる（Geminiメモの.gdocは、メモと全文文字起こしが1ドキュメントに入っている）。Drive MCP上のタイトルは日付がスラッシュ区切り（例: `N朝会 - 2026/09/24 10:01 JST - Gemini によるメモ`）で、ローカルのファイル名（`2026 09 24`）と表記が違う
 - Geminiメモの話者ラベルもNotta同様に誤りうる。文脈と矛盾する発言は断定しない
-- 使い分けの原則（2026-08-12 深石さん）: **Nスケッチ主催＝Google Meet**（文字起こし・録画はMeet Recordingsへ）／**クライアント主催・クライアント都合＝Nottaを参加させる**（Notta_Inboxへ着弾）
-- **同じ会議が両方に記録されることがある**。実例: `260810_[湯本]相談`・`GSI棚卸し_260803_*` はNotta_Inboxの.txtとMeet Recordings側の同名.gdocの両方にある。逆に社内のN朝会の文字起こしがNotta_Inbox側に着弾している例もある → 見つからない・判断に迷うときは両方を確認する
-- **`会議名 - YYYY-MM-DD HH:MM:SS.gdoc`（秒までのタイムスタンプ形式）もMeet Recordingsに着弾する**（2026-08-28 島津第五回で確認）。これはGeminiメモとは別物で、**Notta形式（⏰日時・分数・実名話者）の文字起こしDoc**。**Teams会議でも生成され**、Notta_Inboxの.txtより早い（実例: 会議終了5分後にgdoc着弾、.txtは1時間後も未着）。読み方は同じ（catでdoc_id→read_file_content）。Notta_Inboxに.txtが無くてもこちらに全文があることがある
+- 使い分けの原則（2026-08-12 深石さん）: **Nスケッチ主催＝Google Meet**（文字起こし・録画は `Google Meet/` 配下へ）／**クライアント主催・クライアント都合＝Nottaを参加させる**（Notta_Inboxへ着弾）
+- **同じ会議が両方に記録されることがある**。実例: `260810_[湯本]相談`・`GSI棚卸し_260803_*` はNotta_Inboxの.txtと `Google Meet/Meet Recordings/` 側の同名.gdocの両方にある。逆に社内のN朝会の文字起こしがNotta_Inbox側に着弾している例もある → 見つからない・判断に迷うときは両方を確認する
+- **`会議名 - YYYY-MM-DD HH:MM:SS.gdoc`（秒までのタイムスタンプ形式）は `Google Meet/Meet Recordings/` に着弾する**（2026-08-28 島津第五回で確認。2026-08-26の会議別フォルダ化の後も、このgdocは会議別フォルダではなくここに来る・9/18分まで確認）。これはGeminiメモとは別物で、**Notta形式（⏰日時・分数・実名話者）の文字起こしDoc**。**Teams会議でも生成され**、Notta_Inboxの.txtより早い（実例: 会議終了5分後にgdoc着弾、.txtは1時間後も未着）。読み方は同じ（catでdoc_id→read_file_content）。Notta_Inboxに.txtが無くてもこちらに全文があることがある
 - **⚠️ .txtは永久に来ないことがある（2026-08-28 島津第五回で実証・Zapier実機調査済み）**: Notta_Inboxへの.txtを作るZap「Create Google Drive files from new Notta transcripts」のトリガーは**Instant（Webhook）型**。NottaからのWebhookが欠落するとその回の.txtは**再送されず二度と来ない**（第五回はNottaワークスペースに文字起こしが存在し、gdocルートは17:05に着弾したのに、Zapは未発火のままだった。Zap自体はON・同日14:03の別会議では正常発火）。→ **.txtが数十分待っても来なければ、上のタイムスタンプgdocルートから回収するのが正**（同一ソースなので突合も不要）
 - **日付プレフィックス自動付与は2026-08-28からGAS版（Drive API改名・毎時）が担当**: 正本=dotfiles `gas/notta-inbox-datestamp/`（fukaishiアカウントのApps Script「notta-inbox-datestamp」）。旧launchd版はlaunchd文脈のmvがFile Provider側で巻き戻り機能していなかった（詳細: dotfiles `launchd/notta-inbox-datestamp/README.md`。当面並走中）。日付なしファイルを見つけたら従来どおりセッション内で手動改名してよい（GAS版は最大1時間遅れのため）
 

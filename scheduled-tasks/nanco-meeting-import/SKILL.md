@@ -25,7 +25,7 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
 
 - 使ってよいMCPツール（settings.json の allow と同期・2026-08-27時点）:
   - Slack: 全ツール可 ／ Google Drive: 全ツール可
-  - Googleカレンダー: list_events / search_events / get_event / list_calendars ＋ create_event / update_event（作成・変更は承認済み返信への対応時のみ）。**delete_event は禁止**
+  - Googleカレンダー: list_events / search_events / get_event / list_calendars ＋ create_event / update_event（作成・変更は承認済み返信への対応時、または下記 5.6 の「そら植物園の次回定例の自動登録」のみ）。**delete_event は禁止**
   - Linear: list_issues / get_issue / list_comments / list_teams / list_users / save_issue / save_comment / prepare_attachment_upload / create_attachment_from_upload（save系は本タスク内ルールどおり承認後のみ）
   - Gmail: search_threads / get_thread / get_message / list_drafts（読み取りのみ。**下書き作成・送信・転送は禁止**）
   - Notion: notion-search / notion-fetch / notion-query-data-sources / notion-get-users（読み取りのみ）
@@ -60,6 +60,13 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
 5. KB差分案を作成（本体は書き換えない）: 取込先の既存KB（02_Plan/プロジェクト概要_*.md または *総合AIプロファイル*.md）に対する、決定事項／未決事項の追加・解消／関係者／ステータス変化／更新ログ1行。
    - **新規顧客（フォルダを新規作成した回）は、`カスタマー/AIプロファイル作成_引継ぎマニュアル.md` のフォーマットで `[企業名]様_総合AIプロファイル.md` を自動生成**（本気モード＝Pain/Gain＋根拠引用/LP/バックログ/FAQ/Linear Issue表。作成前に既存2〜3件で実フォーマット確認）。⚠**逐語の文字起こし全文はプロファイルに貼らない**＝要点＋重要発言の引用＋Next Actionに留め、末尾に `[逐語全文は 06_Recording/[会議名].md を参照]` のポインタを置く（全文は取込mdにあり重複させない）。社名が文字起こし由来で不確かなら公式サイト確認 or Slack確認。
 5.5. **Linearイシュー候補の抽出（リストのみ・起票しない）**: 取込んだnanco案件ごとに、文字起こしから起票候補を洗い出す（顧客要望／バグ／姉崎さんの口頭コミット等）。**リスト化までを自動で行い、実際の起票（save_issue）はしない**＝外部書き込みは承認後。候補は `[顧客名][エリア] 説明` の命名で、種別（要望/バグ/口頭コミット）・発言根拠・（あれば）期日を添える。⚠創作禁止＝文字起こしに無い項目は作らない。無い回は「候補なし」でよい。※**重複チェックは実施する**（2026-08-06訂正）＝このLinear MCPは `list_issues` の `query` でタイトル/本文検索できるので、候補ごとに検索して既存の類似イシューを併記する（一般語は複数キーワードで絞る）。統合するか切り出すかの判断・起票は人に委ねる（[[reference_nanco_linear_team]]／[[feedback_nanco_linear_triage]]／[[user_linear_issue_naming]]／[[project_anezaki_verbal_commitments]] 準拠）。
+5.6. **そら植物園の次回定例をカレンダーに自動登録（2026-09-25 深石さん承認で追加）**: そら植物園の定例を取り込んだ回は、文字起こしから次回の日時を探し、**日付と開始時刻が発言ではっきり合意されていれば、承認を待たずに create_event する**（8/24・9/7便では当日夕方に作っていたが、9/11・9/25便では作らず報告だけで止まり、運用がぶれていた）。
+   - 登録前に「次回日付の終日」を list_events で確認し、同名の予定（`[★nanco]そら植物園`）が既にあれば作らない（二重作成防止）
+   - 型（8/24〜9/25の既存予定と同じ）: summary `[★nanco]そら植物園`／開始＝合意した時刻・終了＝発言が無ければ1時間で仮置き／`addGoogleMeetUrl: true`／attendees は `anezaki@nsketch.com` のみ（**顧客はカレンダーに招待しない**。Meetリンクは LINE グループで共有する運用で、sora-meet-link-share タスクが当日朝に送る）
+   - description: 「YYYY/MM/DD の打合せ（HH:MM回）で松尾さんと合意した次回。」＋【日程の根拠（文字起こし 時刻・原文のまま）】の発言引用＋⚠解釈した点（「同じ時間」をどう読んだか・終了時刻の仮置き等）＋【この回の議題】（発言根拠のあるものだけ）＋「※Meetリンクは例年どおり LINEグループ（nanco⇄在庫管理(そら植物園)）で共有する運用。顧客側はカレンダー招待に入れていない。」＋「逐語全文: Nanco/カスタマー/そら植物園/06_Recording/<取込ファイル名>」
+   - 🚫 **作らない条件**: 「仮置き」「一旦」「どちらか」など確定していない発言／曜日だけで日付が一意に決まらない／開始時刻の発言が無い／文字起こしが乱れて読み切れない。この場合は従来どおり報告の「要返信」に載せ、「`次回OK`＝この日時で登録」のように返信方法を書く
+   - 報告には「:calendar: 次回 M/D(曜) HH:MM を登録しました（根拠の発言）」と、作った予定の htmlLink を載せる
+   - そら植物園以外の顧客の次回予定は、従来どおり自動では作らない（報告に載せるだけ）
 5.7. **LINE巡回（毎回・2026-08-06追加）**: Slack `#nanco_カスタマーお問い合わせ`（channel_id `C04S812EP1Q`）の前回実行以降の新着を読む。LINE転写ボット経由の顧客グループ（そら植物園ほか）の生の声がここに来る。
    - 🚨 **`slack_read_channel` に `oldest` を付けない**（2026-08-24に誤報）。`oldest`＋`limit` は **その時刻から「古い側」N件**を返し、**最新側が切り捨てられる**。`limit=100` だけで最新から読み、手元で時刻フィルタする。`pagination_info` の「もっとある」を*古い方向にだけ*辿って打ち切らない
    - 🚨 **「新着0件」と書くときは、根拠として *チャンネル最新メッセージの時刻* を必ず併記する**。その時刻が「今」から離れていたら取り逃している証拠

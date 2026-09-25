@@ -90,6 +90,10 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 3. **app.slack.comからのクロスオリジンfetchが `Failed to fetch` で落ちるケースがある**（2026-08-12時点）。回避策＝**タブ自体を files-pri URLへ遷移**（files-origin.slack.com にリダイレクトされ画像が表示される）→ その同一オリジンで `fetch(location.href,{credentials:"include"})` → チャンク取り出し。⚠遷移するとヘルパーは消えるので**ファイルごとに再注入**
 4. `eval` に**トップレベル `await` は書けない**（SyntaxError）。Promiseを返せば自動awaitされる
 5. チャンクは**120000バイト**（base64 160000文字・`--max-output 200000`内）でも欠損なし＝60000比でコール数半減（5ファイル計9.4MBで全ファイルバイト一致を確認）
+6. **PDFの場合（2026-09-25 千葉大e・井上さんのSlack Connect投稿 6.4MBで実証・バイト一致）**：
+   - チームIDは `img[src]`・`a[href]` には出ない（`a[href]` は `https://<相手ws>.slack.com/files/<自分のUID>/<FILE_ID>/<サニタイズ名>` だけ）。**PDFのサムネは CSS の `background-image: url(".../files-tmb/T…-F…-hash/…_thumb_pdf.png")`** にあるので、`document.documentElement.outerHTML` を FILE_ID で正規表現検索して拾う
+   - direct fetch も、サムネURL（files.slack.com）へ遷移してからの同一オリジンfetchも `Failed to fetch`。**タブを files-pri のPDF URLへ遷移すると `https://slack-files.com/files-pri-safe/T…-F…/<名>.pdf?c=…` に着地し PDF が表示される**→ そこでヘルパー注入 → `fetch(location.href)` で取得できた（`document.contentType` が `application/pdf`、先頭 `%PDF-`）。`open` はPDF表示で戻りが遅いことがあるのでバックグラウンド起動＋待機で回した
+   - 検証は**サイズ一致＋先頭 `%PDF-`＋末尾 `%%EOF`**、仕上げに `pdfinfo` でページ数。⚠バッチスクリプトはPNG/JPEGのマジックしか通さない（PDFは `.BAD` になる）ので、PDFは手順1〜4を手で回す
 
 ## バッチ回収スクリプト（2026-09-08 島津第六回で実証: 24枚・65.9MBを1分17秒で全件バイト一致）
 

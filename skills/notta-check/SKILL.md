@@ -51,6 +51,13 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 ## フォールバック
 
 - ログイン状態のブラウザで app.notta.ai を開いて本文を取得する（agent-browser の専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を想定。MacはこのプロファイルでNottaログイン済み（2026-09-07・ヘッドレスでdashboard表示を確認）。本文取得の手順自体は未検証。旧 `--profile Default` は2026-09-07廃止）
+- ⚠️ **Nottaの業務アカウントは `dev@nsketch.com`**（2026-09-30 深石さん確認）。NSKワークスペース（`https://app.notta.ai/7206228075381755904/dashboard`・Business Plan）はこのアカウントで入る。`fukaishi@nsketch.com` で「Continue with Google」すると個人の「fukaishi’s Workspace（Free Plan）」に入ってしまい、NSKワークスペースURLを開いても個人側へリダイレクトされる。gmailプロファイルには2026-09-30に dev@ でログイン済み（MacBook）。Googleアカウント選択画面の「Notta.ai」はアプリ名表示でアカウントではない
+
+## 手動録音（スマホ等）をNottaで文字起こしする
+
+- Nottaボットが不調で別途録音した場合は、NSKワークスペースの「Upload & transcribe」で音声をアップロードする（2026-09-30 島津来期相談で実施）
+- 動画（iPhoneの.MOV等）は音声だけ抜いてから上げる: `ffmpeg -i IMG_xxxx.MOV -vn -map 0:a:0 -c:a copy 出力.m4a`（再エンコードなし・869MB→30MB）
+- 当座の保険としてローカルwhisper.cppでも起こせる（話者ラベルなし）: `whisper-cli -m ~/whisper-models/ggml-large-v3-turbo.bin -l ja --vad -vm ~/whisper-models/ggml-silero-v5.1.2.bin -otxt -osrt -of 出力 -f 16kHzモノラル.wav`（24分が約30秒）
 
 ## 注意
 

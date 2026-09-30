@@ -69,7 +69,10 @@
 - 導入状況（2026-09-30 実機確認。dotfilesにBrewfileが無く同期されないため、導入はPCごと）:
   - MacBook: 導入済み（`brew install --cask 1password-cli`＋アプリの設定→開発者→「1Password CLIと連携」ON）。op 2.39.0・アプリ 8.12.36。`op user get --me`／`op vault list` で保管庫まで通ることを確認済み
   - Mac mini: op 2.39.0・アプリ 8.12.36 が入っている（SSHで確認）。**アプリ連携がONか・保管庫まで通るかは未確認**（SSH越しだと認可ダイアログがMac miniの画面側に出るため未実行）
-  - 5090機（Windows・NSKETCH5090）: **op もアプリも未導入**。導入は深石さんが自分で行う（Claudeは入れない）。導入されたらこの行を更新する
+  - 5090機（Windows・NSKETCH5090）: **op 本体のみ導入・アプリ連携は見送り**（2026-09-30）。op 2.39.0 は深石さんの指示でClaudeが winget（`AgileBits.1Password.CLI`）で導入。アプリは Microsoft Store 版 8.12.36.40 が入っている（レジストリの Uninstall 一覧には出ない＝`Get-AppxPackage` で確認する）。**この機の op は保管庫に繋がらない**（`op read`・`op run` 等は使えない）
+    - 連携を見送った理由: Windows の連携は Windows Hello が必須（公式手順）。この機は生体認証デバイス無し・PIN未登録（レジストリからの推定）で、ローカルアカウントの自動ログオンで動くParsec遠隔専用機。サインイン設定を触って失敗すると再起動後に入れなくなるため、PIN登録はしない
+    - この機で保管庫の値が要る時: 1Passwordアプリ（GUI）から深石さんが取り出す。op で自動化したくなったらサービスアカウント方式を検討（発行・保管は深石さん）
+    - 未確認: Store版アプリでCLI連携が通るか／Parsec越しにHelloのPINダイアログへ入力できるか
 - **opは必要な時だけ、1回のBash呼び出しにまとめて実行する**（複数の `op read` を1コマンドに並べる／`op run`・`op inject` で一括）。アプリ連携の認可は呼び出し元プロセス単位で、ClaudeのBashは毎回新プロセス＝**1コマンドごとにTouch IDダイアログが出る**（公式: 新ターミナルごとに再認可・10分無操作で失効・最長12h・アプリロックで全失効）。動作確認目的でopを叩かない（2026-09-18に検証で連発し「何回も出てくる」となった）
 - `op whoami` は連携下で常に「account is not signed in」を返す偽エラー。確認は `op user get --me` か `op vault list`
 - 連携ON直後に「not signed in」で他コマンドも通らない時は `op signin` を一度実行（承認はアプリ側でTouch ID）

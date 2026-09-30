@@ -8,7 +8,7 @@
 - 作業が終わったら `close` する（専用プロファイルのログイン状態は残る）
 
 ## 1Password CLI（op・Claude Code と共用 / 2026-09-18制定）
-- MacBook に導入済み（`brew install --cask 1password-cli`＋1Passwordアプリの設定→開発者→「1Password CLIと連携」ON）。アカウント nsketchinc.1password.com。Mac mini にも op 2.39.0・アプリ 8.12.36 が入っている（2026-09-30 SSHで確認。ただしアプリ連携がONか・保管庫まで通るかは未確認）。5090機（Windows・NSKETCH5090）は op もアプリも未導入（2026-09-30 確認。導入は深石さん本人が行う）
+- MacBook に導入済み（`brew install --cask 1password-cli`＋1Passwordアプリの設定→開発者→「1Password CLIと連携」ON）。アカウント nsketchinc.1password.com。Mac mini にも op 2.39.0・アプリ 8.12.36 が入っている（2026-09-30 SSHで確認。ただしアプリ連携がONか・保管庫まで通るかは未確認）。5090機（Windows・NSKETCH5090）は op 2.39.0 本体のみ導入・アプリ連携は見送り（2026-09-30。Windows の連携は Windows Hello 必須だが、自動ログオンで動くParsec遠隔専用機のためPIN登録をしない）。**5090機の op は保管庫に繋がらない**ので `op read`・`op run` を試さない。値が要る時は深石さんが1Passwordアプリから取り出す
 - 🚫 **Codex のサンドボックス内では op は 1Password アプリに接続できない**（2026-09-18 検証: read-only / workspace-write / `network_access=true` / `features.network_proxy.unix_sockets` の allow いずれも「couldn't connect to the 1Password desktop app」。サンドボックス無しでは成功）。op を含むコマンドは**最初からサンドボックス外での実行を要求（承認を得る）**し、失敗→再試行で無駄に回さない
 - 承認後、1Password 側で「Allow Codex to get CLI access」の Touch ID ダイアログが出る。**本人が承認する**（パスワード・トークンを自分で入力しない）。認可は呼び出し元プロセス単位＝1コマンドごとに出るため、**op は必要な時だけ、1回の呼び出しにまとめて実行**（複数の `op read` を1コマンドに／`op run`・`op inject` で一括）。動作確認目的で叩かない
 - `op whoami` は連携下で常に「account is not signed in」を返す偽エラー。確認は `op user get --me` か `op vault list`

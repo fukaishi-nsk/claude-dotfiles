@@ -66,7 +66,10 @@
 - 縦長ページの全項目スクショは `set viewport 1280 3400` → 素の `screenshot` が最良（内部スクロールUIには--fullが効かないため）
 
 ## 1Password CLI（op）の運用（2026-09-18制定）
-- MacBookに導入済み（`brew install --cask 1password-cli`＋アプリの設定→開発者→「1Password CLIと連携」ON）。Mac miniは未導入（dotfilesにBrewfileが無く同期されない・要別途install）
+- 導入状況（2026-09-30 実機確認。dotfilesにBrewfileが無く同期されないため、導入はPCごと）:
+  - MacBook: 導入済み（`brew install --cask 1password-cli`＋アプリの設定→開発者→「1Password CLIと連携」ON）。op 2.39.0・アプリ 8.12.36。`op user get --me`／`op vault list` で保管庫まで通ることを確認済み
+  - Mac mini: op 2.39.0・アプリ 8.12.36 が入っている（SSHで確認）。**アプリ連携がONか・保管庫まで通るかは未確認**（SSH越しだと認可ダイアログがMac miniの画面側に出るため未実行）
+  - 5090機（Windows・NSKETCH5090）: **op もアプリも未導入**。導入は深石さんが自分で行う（Claudeは入れない）。導入されたらこの行を更新する
 - **opは必要な時だけ、1回のBash呼び出しにまとめて実行する**（複数の `op read` を1コマンドに並べる／`op run`・`op inject` で一括）。アプリ連携の認可は呼び出し元プロセス単位で、ClaudeのBashは毎回新プロセス＝**1コマンドごとにTouch IDダイアログが出る**（公式: 新ターミナルごとに再認可・10分無操作で失効・最長12h・アプリロックで全失効）。動作確認目的でopを叩かない（2026-09-18に検証で連発し「何回も出てくる」となった）
 - `op whoami` は連携下で常に「account is not signed in」を返す偽エラー。確認は `op user get --me` か `op vault list`
 - 連携ON直後に「not signed in」で他コマンドも通らない時は `op signin` を一度実行（承認はアプリ側でTouch ID）

@@ -58,6 +58,7 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 - Nottaボットが不調で別途録音した場合は、NSKワークスペースの「Upload & transcribe」で音声をアップロードする（2026-09-30 島津来期相談で実施）
 - 動画（iPhoneの.MOV等）は音声だけ抜いてから上げる: `ffmpeg -i IMG_xxxx.MOV -vn -map 0:a:0 -c:a copy 出力.m4a`（再エンコードなし・869MB→30MB）
 - 当座の保険としてローカルwhisper.cppでも起こせる（話者ラベルなし）: `whisper-cli -m ~/whisper-models/ggml-large-v3-turbo.bin -l ja --vad -vm ~/whisper-models/ggml-silero-v5.1.2.bin -otxt -osrt -of 出力 -f 16kHzモノラル.wav`（24分が約30秒）
+- アップロード設定: 言語Japanese・Identify speakers・人数は「I'm not sure」。**アップロード分もZapier経由でNotta_Inboxに着弾する**（2026-09-30実績: 24分音声でアップロードから約10分・ファイル名＝アップロードしたファイル名＋.txt）。話者は「話者1/2/3」表記なので、発言内容から実名や社名に置換して06_Recordingへ
 
 ## 注意
 

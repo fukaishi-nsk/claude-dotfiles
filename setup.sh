@@ -117,7 +117,7 @@ done
 # ※ 全スキルは共有しない（Claude専用スキルがCodexのskillsコンテキスト予算を圧迫するため）
 # ※ symlinkはCodexがスキルとして認識しないため実ファイルコピー（2026-08-10 codex execで検証済み）
 #    → 正本（skills/配下）を編集したら setup.sh を再実行してコピーを更新すること
-CODEX_SHARED_SKILLS=(notta-check)
+CODEX_SHARED_SKILLS=(notta-check email-draft)
 if [ -d "$HOME/.codex" ]; then
   mkdir -p "$HOME/.codex/skills"
   for skill_name in "${CODEX_SHARED_SKILLS[@]}"; do

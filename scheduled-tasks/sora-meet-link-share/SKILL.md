@@ -5,7 +5,7 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
 
 目的: そら植物園の定例MTG（顧客はカレンダー招待に入れない運用）のMeetリンク共有を自動化する。
 現行の手動運用＝深石さんがMTG当日の朝、Googleカレンダーの招待テキストをLINEグループへ貼っている
-（実例: 2026-08-04 9:55／08-07 9:46／08-10 11:21。Slack C04S812EP1Q の line-relay 転写で確認済み）。
+（実例: 2026-08-04 9:55／08-07 9:46／08-10 11:21。当時の転写先 Slack C04S812EP1Q の line-relay 転写で確認済み）。
 この文面の型をそのまま踏襲する。⚠送信名義は深石さん個人ではなく OA「nancoサポート」になる点だけ従来と異なる。
 
 ## 実行モード
@@ -17,7 +17,7 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
 - 送信先LINEグループ: `nanco⇄在庫管理(そら植物園)` groupId=`C1236146db7f194dc3bdaf770a3553aba`（2026-07-30参加ログで確認）
 - 送信経路: Cloudflare Worker `https://line-group-relay.nsketch-nanco.workers.dev/push`（POST・Bearer認証）
   - 認証トークン: `~/.claude/scheduled-tasks/sora-meet-link-share/.push_token`（PCローカル・git管理しない。Worker側Secretsの `PUSH_TOKEN` と同値）
-  - Workerは送信成否を `#nanco_カスタマーお問い合わせ`（C04S812EP1Q）へ自動ミラーする（監査ログ）
+  - Workerは送信成否を `#nanco_line`（C0C5Z16821X）へ自動ミラーする（監査ログ。2026-10-01に #nanco_カスタマーお問い合わせ＝C04S812EP1Q から移設）
 - 状態ファイル（PCローカル・git管理しない）:
   - `config.json` … `{"dryRun": true|false}`。**trueの間はLINEへ送らずSlack予告のみ**
   - `state.json` … `{"sentEventIds": [...]}`。送信済みイベントID（重複送信防止）
@@ -49,7 +49,7 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
        -H "content-type: application/json" \
        -d '{"to":"C1236146db7f194dc3bdaf770a3553aba","text":"<文面>"}'
      ```
-     レスポンス `{"ok":true,...}` を確認（**実体検証**: C04S812EP1Q にWorkerの `📤 LINEへ送信しました` ミラーが出ていることまで見る）→
+     レスポンス `{"ok":true,...}` を確認（**実体検証**: C0C5Z16821X（#nanco_line）にWorkerの `📤 LINEへ送信しました` ミラーが出ていることまで見る）→
      `state.json` の `sentEventIds` へイベントIDを追記 → Slack `#log_fukaishi` に `✅ そらMTGのMeetリンクをLINEへ送信しました` ＋文面＋ミラーへの言及を報告。
      失敗時（ok:false／curl失敗）は `#log_fukaishi` に `🔴 送信失敗・手動対応してください` ＋エラー全文を報告（リトライは1回まで）。
 

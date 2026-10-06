@@ -26,7 +26,7 @@ user-invocable: true
 
 ### 定数（環境固有）
 - **Meet Recordings フォルダID**: `1FeGWMGQgOc6TsDNptpjQ7T-mYlv_Nhmd`（owner: fukaishi@nsketch.com）。2026-08-26以降は「Google Meet」フォルダの配下に移り、ここには8/25までの成果物と秒付きタイムスタンプgdoc（Notta形式）だけが入る
-- **Google Meet フォルダID（2つある）**: 元の `1AjNV0b5jnpHF8UESpIG0-ouPyESwu1_R`（2026-08-26〜10-01 19:06の会議別フォルダ）／**2つ目 `1SnCFtkyqkarrNBsGHANhlw8r_s2OS_SB`**（2026-10-01 19:06にマイドライブ直下へ新設・ローカル表示は `Google Meet (1)`。以降の会議別フォルダ・録画・Geminiメモはこちら。新設の原因は不明・様子見中）。どちらも直下に `<会議名> (recurring)/`（定例）か `<会議名> - YYYY MM DD HH:MM JST/`（単発）のサブフォルダがあり、その中に成果物が入る
+- **Google Meet フォルダは増える（2026-10-06時点で3つ）**: 元の `1AjNV0b5jnpHF8UESpIG0-ouPyESwu1_R`（2026-08-26〜10-01 19:06）／2つ目 `1SnCFtkyqkarrNBsGHANhlw8r_s2OS_SB`（10-01 19:06新設・ローカル表示 `Google Meet (1)`）／3つ目 `16masgN5PLTLh2xuI--c5KUxrcrHuocuH`（10-02 11:20新設・ローカル表示 `Google Meet (2)`。10/6 山下さん相談のTranscriptはここ）。**原因: Google Meet の保存フォルダの権限を変えると、Meet が新しい「Google Meet」フォルダを作り直す**（2026-10-06 深石さん）。→ IDを決め打ちしない。毎回 `search_files` で `title = 'Google Meet' and mimeType = 'application/vnd.google-apps.folder' and owner = 'me'` を引いて全部を対象にする。どれも直下に `<会議名> (recurring)/`（定例）か `<会議名> - YYYY MM DD HH:MM JST/`（単発）のサブフォルダがあり、その中に成果物が入る
 - **顧客ルート**: 共有ドライブ `Nanco / カスタマー`（このフォルダ直下に各顧客フォルダがある）
 - **顧客マスタ（照合辞書）**: `カスタマー/00_顧客マスタ.md` … 1列目「社名（フォルダ名と一致）」が正準フォルダ名
 - **Slack報告先**: チャンネル `#log_fukaishi`
@@ -92,7 +92,7 @@ user-invocable: true
 ### Step 3.5: 取込元Doc（Gemini によるメモ）の特定
 **主経路**：Step 1で取得したイベントの `attachments` から **title=「Gemini によるメモ」の `fileUrl`** を取り、doc IDを抜く（`/document/d/<ID>/`）。複数あれば全部。→ 取込元確定（Drive検索不要）。
 **フォールバック**（カレンダーにメモDocが無い時のみ）：次の3か所を**すべて**見る（どれか1か所だけだと見落とす）。いずれも**一覧取得し、タイトルはクライアント側で会議名＋日時を部分一致**させて選ぶ。
-1. 2つの Google Meet フォルダ（`1AjNV0b5jnpHF8UESpIG0-ouPyESwu1_R`・`1SnCFtkyqkarrNBsGHANhlw8r_s2OS_SB`）の直下を `parentId='…' and mimeType='application/vnd.google-apps.folder'` で一覧 → 会議名が一致するサブフォルダ（`(recurring)` か `- YYYY MM DD HH:MM JST`）を選ぶ → そのサブフォルダを `parentId='<サブフォルダID>' and mimeType='application/vnd.google-apps.document' and createdTime > '<会議日0時Z>'` で一覧
+1. すべての Google Meet フォルダ（上の定数の search_files で毎回列挙する。決め打ちIDだけだと新設分を見落とす）の直下を `parentId='…' and mimeType='application/vnd.google-apps.folder'` で一覧 → 会議名が一致するサブフォルダ（`(recurring)` か `- YYYY MM DD HH:MM JST`）を選ぶ → そのサブフォルダを `parentId='<サブフォルダID>' and mimeType='application/vnd.google-apps.document' and createdTime > '<会議日0時Z>'` で一覧
 2. Meet Recordings(`1FeGWMGQgOc6TsDNptpjQ7T-mYlv_Nhmd`)を `parentId='…' and mimeType='application/vnd.google-apps.document' and createdTime > '<会議日0時Z>'` で一覧（秒付きタイムスタンプgdoc＝Notta形式の文字起こしがここに来る）
 - 同じ会議でも、文字起こしは元の Google Meet、録画は2つ目、と分かれることがある（2026-10-01 実例）
 - 2時間超の会議は録画の着弾が終了の約3時間後（10/1週次MTG）。Geminiメモ・録画とも通知メールが来ないことがある → 無人実行で見つからなくても「無い」と断定せず、次回の3日窓で拾う

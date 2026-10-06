@@ -17,13 +17,14 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
   - **定例** → `Google Meet/<会議名> (recurring)/`（例: `N朝会 (recurring)/`・`Nクリエイティブチェック (recurring)/`・`湯本電機_定例 (recurring)/`）
   - **単発** → 1回ごとのフォルダ `Google Meet/<会議名> - YYYY MM DD HH:MM JST/`（例: `[artience]グーポン相談 - 2026 09 01 15:00 JST/`）。会議名の代わりに会議コードが名前のフォルダもある（例: `kei-etjw-dfx - 2026 09 18 10:59 JST/`）
   - **`Google Meet/Meet Recordings/`** → 2026-08-25分までのGeminiメモ・録画（会議別フォルダができる前の分）と、下記の秒付きタイムスタンプgdoc（8/26以降もここに着弾し続けている）
-  - ⚠️ **2026-10-01 19:06 に、マイドライブ直下へ2つ目の「Google Meet」フォルダが作られた**（ローカル表示は `Google Meet (1)`・MacBook/Mac mini とも同名・Drive id `1SnCFtkyqkarrNBsGHANhlw8r_s2OS_SB`。元の「Google Meet」は id `1AjNV0b5jnpHF8UESpIG0-ouPyESwu1_R`）。**それ以降の会議別フォルダ・録画・Geminiメモはこちらに着弾**（実例: 10/1 【nanco】週次MTGの録画 19:10着・吉原さん相談の録画・10/2 ヤマシタ様のGeminiメモ）。同じ会議の文字起こしは元の「Google Meet」、録画は `(1)` 側、と分かれることもある。新設の原因は不明・様子見中（2026-10-02 深石さん判断）→ **当面は両方を探す**
+  - ⚠️ **2026-10-01 19:06 に、マイドライブ直下へ2つ目の「Google Meet」フォルダが作られた**（ローカル表示は `Google Meet (1)`・MacBook/Mac mini とも同名・Drive id `1SnCFtkyqkarrNBsGHANhlw8r_s2OS_SB`。元の「Google Meet」は id `1AjNV0b5jnpHF8UESpIG0-ouPyESwu1_R`）。**それ以降の会議別フォルダ・録画・Geminiメモはこちらに着弾**（実例: 10/1 【nanco】週次MTGの録画 19:10着・吉原さん相談の録画・10/2 ヤマシタ様のGeminiメモ）。同じ会議の文字起こしは元の「Google Meet」、録画は `(1)` 側、と分かれることもある
+  - ⚠️ **さらに 2026-10-02 11:20 に3つ目ができた**（ローカル表示 `Google Meet (2)`・Drive id `16masgN5PLTLh2xuI--c5KUxrcrHuocuH`。10/6 山下さん相談のTranscriptはここ）。**原因: Google Meet の保存フォルダの権限を変えると、Meet が新しい「Google Meet」フォルダを作り直す**（2026-10-06 深石さん）→ **`Google Meet*` を全部探す**（下の find はワイルドカードで全フォルダを拾う形）。Drive MCP なら `title = 'Google Meet' and mimeType = 'application/vnd.google-apps.folder' and owner = 'me'` で全IDを列挙する
   - ⚠️ 2時間超の会議は**録画の着弾が会議終了から約3時間後**（10/1週次MTG: 16:12頃終了→19:10着・約1.9GB）。録画・メモとも**通知メールが来ないことがある**。「無い」と断定する前に時間を置いて両フォルダを取り直す
 - 探し方の例（会議フォルダの中にサブフォルダは無い）:
   ```bash
   MD="$HOME/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive"
-  find "$MD/Google Meet" "$MD/Google Meet (1)" -maxdepth 3 -mtime -2 2>/dev/null   # 直近2日の着弾。両フォルダ・定例・単発・Meet Recordings をまとめて拾える
-  find "$MD/Google Meet" "$MD/Google Meet (1)" -maxdepth 2 \( -name "*N朝会*2026 09 18*" -o -name "*N朝会*2026-09-18*" \) 2>/dev/null   # 会議名＋日付。日付は「2026 09 18」と「2026-09-18」の2形式がある
+  find "$MD"/Google\ Meet* -maxdepth 3 -mtime -2 2>/dev/null   # 直近2日の着弾。全Google Meetフォルダ・定例・単発・Meet Recordings をまとめて拾える
+  find "$MD"/Google\ Meet* -maxdepth 2 \( -name "*N朝会*2026 09 18*" -o -name "*N朝会*2026-09-18*" \) 2>/dev/null   # 会議名＋日付。日付は「2026 09 18」と「2026-09-18」の2形式がある
   ```
   Drive MCP で探すときはフォルダ名でなく `title contains '会議名'` で検索すれば両方にヒットする
 - Meetの成果物＝`会議名 - YYYY MM DD HH:MM JST - Gemini によるメモ.gdoc`（Geminiメモ＋文字起こし）・`会議名 - YYYY MM DD HH:MM JST～Recording`（録画）・`会議名 - YYYY MM DD HH:MM JST～Transcript.gdoc`（Meetの文字起こし）。`～` は全角チルダ（U+FF5E）で波ダッシュ `〜` ではない → grep は `Recording$`・`Transcript\.gdoc$` のように末尾で当てる

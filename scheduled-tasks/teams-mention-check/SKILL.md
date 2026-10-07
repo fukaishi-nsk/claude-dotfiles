@@ -3,7 +3,7 @@ name: teams-mention-check
 description: artienceのTeams(ADKテナント)@メンションを毎朝9時に直読みし、新着を古い順・原文のまま・メッセージリンク付きでSlack #2602_artience へ転写する（メール通知カバー率4割→10割化・2026-08-28制定）。新着の添付ファイルは 00_File_from へ保存する（2026-09-15〜）
 ---
 
-目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。**新着メッセージに添付ファイルがあれば案件フォルダの `00_File_from` に保存する**。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）、「（添付を）保存してほしい」（2026-09-15。9/3〜9/14の添付3点が未格納のまま溜まっていたのが発端）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md／teams-attachment-retrieval.md。
+目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。**新着メッセージに添付ファイルがあれば案件フォルダの `00_File_from` に保存する**。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）、「（添付を）保存してほしい」（2026-09-15。9/3〜9/14の添付3点が未格納のまま溜まっていたのが発端）、「今後は藤波さんの投稿も拾って」（2026-10-07＝メンション以外に藤波 秀麿さんの投稿も転写対象・手順5b）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md／teams-attachment-retrieval.md。
 
 【実行モード】無人。ブロックする質問はしない。創作禁止＝フィードに無い情報を書かない・**原文を一字も改変しない**（@メンション名の羅列も原文の一部としてそのまま）。判断できない事象は Slack #log_fukaishi（C03119VSJGK）に報告して保留。
 
@@ -39,6 +39,12 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 5. 新着判定（二段構え）:
    - エントリの日付が state.json の `seededBefore` より前 → 無条件で既知扱い。
    - それ以外は指紋化して seen と照合。機械一致しなくても、**同一と思われる投稿は再通知しない**（40文字の切り位置ズレ等の表記ゆれは常識判断で吸収する。誤った再通知はチャンネルのノイズになる）。
+5b. **藤波 秀麿さん（Nスケッチ側の実装担当・通称まろくん）の投稿も拾う**（深石さん宛メンションでなくても対象・2026-10-07 深石さん指示「今後は藤波さんの投稿も拾って」。発端＝10/7 9:33 藤波さん→松田さん宛の「修正反映しました」がメンションフィードに出ず漏れた）:
+   a. 左ペイン「Teams and channels」＞ artience｜制作 の **WEB関連・デザイン関連・一般** の3チャンネルを順にclick → wait --load networkidle → `wait 3000`。
+   b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>{let n=e;for(let i=0;i<8&&n;i++){n=n.parentElement;if(n&&n.innerText.length>40)break;}return [e.id,new Date(+e.id.slice(10)).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}),n.innerText.slice(0,200)]}).slice(-15))" --profile …` で直近の投稿（発言者・日時）を取得し、**発言者が「藤波 秀麿」で、前回巡回以降（目安＝前日の巡回時刻以降）の投稿**を候補にする。
+   c. 候補は手順5と同じ指紋（発言者名は `藤波　秀麿`）で seen と照合し、未転写のものだけ新着として扱う。⚠️メンションフィード経由で既に新着扱いのもの（藤波さんが深石さんにメンションした投稿）は二重にしない。
+   d. 本文は長文だと「see more」で折り畳まれている＝snapshot -i の `see more` ref をclickしてから innerText を取り直す（2026-10-07実証）。msgId＝その投稿の timestamp id。parentId は、その投稿が属するスレッドを開いて最上部のidを取る（チャンネルビューでは返信もルートの直下に並ぶので、日時順からの推測で決めない）。添付は手順6e・7と同じ扱い。
+   e. 転写（手順8）では同じ投稿にまとめ、見出しを「📣 Teams新着 N件（artience）」とし、藤波さんの投稿の ▪️ 行の末尾に「（藤波さん投稿・深石さん宛メンションではない）」と付記する。
 6. **新着それぞれについてメッセージリンクを構築**（新着が無ければスキップ）:
    a. そのrowの**本文gridcell**をclick → wait → スレッドビュー（右ペイン）が開く（clickが「covered by」で弾かれたら既知の制約の項を参照）。
    b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>e.id))" --profile "$HOME/.agent-browser/profiles/gmail"` でid一覧（`timestamp-<epochミリ秒>`）を取得。
@@ -50,6 +56,7 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
    a. URL別の取り方（2026-09-15 実証）:
       - **Dropbox ファイル共有**（`www.dropbox.com/scl/fi/…&dl=0`＝SHA watanabeさんの定番）: `dl=0` を `dl=1` に置き換えて `curl -sSL -o "<ステージング>/<ファイル名>" "<URL>"`（ログイン不要）。
       - **Dropbox フォルダ共有**（`www.dropbox.com/scl/fo/…`）: `dl=1` で zip が落ちる → `<ステージング>/<フォルダ名>.zip` に保存 → `unzip -n "<zip>" -d "<00_File_from>/<フォルダ名>"`（⚠️未実証。失敗したら 7d の失敗扱い）。
+      - **Teams添付カード（pptx等・ADKのSharePoint）＝現行の正攻法**（2026-09-28〜10-07 で計3回実証）: スレッドビューで添付カード（`group "<ファイル名>"` 配下の `generic` ref）を**普通の click** → 新タブで PowerPoint Online（編集モード）が開く → `button "File"` → `menuitem "Create a copy"` → `menuitem "Download a copy"` → 確認ダイアログの `button "Download"` を**すべて普通の click** → `~/Downloads/<ファイル名>` に1件落ちる（`download` コマンドは使わない＝重複が残る）。編集モードなのでキー入力はしない。検証は zipfile でスライド数と slide1 のテキストを確認 → `cp -n` で 00_File_from へ。
       - **ADKのOneDrive/SharePoint**（`*.sharepoint.com`＝児玉さん等ADK側の定番）: ゲストのログインが要るので agent-browser で `navigate "<URL>"`（`?e=xxxx` まで残せば後ろの xsdata 等は不要）→ wait --load networkidle → snapshot -i → menuitem「このファイルをデバイスにダウンロードする」の ref に対して `… agent-browser download @ref "<ステージング>/<ファイル名>" --profile …`。⚠️普通の click は ~/Downloads（Bashから読めない）に落ちるので**必ず download コマンド**。
       - **上記以外**（Figma・Google Drive・一般Webページ等のリンク）は自動で落とさない＝Slack投稿に「📎 未回収（対象外リンク）: <リンク名>」と書くだけ。メッセージに直接貼られた画像（インライン画像）も対象外（未検討）。
    b. 検証: `file` で種別を確認（PDF・Illustrator・ZIP・画像等ならOK。**HTML/テキストだったらログインページ等を掴んだ失敗**）・サイズ>0。PDFなら1ページ目をReadで目視し、投稿本文のファイル名・内容と矛盾しないか見る。

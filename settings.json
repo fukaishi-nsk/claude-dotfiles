@@ -84,6 +84,8 @@
       "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-fetch",
       "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-query-data-sources",
       "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-get-users",
+      "mcp__notion__notion-update-page",
+      "mcp__8f3a4f82-e35e-4539-af00-d77e424db242__notion-update-page",
       "mcp__claude_ai_nanco__whoami",
       "mcp__claude_ai_nanco__search_items",
       "mcp__claude_ai_nanco__get_item",

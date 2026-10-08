@@ -3,7 +3,7 @@ name: teams-mention-check
 description: artienceのTeams(ADKテナント)@メンションを毎朝9時に直読みし、新着を古い順・原文のまま・メッセージリンク付きでSlack #2602_artience へ転写する（メール通知カバー率4割→10割化・2026-08-28制定）。新着の添付ファイルは 00_File_from へ保存する（2026-09-15〜）
 ---
 
-目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。**新着メッセージに添付ファイルがあれば案件フォルダの `00_File_from` に保存する**。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）、「（添付を）保存してほしい」（2026-09-15。9/3〜9/14の添付3点が未格納のまま溜まっていたのが発端）、「今後は藤波さんの投稿も拾って」（2026-10-07＝メンション以外に藤波 秀麿さんの投稿も転写対象・手順5b）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md／teams-attachment-retrieval.md。
+目的: artience案件のTeams（ADKテナント・深石さんはゲスト）の@メンションを全件捕捉し、新着を**古い順に・原文のまま・Teamsメッセージへのリンク付きで** Slack #2602_artience に転写する。**新着メッセージに添付ファイルがあれば案件フォルダの `00_File_from` に保存する**。背景＝Teamsの@メンション通知メール（no-reply@teams.mail.microsoft→Gmail）は「不在時のみ送信」のMicrosoft仕様で、実測カバー率は約4割（2026-07-31〜08-28の19メンション中メール7通）。深石さんの指示「カバー率10割にしてほしい」「Slack 2602_artienceチャンネルへ転写」「メッセージへのリンクもほしい」「要約しないで原文のまま転写」「毎朝9時に巡回」「メッセージは古い順に」（すべて2026-08-28）、「（添付を）保存してほしい」（2026-09-15。9/3〜9/14の添付3点が未格納のまま溜まっていたのが発端）、「今後は藤波さんの投稿も拾って」（2026-10-07＝メンション以外に藤波 秀麿さんの投稿も転写対象・手順5b）、「藤波宛も今後はチェックして、Nスケッチ宛をチェックしてということ」（2026-10-08＝**転写対象は「Nスケッチ宛」＝深石さん宛＋藤波さん宛のメンション、＋藤波さん本人の投稿**・手順5b）に基づく。Graph API・Power Automate等の正攻法は2026-07-27調査で全滅確定（ゲスト＋管理者同意壁）。詳細はartience案件のプロジェクトメモリ teams-access-methods.md／teams-attachment-retrieval.md。
 
 【実行モード】無人。ブロックする質問はしない。創作禁止＝フィードに無い情報を書かない・**原文を一字も改変しない**（@メンション名の羅列も原文の一部としてそのまま）。判断できない事象は Slack #log_fukaishi（C03119VSJGK）に報告して保留。
 
@@ -39,12 +39,12 @@ description: artienceのTeams(ADKテナント)@メンションを毎朝9時に�
 5. 新着判定（二段構え）:
    - エントリの日付が state.json の `seededBefore` より前 → 無条件で既知扱い。
    - それ以外は指紋化して seen と照合。機械一致しなくても、**同一と思われる投稿は再通知しない**（40文字の切り位置ズレ等の表記ゆれは常識判断で吸収する。誤った再通知はチャンネルのノイズになる）。
-5b. **藤波 秀麿さん（Nスケッチ側の実装担当・通称まろくん）の投稿も拾う**（深石さん宛メンションでなくても対象・2026-10-07 深石さん指示「今後は藤波さんの投稿も拾って」。発端＝10/7 9:33 藤波さん→松田さん宛の「修正反映しました」がメンションフィードに出ず漏れた）:
+5b. **藤波 秀麿さん（Nスケッチ側の実装担当・通称まろくん）宛のメンションと、藤波さん本人の投稿も拾う**（＝Nスケッチ宛を全部拾う。メンションフィードには深石さん宛しか出ないので、チャンネルを直接見る。2026-10-07 深石さん指示「今後は藤波さんの投稿も拾って」→2026-10-08「藤波宛も今後はチェックして、Nスケッチ宛をチェックしてということ」で藤波さん宛メンションを追加。発端＝10/7 9:33 藤波さん→松田さん宛の「修正反映しました」と、10/7 14:30・14:47 児玉さん→藤波さん宛がメンションフィードに出ず漏れた）:
    a. 左ペイン「Teams and channels」＞ artience｜制作 の **WEB関連・デザイン関連・一般** の3チャンネルを順にclick → wait --load networkidle → `wait 3000`。
-   b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>{let n=e;for(let i=0;i<8&&n;i++){n=n.parentElement;if(n&&n.innerText.length>40)break;}return [e.id,new Date(+e.id.slice(10)).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}),n.innerText.slice(0,200)]}).slice(-15))" --profile …` で直近の投稿（発言者・日時）を取得し、**発言者が「藤波 秀麿」で、前回巡回以降（目安＝前日の巡回時刻以降）の投稿**を候補にする。⚠️チャンネルビューは各スレッドの**最新数件の返信しか出さない**＝当日動きのあるスレッドは「Open N replies …」ボタンをclickしてスレッドを開き、当日分を全部確認する（2026-10-07実測）。
-   c. 候補は手順5と同じ指紋（発言者名は `藤波　秀麿`）で seen と照合し、未転写のものだけ新着として扱う。⚠️メンションフィード経由で既に新着扱いのもの（藤波さんが深石さんにメンションした投稿）は二重にしない。
-   d. 本文は長文だと「see more」で折り畳まれている＝snapshot -i の `see more` ref をclickしてから innerText を取り直す（2026-10-07実証）。msgId＝その投稿の timestamp id。parentId は、その投稿が属するスレッドを開いて最上部のidを取る（チャンネルビューでは返信もルートの直下に並ぶので、日時順からの推測で決めない）。添付は手順6e・7と同じ扱い。
-   e. 転写（手順8）では同じ投稿にまとめ、見出しを「📣 Teams新着 N件（artience）」とし、藤波さんの投稿の ▪️ 行の末尾に「（藤波さん投稿・深石さん宛メンションではない）」と付記する。
+   b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>{let n=e;for(let i=0;i<8&&n;i++){n=n.parentElement;if(n&&n.innerText.length>40)break;}return [e.id,new Date(+e.id.slice(10)).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}),n.innerText.slice(0,200)]}).slice(-15))" --profile …` で直近の投稿（発言者・日時）を取得し、前回巡回以降（目安＝前日の巡回時刻以降）の投稿のうち **①発言者が「藤波 秀麿」のもの、②藤波さん宛メンションを含むもの** を候補にする。②の判定は  の  で行う（innerText だけでは宛名とただの文中の名前を区別できない・2026-10-08実証）。⚠️チャンネルビューは各スレッドの**最新数件の返信しか出さない**＝当日動きのあるスレッドは「Open N replies …」ボタンをclickしてスレッドを開き、当日分を全部確認する（2026-10-07実測）。
+   c. 候補は手順5と同じ指紋（藤波さん本人の投稿なら発言者名は `藤波　秀麿`）で seen と照合し、未転写のものだけ新着として扱う。⚠️メンションフィード経由で既に新着扱いのもの（深石さん宛を含む投稿＝藤波さんと深石さんの両方宛を含む）は二重にしない。
+   d. 本文は長文だと「see more」で折り畳まれている＝snapshot -i の `see more` ref をclickしてから innerText を取り直す（2026-10-07実証）。1件分の全文は `document.getElementById("timestamp-<ms>").closest("[data-tid=channel-replies-pane-message]").innerText`（スレッドビュー）／`closest("[data-tid=response-surface]")`（チャンネルビュー）で取れる（2026-10-08実証。先頭の発言者・時刻・Edited、末尾の「N Like reaction.」等はUI表示なので本文に含めない）。msgId＝その投稿の timestamp id。parentId は、その投稿が属するスレッドを開いて最上部のidを取る（チャンネルビューでは返信もルートの直下に並ぶので、日時順からの推測で決めない）。添付は手順6e・7と同じ扱い。
+   e. 転写（手順8）では同じ投稿にまとめ、見出しを「📣 Teams新着 N件（artience）」とし、藤波さんの投稿の ▪️ 行の末尾に「（藤波さん投稿・深石さん宛メンションではない）」、藤波さん宛メンションの ▪️ 行の末尾に「（藤波さん宛）」と付記する。
 6. **新着それぞれについてメッセージリンクを構築**（新着が無ければスキップ）:
    a. そのrowの**本文gridcell**をclick → wait → スレッドビュー（右ペイン）が開く（clickが「covered by」で弾かれたら既知の制約の項を参照）。
    b. `… agent-browser eval "JSON.stringify([...document.querySelectorAll('[data-tid=timestamp]')].map(e=>e.id))" --profile "$HOME/.agent-browser/profiles/gmail"` でid一覧（`timestamp-<epochミリ秒>`）を取得。

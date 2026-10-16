@@ -14,6 +14,10 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
 
 ## 定数
 - 対象イベント: 本人カレンダー(primary=fukaishi@nsketch.com)で `summary` が `[★nanco]そら植物園` に一致（前方一致でよい。`★`はnanco顧客会議の手動タグ）
+- 対象カレンダー（2026-10-16〜・**2つとも必ず見る**）:
+  - 本人カレンダー `primary`（fukaishi@nsketch.com）
+  - 共有カレンダー「【ALL】Nsketch予定表」 `c_mv4sde53j9kcvghkhdstkupng0@group.calendar.google.com`
+  - 経緯: 深石さんが出られない回は Nsketch予定表 側に入れる運用がある。2026-10-16(金)16:00の回がこれで、primaryだけを見ていた09:05便は「予定なし」で終了した（Meetリンクは深石さんが手動で送信済み）
 - 送信先LINEグループ: `nanco⇄在庫管理(そら植物園)` groupId=`C1236146db7f194dc3bdaf770a3553aba`（2026-07-30参加ログで確認）
 - 送信経路: Cloudflare Worker `https://line-group-relay.nsketch-nanco.workers.dev/push`（POST・Bearer認証）
   - 認証トークン: `~/.claude/scheduled-tasks/sora-meet-link-share/.push_token`（PCローカル・git管理しない。Worker側Secretsの `PUSH_TOKEN` と同値）
@@ -24,8 +28,10 @@ description: そら植物園MTG当日の朝、カレンダーからMeetリンク
 
 ## 手順
 1. `config.json` と `state.json` を読む。
-2. Googleカレンダー `list_events`（timeZone=Asia/Tokyo）で**当日0:00〜23:59**のイベントを取得し、
-   `summary` が `[★nanco]そら植物園` のものを探す。無ければ**何もせず終了**（Slack投稿も不要）。
+2. Googleカレンダー `list_events`（timeZone=Asia/Tokyo）で**当日0:00〜23:59**のイベントを、**対象カレンダー2つそれぞれ**（`calendarId` を指定）から取得し、
+   `summary` が `[★nanco]そら植物園` のものを探す。2つとも無ければ**何もせず終了**（Slack投稿も不要）。
+   - ⚠ 同じMTGが両方のカレンダーにある場合（招待で両方に載る等）は、**`conferenceUrl` が同じものを1件にまとめる**（送るのは1回だけ）。送信したら**両方のイベントID**を `sentEventIds` に記録する。
+   - いずれかのIDが `sentEventIds` にあれば、同じ `conferenceUrl` の他方も送信済みとして扱う。
 3. 見つかった各イベントについて:
    - `id` が `state.json` の `sentEventIds` にある → スキップ（送信済み）。
    - `conferenceUrl`（Meetリンク）が無い → Slack `#log_fukaishi` に「⚠リンク無しイベントあり」と報告してスキップ。

@@ -36,6 +36,12 @@ description: 顧客向けメール（nancoサポート・Nスケッチ）の下�
 
 7. **送信を確認したら、nanco顧客のステータス一覧を更新する（2026-10-08〜）**: nanco 顧客宛てのメール・LINE が送られたことを実体（スレッド末尾の SENT メッセージ、LINE は Slack `#nanco_line` の転写や深石さんの報告）で確かめたら、`/nanco-status-update` の手順で Notion「🫂 Customers」DB の該当行を更新する。最終接触＝送信日、ボール＝送った内容で決める（返事を待つ→先方／「◯◯を送ります」と成果物を約束した→こちら）、次のアクション・確認日・根拠（件名＋送信日時）も書く。下書きの段階では更新しない。受託案件（島津・千葉大など nanco 以外）は対象外。Notion が使えない環境（Codex など）では、更新すべき内容を報告に書くだけにする
 
+8. **Grok Bot の添削ログを取り込む（2026-10-16〜）**: Grok Bot（受信トレイ番）も、このファイルの Drive コピー（`マイドライブ/claude-shared/email-draft/SKILL.md`・setup.sh の `GROK_SHARED_SKILLS` で自動更新）を読んで返信案を書いている。深石さんが Grok Bot の案を直して（または無修正で）送ると、Bot が同じフォルダの `grok-feedback.md` に「使った型／元の案／送った文面／直したところ」を1件ずつ下に足していく
+   - このスキルを使うときは、まず `~/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/claude-shared/email-draft/grok-feedback.md` を読み、下の「取込済み」より新しいエントリがあれば、Claude の添削と同じ扱いで該当の型に追記する（無修正なら成功例として記録）
+   - `grok-feedback.md` は **Bot だけが書くファイル**。Claude は読むだけで編集しない（Drive の同時編集の競合を避けるため）。どこまで取り込んだかは、下の行を更新して記録する
+   - 取込済み: （まだなし）
+   - Grok Bot の送信カードは fukaishi@ から直送される。nanco 顧客宛て（support@ が型）は Bot が文面だけ用意する約束（Bot 説明欄の「守ること」）。Bot 由来の送信で From が fukaishi@ になっていたら、切替漏れとして記録する
+
 ## 文体ルール（nancoサポート）
 
 - 宛名: 「会社名（改行）姓＋**さま**」。「様」ではなくひらがな（例: 岳本さま、小岸さま）

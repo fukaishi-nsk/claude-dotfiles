@@ -149,6 +149,26 @@ if [ -d "$HOME/.codex" ] && [ -f "$DOTFILES_DIR/codex/AGENTS.md" ]; then
   fi
 fi
 
+# Grok Bot共有スキル: 指定したスキルの SKILL.md を Google Drive（マイドライブ/claude-shared/<名前>/SKILL.md）へコピーする（2026-10-16〜・深石さん許可済み＝顧客名入りの全文を渡す）
+# ※ Grok Bot はクラウドで動き手元のファイルを読めないため、Drive コネクタ経由で読ませる（Grok Bot 側の Private skill が Drive のこのファイルを参照）
+# ※ 中身が変わった時だけ上書きする。rm してから置くと Drive のファイルIDが変わり、Grok Bot 側の参照が切れるので rm しない
+GROK_SHARED_SKILLS=(email-draft)
+GDRIVE_MYDRIVE=""
+for d in "$HOME/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive" "$HOME/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/マイドライブ"; do
+  [ -d "$d" ] && GDRIVE_MYDRIVE="$d" && break
+done
+if [ -n "$GDRIVE_MYDRIVE" ]; then
+  for skill_name in "${GROK_SHARED_SKILLS[@]}"; do
+    src="$DOTFILES_DIR/skills/$skill_name/SKILL.md"
+    dest="$GDRIVE_MYDRIVE/claude-shared/$skill_name/SKILL.md"
+    if [ -f "$src" ] && { [ ! -f "$dest" ] || ! cmp -s "$src" "$dest"; }; then
+      mkdir -p "$(dirname "$dest")"
+      cp "$src" "$dest"
+      echo "  ✅ $dest ← $src（Grok Bot用・Driveへコピー）"
+    fi
+  done
+fi
+
 echo ""
 echo "🎉 セットアップ完了！Claude Code を再起動してください。"
 echo "   ※ scheduled-tasks は手順書のみ「実ファイルコピー」で同期されます（symlink禁止・2026-09-07〜）。"

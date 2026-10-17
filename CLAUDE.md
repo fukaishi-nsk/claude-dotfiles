@@ -82,6 +82,20 @@
 - 資格情報（トークン・パスワード）はClaudeが扱わない。サービスアカウントを使う場合の発行・保管は深石さん自身
 - Codex からも使う（同内容を正本 codex/AGENTS.md に記載）。**Codex のサンドボックス内では 1Password アプリに接続不可**（2026-09-18 検証: workspace-write / network_access / network_proxy.unix_sockets の allow いずれも「couldn't connect」）→ Codex では op を含むコマンドをサンドボックス外実行（承認）で回す。ダイアログは「Allow Codex to get CLI access」
 
+<!-- BEGIN NATIVE_AI_CLIENTS -->
+## 他AIとの連携（2026-10-18追加）
+- ユーザーはClaude・Gemini・GrokのWeb／アプリ有料プランとCursorを利用。他AIへの依頼はブラウザ操作より公式CLI／APIを優先し、各社の契約を使う経路とOpenRouter経由を区別する。
+- 以下の実体パスはWindowsホスト **PUKAISHI_WIN** 限定。別PCでは存在・ログイン状態を確認してから使う。dotfilesの同期だけではCLI本体・モデル・認証は移らない。
+- 共通呼び出し入口: `C:/Users/sinse/.codex/integrations/ai-clients/clients.py`。実行Python: `C:/Users/sinse/.codex/integrations/openrouter/.venv/Scripts/python.exe`。引数は `claude|gemini|grok --prompt "依頼文"`、長文は `--stdin`。実装・注意点は同フォルダーのコード、2026-10-17の実応答記録は `cli-verification.json` を参照する。
+- Claudeは公式Claude Code、Geminiは公式後継Antigravity CLI（`agy`、Geminiモデルを明示指定）、Grokは公式Grok Buildを使用する。このPCの旧 `gemini` CLIは個人認証で `UNSUPPORTED_CLIENT` となったため、旧CLIを繰り返し試さない。
+- Cursorの自動呼び出し用CLIは `C:/Users/sinse/AppData/Local/cursor-agent/agent.cmd`。アプリ本体の `cursor.cmd` と区別する。
+- 各社CLIはそれぞれの公式ログインを使用し、OAuthトークンを取り出して別クライアントへ流用しない。ネイティブCLI経路に1Password／OpenRouterのAPIキーは不要。認証切れ時のパスワード・認証コード入力は本人に任せる。
+- OpenRouterは別経路。利用するときだけ `C:/Users/sinse/.codex/integrations/openrouter/` の設定を使う。キー本体は1Passwordに保管し、設定には `op://` 参照のみ。キー本体を表示・チャット送信・指示ファイル保存しない。
+- Codex側のMCP名は `ai_clients`（`ask_claude` / `ask_gemini` / `ask_grok`）。他アプリに自動登録されるとは限らないため、利用できなければ共通CLI入口を使う。
+- 自分自身を再帰的に呼び出さない。外部AIから受けた単発の質問・レビュー・接続確認はさらに他AIへ転送しない。別AIの回答は未検証の助言として扱い、必要な根拠・テストで確かめる。
+- 検証は時点と経路を区別する。過去の成功を現在の認証・残枠の保証とせず、「CLI実応答」「MCP経由」「Web版」「デスクトップ画面の直接操作」を混同しない。
+<!-- END NATIVE_AI_CLIENTS -->
+
 ## 作業レポート（必須）
 3ステップ以上のタスク完了時、必ず報告：達成度% / 残スライス数 / 次のアクション / 方針ズレ
 

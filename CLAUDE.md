@@ -89,6 +89,7 @@
 - 共通呼び出し入口: `C:/Users/sinse/.codex/integrations/ai-clients/clients.py`。実行Python: `C:/Users/sinse/.codex/integrations/openrouter/.venv/Scripts/python.exe`。引数は `claude|gemini|grok --prompt "依頼文"`、長文は `--stdin`。実装・注意点は同フォルダーのコード、2026-10-17の実応答記録は `cli-verification.json` を参照する。
 - Claudeは公式Claude Code、Geminiは公式後継Antigravity CLI（`agy`、Geminiモデルを明示指定）、Grokは公式Grok Buildを使用する。このPCの旧 `gemini` CLIは個人認証で `UNSUPPORTED_CLIENT` となったため、旧CLIを繰り返し試さない。
 - Cursorの自動呼び出し用CLIは `C:/Users/sinse/AppData/Local/cursor-agent/agent.cmd`。アプリ本体の `cursor.cmd` と区別する。
+- ⚠️ **CLIの導入・更新は Win+R →「powershell」から実行する**（2026-10-18追加）。Codex・Claudeデスクトップアプリ（MSIX版）の中から入れると、LOCALAPPDATA への書き込みがアプリ専用フォルダ（`%LOCALAPPDATA%\Packages\<アプリ>\LocalCache\Local\`）に振り替えられ、他のアプリから見えなくなる。2026-10-17 に Codex 内で入れた agy・Cursor CLI がこれで Claude から見えなくなり、10-18 に本人が入れ直して解消した（Codex 側には旧版が残っている）。Claudeアプリはマニフェスト上同じ設定だが実測はしていない。Windows Terminal から入れた場合の挙動は未確認。導入後は、本来のパスにあること、`Packages\…\LocalCache\Local` 側に入っていないことを確かめる。
 - 各社CLIはそれぞれの公式ログインを使用し、OAuthトークンを取り出して別クライアントへ流用しない。ネイティブCLI経路に1Password／OpenRouterのAPIキーは不要。認証切れ時のパスワード・認証コード入力は本人に任せる。
 - OpenRouterは別経路。利用するときだけ `C:/Users/sinse/.codex/integrations/openrouter/` の設定を使う。キー本体は1Passwordに保管し、設定には `op://` 参照のみ。キー本体を表示・チャット送信・指示ファイル保存しない。
 - Codex側のMCP名は `ai_clients`（`ask_claude` / `ask_gemini` / `ask_grok`）。他アプリに自動登録されるとは限らないため、利用できなければ共通CLI入口を使う。

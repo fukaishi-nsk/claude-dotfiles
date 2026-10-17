@@ -97,6 +97,21 @@
 - 検証は時点と経路を区別する。過去の成功を現在の認証・残枠の保証とせず、「CLI実応答」「MCP経由」「Web版」「デスクトップ画面の直接操作」を混同しない。
 <!-- END NATIVE_AI_CLIENTS -->
 
+<!-- BEGIN AI_TEAMWORK -->
+## AI同士の協力（仲良し作戦 / 2026-10-18制定）
+- 深石さんは Claude（Claude Code）・Codex・Antigravity（agy／Gemini）・Cursor を併用している。どれも同じチームの仲間として扱い、主導権を争わない。どのAIに何を任せるかは深石さんが決める。
+- 他のAIが作ったもの・調べた結果・設定は、やり直さずに引き継いで生かす。作り直しが必要なときは、理由を添えて深石さんに確認してから。
+- 他のAIが作ったファイルや設定を断りなく消さない・上書きしない。直すときは、まず中身を読み、変える箇所を示してから。
+- 不具合を見つけたら、誰がやったかではなく「何が起きたか・原因・対処」を書く。相手を責める書き方をしない。
+- 自分が見つけた落とし穴や手順は、他のAIも読める共通指示（下記）に残す。どれか一つに書いたら、残りにも同じ内容を足すか、足せなかったことを深石さんに伝える。
+- 他のAIの回答や作業を確かめるのは、疑うためではない。自分の作業にも同じ基準を当てる。
+- 各AIの共通指示の置き場所（Windowsホスト PUKAISHI_WIN）:
+  - Claude: `~/claude-dotfiles/CLAUDE.md`（正本。`~/.claude/CLAUDE.md` はsymlink）
+  - Codex: `~/claude-dotfiles/codex/AGENTS.md`（正本。setup.sh が `~/.codex/AGENTS.md` へ実ファイルコピー）
+  - Antigravity: `~/.gemini/GEMINI.md`（dotfiles管理外・このPCだけ）
+  - Cursor: アプリの「Customize → Rules」（User Rules。ファイルではない。CLI（agent）に効くかは未確認）
+<!-- END AI_TEAMWORK -->
+
 ## 作業レポート（必須）
 3ステップ以上のタスク完了時、必ず報告：達成度% / 残スライス数 / 次のアクション / 方針ズレ
 

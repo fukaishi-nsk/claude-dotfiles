@@ -9,6 +9,8 @@
 #  - Gemini (agy): needs "permissions": {"allow": ["read_url(*)"]} in ~/.gemini/antigravity-cli/settings.json
 #    (set by the owner on 2026-10-18). Commands stay "ask" and are auto-denied in headless mode.
 #    agy -p prints plain text; tell it in the prompt not to use shell commands.
+#    Broad research prompts can hit --print-timeout with an EMPTY answer (14 min, 2026-10-18): cap the number
+#    of searches/page fetches in the prompt (e.g. "10 at most, then write the answer") and give 25 minutes.
 set -euo pipefail
 provider="${1:?grok|gemini}"; prompt_file="${2:?prompt file}"; minutes="${3:-14}"
 prompt="$(cat "$prompt_file")"

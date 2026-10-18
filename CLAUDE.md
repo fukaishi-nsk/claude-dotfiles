@@ -96,6 +96,7 @@
 - 自分自身を再帰的に呼び出さない。外部AIから受けた単発の質問・レビュー・接続確認はさらに他AIへ転送しない。別AIの回答は未検証の助言として扱い、必要な根拠・テストで確かめる。
 - 検証は時点と経路を区別する。過去の成功を現在の認証・残枠の保証とせず、「CLI実応答」「MCP経由」「Web版」「デスクトップ画面の直接操作」を混同しない。
 <!-- END NATIVE_AI_CLIENTS -->
+- ⚠️ **共通入口 `clients.py` は単発の質問・レビュー用で、ウェブ／SNS のリサーチには使えない**（2026-10-18 実測）。Grok は `--disable-web-search --tools '' --max-turns 1`、Gemini は `--mode plan`・150 秒で、検索が要る依頼は「CLI did not return JSON」（Grok。ログイン切れではない）か、段取りの説明だけ（Gemini）で終わる。リサーチを頼むときは、**本人の許可を得てから**各 CLI を直接呼ぶ。Grok は `grok.exe --no-subagents --permission-mode plan --max-turns 40 --output-format json -p …` を空の作業フォルダーで実行すれば、X 検索込みで動いた。Gemini（agy）はヘッドレスだと `command` / `read_url` の権限が自動拒否されて空の回答になる。通すには `~/.gemini/antigravity-cli/settings.json` の `permissions.allow` にルールが要る（`--dangerously-skip-permissions` は使わない）。失敗したら、原因を切り分けてやり直す。黙って諦めない
 
 <!-- BEGIN AI_TEAMWORK -->
 ## AI同士の協力（仲良し作戦 / 2026-10-18制定）

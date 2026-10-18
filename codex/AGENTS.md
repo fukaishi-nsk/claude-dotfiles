@@ -32,4 +32,4 @@
   - Antigravity: `~/.gemini/GEMINI.md`（dotfiles管理外・このPCだけ）
   - Cursor: アプリの「Customize → Rules」（User Rules。ファイルではない。CLI（agent）に効くかは未確認）
 <!-- END AI_TEAMWORK -->
-- ⚠️ 共通入口 `C:/Users/sinse/.codex/integrations/ai-clients/clients.py` は単発の質問・レビュー用で、ウェブ／SNS のリサーチには使えない（2026-10-18、Claude が実測）。Grok は検索オフ・1ターン、Gemini は plan モード・150 秒のため、検索が要る依頼は「CLI did not return JSON」（Grok。ログイン切れではない）か、段取りの説明だけ（Gemini）で終わる。リサーチは本人の許可を得てから各 CLI を直接呼ぶ。Gemini（agy）はヘッドレスだと `command` / `read_url` の権限が自動拒否されて空の回答になる。通すには `~/.gemini/antigravity-cli/settings.json` の `permissions.allow` にルールが要る
+- ⚠️ Grok・Gemini にウェブ／SNS のリサーチを頼むときは `~/claude-dotfiles/scripts/ai_research.sh grok|gemini <依頼文ファイル> [分]` を使う（2026-10-18、Claude が実測・両方動作確認済み）。共通入口 `clients.py` は単発の質問・レビュー用で、検索が要る依頼は失敗する（Grok は「CLI did not return JSON」と出るがログイン切れではない）。Gemini（agy）は `~/.gemini/antigravity-cli/settings.json` の `permissions.allow` に `read_url(*)` を入れてある（画面なしの実行で URL 読み取りが自動拒否されるのを防ぐため。本人が設定）。コマンド実行は確認のまま。`--dangerously-skip-permissions` は使わない

@@ -11,7 +11,7 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [${TARGET:-?}] $*" >> "$LOG"; }
 # Slack に投稿する。Webhook 未設定ならログに残すだけ
 notify() {
   local url payload
-  url=$(tr -d '\r\n ' < "$WEBHOOK_FILE" 2>/dev/null)
+  url=""; [ -f "$WEBHOOK_FILE" ] && url=$(tr -d '\r\n ' < "$WEBHOOK_FILE")
   if [ -z "$url" ]; then log "notify skipped (no webhook): $(printf '%s' "$1" | head -1)"; return 0; fi
   payload=$(printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | awk 'BEGIN{ORS="\\n"}{print}')
   if curl -s -m 15 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' \
@@ -38,7 +38,7 @@ probe() {
   local dir; dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   case "$TARGET" in
     macmini)
-      ssh -o BatchMode=yes -o ConnectTimeout=10 macmini 'bash -s' < "$dir/probe-macmini.sh" 2>/dev/null ;;
+      tr -d '\r' < "$dir/probe-macmini.sh" | ssh -o BatchMode=yes -o ConnectTimeout=10 macmini 'bash -s' 2>/dev/null ;;
     3090)
       # IP は LAN の差し口で .26 / .24 に変わる
       ssh -o BatchMode=yes -o ConnectTimeout=10 Host3090 'powershell -NoProfile -NonInteractive -Command -' < "$dir/probe-3090.ps1" 2>/dev/null ||

@@ -1,0 +1,2 @@
+# Git for Windows (core.autocrlf=true) would check these out as CRLF and break the probes sent to the Mac mini
+* text eol=lf

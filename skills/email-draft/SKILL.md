@@ -19,6 +19,11 @@ description: 顧客向けメール（nancoサポート・Nスケッチ）の下�
 1. **返信の場合は必ず元スレッドを読む**（Gmail検索→get_thread）。相手の宛名表記・過去のトーン・約束事項を確認する
    - **添付があれば、返信を書く前に開く**（2026-09-14 重松・川鍋氏で実発生）: コネクタは添付を取れないので `/gmail-attachment-dl`（agent-browser）で回収して中身を読む。添付を見ずに「原因を特定し修正版を準備中」と書いた下書きが、添付の現象（招待QR読取・ログアウト後の起動時フリーズ）は修正済みの事象と別物で、状況説明が実態とズレた。**添付＝顧客の一次報告。開かずに状況を語らない**
 2. **まずテキストで文面を提示し、承認を得てからGmail下書きを作成する**。下書き作成も外部書き込み＝勝手にやらない
+   - **下書きは `~/claude-dotfiles/scripts/gmail_draft.py` で作り、From をAIが決めて入れる（2026-10-19〜）**。Gmail コネクタの create_draft は From を指定できず、いつも fukaishi@ 名義になり、深石さんの手動切替が漏れていた（9/18 サンコダ・10/19 吟優舎）。nanco 顧客宛ては `--from support@nanco.io`、受託案件（島津・千葉大など）とレディクル初回など Nスケッチ名義は `--from fukaishi@nsketch.com`
+   - 使い方: 本文を HTML ファイルに書き（`<br>` と `<a href>`、署名も含める）→ `python3 -W ignore gmail_draft.py create --from <送信元> --to <宛先> --cc <CC…> --html-file <本文> --reply-to <返信先の Gmail message id>`。返信なら元のスレッドに入り、件名「Re: 〜」・In-Reply-To・元メールの引用が付く。新規メールは `--subject` を指定し `--reply-to` を外す
+   - 作ったら `gmail_draft.py show <draftId>` で From・To・Cc・件名・threadId を確かめてから報告する。報告で「From を切り替えてください」とは書かない（切り替え不要になったため）
+   - 認証は `~/.config/claude-gmail/`（client_secret.json・token.json・権限600・dotfiles 外）。Google Cloud プロジェクト「claude-gmail」（ID enhanced-tuner-512103-e3・組織 nsketch.com・OAuth は「内部」・デスクトップクライアント）。権限は下書き作成・メール閲覧・送信元一覧の閲覧だけで、送信の権限は無い。**MacBook だけで認証済み**。Mac mini で使うときは、client_secret.json を置いて `gmail_draft.py auth` を一度実行する
+   - スクリプトが使えないとき（認証切れなど）はコネクタの create_draft に戻り、報告で From の切り替えを頼む
 3. 対応報告を含む場合、**実作業が完了してから送る**順序になっているか確認する（完了形で書くため）
 4. **リンク汚染に注意（2026-07-13 姫路エコテックで実発生）**: APIで作った下書き（素のURL）をGmail Webの編集画面で開くと、Gmailが裸のURLを自動リンク化→`https://www.google.com/url?q=...&source=gmail&ust=...`のリダイレクトURLに書き換え、**本文テキストごと焼き込んで送信される**ことがある。対策:
    - 下書き作成を報告する際、「送信前に署名のURL（https://nanco.io）が素のままかご確認ください」と毎回一言添える

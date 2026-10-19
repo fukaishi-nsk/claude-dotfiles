@@ -7,6 +7,7 @@ description: 会社の3090機（nsk3090・Windows 11）が「Parsecで見られ�
 
 対象: GALLERIA ZA7R-R39（PC名 `NSK3090`・Windows 11 Home）。SSHユーザー `nsketch`（ローカル管理者）、自動サインインON・スリープOFF。Parsec は「Per Computer」導入＝Windowsサービス `Parsec`（自動起動・ログイン画面からでも接続可）。
 逆方向（3090からMac miniを直す）は `macmini-recover` スキル。
+30分ごとの見守り合い（異常を Slack に知らせるだけ）と Mac mini の月次再起動は `~/claude-dotfiles/buddy/`（nsk-buddy）。Slack の通知から呼ばれた時は、通知の内容を手順1の診断で確かめてから動く。
 
 ## 0. 接続先（どのPCから叩くか）
 

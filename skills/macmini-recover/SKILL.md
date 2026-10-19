@@ -8,6 +8,7 @@ description: Mac mini（fukaishi_macmini・常時稼働の母艦）が「Parsec�
 Mac mini（ユーザー `fukaishi_macmini`、LAN `192.168.10.28`、Tailscale `100.110.187.46`）がリモート画面から見えなくなった時の手順。
 2026-07-21・2026-10-19 に同じ障害（TCP膠着）が起き、どちらも再起動で直った。
 逆方向（Mac mini・MacBook から3090を直す）は `nsk3090-recover` スキル。
+30分ごとの見守り合い（異常を Slack に知らせるだけ）と Mac mini の月次再起動は `~/claude-dotfiles/buddy/`（nsk-buddy）。Slack の通知から呼ばれた時は、通知の内容を手順1の診断で確かめてから動く。
 
 ## 0. 接続先（どのPCから叩くか）
 

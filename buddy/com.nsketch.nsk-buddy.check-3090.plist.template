@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.nsketch.nsk-buddy.check-3090</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__HOME__/claude-dotfiles/buddy/buddy-check.sh</string>
+        <string>3090</string>
+    </array>
+    <key>StartInterval</key>
+    <integer>1800</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>__HOME__/.nsk-buddy/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/.nsk-buddy/launchd.out.log</string>
+</dict>
+</plist>

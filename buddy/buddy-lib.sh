@@ -14,8 +14,10 @@ notify() {
   url=""; [ -f "$WEBHOOK_FILE" ] && url=$(tr -d '\r\n ' < "$WEBHOOK_FILE")
   if [ -z "$url" ]; then log "notify skipped (no webhook): $(printf '%s' "$1" | head -1)"; return 0; fi
   payload=$(printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | awk 'BEGIN{ORS="\\n"}{print}')
-  if curl -s -m 15 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' \
-       --data "{\"text\":\"$payload\"}" "$url" | grep -q '^200$'; then
+  # 本文は標準入力で渡す。3090 の curl は Windows 版で、引数の日本語が Shift-JIS に変換されて化けるため
+  if printf '{"text":"%s"}' "$payload" |
+     curl -s -m 15 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json; charset=utf-8' \
+       --data-binary @- "$url" | grep -q '^200$'; then
     log "notified: $(printf '%s' "$1" | head -1)"
   else
     log "notify FAILED: $(printf '%s' "$1" | head -1)"

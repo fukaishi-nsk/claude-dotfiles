@@ -21,6 +21,7 @@ description: 顧客向けメール（nancoサポート・Nスケッチ）の下�
 2. **まずテキストで文面を提示し、承認を得てからGmail下書きを作成する**。下書き作成も外部書き込み＝勝手にやらない
    - **下書きは `~/claude-dotfiles/scripts/gmail_draft.py` で作り、From をAIが決めて入れる（2026-10-19〜）**。Gmail コネクタの create_draft は From を指定できず、いつも fukaishi@ 名義になり、深石さんの手動切替が漏れていた（9/18 サンコダ・10/19 吟優舎）。nanco 顧客宛ては `--from support@nanco.io`、受託案件（島津・千葉大など）とレディクル初回など Nスケッチ名義は `--from fukaishi@nsketch.com`
    - 使い方: 本文を HTML ファイルに書き（`<br>` と `<a href>`、署名も含める）→ `python3 -W ignore gmail_draft.py create --from <送信元> --to <宛先> --cc <CC…> --html-file <本文> --reply-to <返信先の Gmail message id>`。返信なら元のスレッドに入り、件名「Re: 〜」・In-Reply-To・元メールの引用が付く。新規メールは `--subject` を指定し `--reply-to` を外す
+   - ⚠ CC が複数のときは `--cc a@x b@y` と1つの `--cc` の後ろに並べる。`--cc a --cc b` と繰り返すと最後の1件だけになる（2026-10-19 台和で姉崎さんが落ちた）
    - 作ったら `gmail_draft.py show <draftId>` で From・To・Cc・件名・threadId を確かめてから報告する。報告で「From を切り替えてください」とは書かない（切り替え不要になったため）
    - 認証は `~/.config/claude-gmail/`（client_secret.json・token.json・権限600・dotfiles 外）。Google Cloud プロジェクト「claude-gmail」（ID enhanced-tuner-512103-e3・組織 nsketch.com・OAuth は「内部」・デスクトップクライアント）。権限は下書き作成・メール閲覧・送信元一覧の閲覧だけで、送信の権限は無い。**MacBook・Mac mini とも使える**（2026-10-19。Mac mini は Google のライブラリを pip --user で入れ、MacBook の client_secret.json と token.json を Tailscale の scp でコピー。`send-as` で送信元2つが取れることを確認）。Windows 機など別のPCで使うときは、同じようにライブラリと2ファイルを置く。認証が切れたら `gmail_draft.py auth`（ブラウザで深石さんが許可）
    - スクリプトが使えないとき（認証切れなど）はコネクタの create_draft に戻り、報告で From の切り替えを頼む

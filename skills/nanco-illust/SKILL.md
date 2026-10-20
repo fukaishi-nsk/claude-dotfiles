@@ -44,6 +44,16 @@ cd ~/src/nanco_illust && .venv/bin/python nanco_generate_fal.py "<English subjec
 - 出力: `generated/<日時>_<お題>/`（元画像）・`transparent/`（背景透過）・`_sheet.png`／`_sheet.txt`（番号と元ファイルの対応）
 - 終了コード 1＝1枚以上が描けなかった（fal のエラーなど）。ログの FAILED 行を見て伝える
 
+## 前後（BEFORE→AFTER）の対を描く（2026-10-20 デンケンで確立）
+
+- 2枚を別々に描くと、同じ seed・同じ言い回しでも物の数・形・大きさが変わって**別の場面に見える**（深石さん「完全に別シーンに見える」）
+- うまくいった方法: BEFORE を nanco の LoRA で描く → その元画像（透過前）を `fal_client.upload_file` で上げ → **`fal-ai/flux-pro/kontext`** に `image_url` と指示文を渡して AFTER に書き換える（1枚 約$0.04）。同じ紙・同じ缶が、同じ線と色のまま片付いた
+  - 指示文の例: `Rearrange the same objects into a tidy, organized state: stack all the scattered papers into one neat straight pile and stand the paint cans upright in a neat row beside it. Keep exactly the same hand-drawn illustration style, line weight, sage green colors, size, viewpoint and plain white background. No people, no text.`
+  - 透過はスクリプトの `remove_background_smooth()` を import して使う。AFTER は物が大きめに描かれるので、資料では2枚の高さをそろえて置く
+  - 比較した `fal-ai/flux-lora/image-to-image`（元画像を下敷きに LoRA で描き直し・strength 0.75/0.85）は、紙の色や缶の形が変わってつながりが弱かった
+  - Kontext は nanco の LoRA を通さない。絵柄は入力画像から受け継ぐだけなので、毎回同じになるとは限らない。**商用利用の条件は未確認**（下の利用規約と同じ扱い）
+  - 今回のスクリプトはセッションの一時フォルダに置いただけ。繰り返し使うなら `nanco_generate_fal.py` に `--edit-from <画像> --edit "<指示文>"` のような形で取り込む（未実装）
+
 ## 気をつけること
 
 - **画面・紙の文字はでたらめになる**（FLUX の癖）。数字や文字が要る絵は、資料側で文字を重ねる前提で、そう伝える

@@ -54,6 +54,12 @@ cd ~/src/nanco_illust && .venv/bin/python nanco_generate_fal.py "<English subjec
   - Kontext は nanco の LoRA を通さない。絵柄は入力画像から受け継ぐだけなので、毎回同じになるとは限らない。**商用利用の条件は未確認**（下の利用規約と同じ扱い）
   - 今回のスクリプトはセッションの一時フォルダに置いただけ。繰り返し使うなら `nanco_generate_fal.py` に `--edit-from <画像> --edit "<指示文>"` のような形で取り込む（未実装）
 
+## 描いた絵の置き場所と自動の片付け（2026-10-20〜）
+
+- `generated/` 直下のフォルダは、**描いてから30日たつと毎日4:30にMacのゴミ箱へ移る**（launchd `com.nsketch.nanco-illust-cleanup`・正本 `~/claude-dotfiles/launchd/nanco-illust-cleanup/`）。直下のファイル（`fal_usage.csv` など）は残る
+- 資料に使った絵・使い回したい絵は、30日以内に共有ドライブ `Nanco/illust/nanco-illust_資料素材/` へ移す（透過版＋`元画像/`に元画像。`_一覧.png` も作り直す）。一覧は nanco-material の「素材と前例」
+- セッションの一時フォルダ（scratchpad）で作った絵（Kontext の AFTER など）は、セッションが終わると消えるので、使ったらすぐ素材フォルダへ移す
+
 ## 気をつけること
 
 - **画面・紙の文字はでたらめになる**（FLUX の癖）。数字や文字が要る絵は、資料側で文字を重ねる前提で、そう伝える

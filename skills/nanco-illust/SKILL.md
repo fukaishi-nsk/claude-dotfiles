@@ -1,6 +1,6 @@
 ---
 name: nanco-illust
-description: nanco ブランドのイラスト（手描き風の線画＋セージグリーンの差し色）を fal.ai で描き、深石さんと相談しながら直す。使うのは次の2つの場合だけ ①nanco-material（オンライン相談後などのサービス資料の改定）の中で図解の絵が要る時 ②深石さんが /nanco-illust と明示した時。それ以外の「絵を描いて」「画像を作って」では使わない（2026-10-20 深石さん指示）。Mac mini（~/src/nanco_illust）でだけ動く。
+description: nanco ブランドのイラスト（手描き風の線画＋セージグリーンの差し色）を fal.ai または会社の 3090 で描き、深石さんと相談しながら直す。使うのは次の2つの場合だけ ①nanco-material（オンライン相談後などのサービス資料の改定）の中で図解の絵が要る時 ②深石さんが /nanco-illust と明示した時。それ以外の「絵を描いて」「画像を作って」では使わない（2026-10-20 深石さん指示）。Mac mini（~/src/nanco_illust）でだけ動く。
 ---
 
 # nanco-illust — 相談しながら nanco のイラストを描く
@@ -16,7 +16,7 @@ description: nanco ブランドのイラスト（手描き風の線画＋セー�
 ## 前提（変えるときは深石さんに確認）
 
 - 動く場所: **Mac mini だけ**（`~/src/nanco_illust`）。MacBook からは remote-control で Mac mini のセッションを使う。MacBook の手元にはスクリプトも LoRA も無い
-- 生成: **fal.ai の `fal-ai/flux-lora`**（FLUX.1-dev ＋ nanco の LoRA）。5090・3090 は使わない（5090 は 2026年11月から使えない）
+- 生成: **fal.ai の `fal-ai/flux-lora`**（FLUX.1-dev ＋ nanco の LoRA）と **3090 版**（下の「3090 で描く」）の2つ。深石さん 2026-10-21「3090版とfalを両方使う」。**使い分けは未決**: 指定がなければ fal で描き、3090 でも描けることを一言添える。5090 は使わない（2026年11月から使えない）
 - スクリプト: `~/src/nanco_illust/nanco_generate_fal.py`（Python は `~/src/nanco_illust/.venv/bin/python`）。fal のキーは `~/src/nanco_illust/.env` の `FAL_KEY` をスクリプトが自分で読む → **1Password・Touch ID は要らない**
 - LoRA: `~/src/nanco_illust/loras/` の10段階（lv01＝線画だけ 〜 lv10＝色の面が多い）。強さは **1.0 固定**（深石さん 2026-10-20 決定。0.6/0.8 は線が黒くなるが絵柄が離れた）
 - 品質チェックで落ちた絵は別の seed で自動で描き直す（最大2回）。**線がグレー・緑の絵は落とす／線が少ない絵は通す**（2026-10-20 決定）
@@ -44,6 +44,19 @@ cd ~/src/nanco_illust && .venv/bin/python nanco_generate_fal.py "<English subjec
 - 出力: `generated/<日時>_<お題>/`（元画像）・`transparent/`（背景透過）・`_sheet.png`／`_sheet.txt`（番号と元ファイルの対応）
 - 終了コード 1＝1枚以上が描けなかった（fal のエラーなど）。ログの FAILED 行を見て伝える
 
+## 3090 で描く（費用0円・2026-10-21〜）
+
+- コマンドは fal 版と同じ引数（`--workers` だけ無い）。出力の形（元画像・`transparent/`・`_sheet.png`）も同じ:
+  ```bash
+  cd ~/src/nanco_illust && .venv/bin/python nanco_generate_3090.py "<English subject>" --only lv03,lv04 --seeds 2 --sheet
+  ```
+- 中身: Mac mini が段階・seed・お題の言葉を決め（fal 版と同じ関数）、SSH（`Host3090`）で 3090 の `C:\Users\nsketch\flux3090\nanco3090\nanco3090_worker.py` に描かせ、絵を受け取って透過と一覧を作る。3090 側は 5090 と同じ diffusers の描き方で、本体だけ Nunchaku INT4 の FLUX.1-dev。**同じ seed なら 5090 の昔の絵とほぼ同じ絵**になる（fal とは少し違う）。深石さんの評価「悪くない」（2026-10-22）
+- 速さ: モデル読み込み約15秒＋**1枚約16秒**（1枚ずつ順番）。4枚で約2分。たくさん描くと fal より遅い
+- 記録: `generated/local3090_usage.csv`。3090 側にも `nanco3090\runs\` に元画像が残る
+- 3090 が使えない時: 3090 の GPU が使用中（VRAM 4GB超）なら描かずに止まる → 3090 で何が動いているか深石さんに確認する（深石さんが3090を使っている時間がある）。つながらない時は `/nsk3090-recover`
+- LoRA は 3090 の `nanco3090\loras\` に10段階のコピーがある。Mac 側の LoRA を作り直したら、3090 にも送り直す
+- 利用規約: FLUX.1-dev は非商用ライセンス。手元の GPU で描いた絵を nanco の仕事に使ってよいかは**未確認**（fal は「生成画像は商用利用可」と明記）
+
 ## 前後（BEFORE→AFTER）の対を描く（2026-10-20 デンケンで確立）
 
 - 2枚を別々に描くと、同じ seed・同じ言い回しでも物の数・形・大きさが変わって**別の場面に見える**（深石さん「完全に別シーンに見える」）
@@ -70,4 +83,5 @@ cd ~/src/nanco_illust && .venv/bin/python nanco_generate_fal.py "<English subjec
 ## 経緯（詳しくは Mac mini のプロジェクトメモリ `naynco-project.md` Step 11）
 
 - 2026-10-19〜20 に 5090／3090／fal／MiniMax（image-01・H3）を比べ、**fal flux-lora に決定**（速い・今の絵柄に近い・GPU 不要）
-- H3（MiniMax の公開モデル）は 3090＋ComfyUI で1枚12秒まで速くなったが、線が太すぎ／細くすると手描き感が消えるで見送り（環境は 5090 `ai-toolkit-h3\`・3090 `h3\` に残置）
+- H3（MiniMax の公開モデル）は 3090＋ComfyUI で1枚12秒まで速くなったが、線が太すぎ／細くすると手描き感が消えるで見送り（環境は 2026-10-21 に削除済み）
+- 2026-10-21 FLUX.2 klein 4B（Apache 2.0）でも LoRA を作ったが、手書き感が薄く見送り（LoRA は Mac `loras/klein/`）。同日、3090 で 5090 と同じ描き方＋Nunchaku INT4 にして1枚16秒で再現できた → 3090 版として追加

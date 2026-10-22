@@ -54,7 +54,7 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 6. **移したら案件のSlackチャンネルに置き場所を投稿する**（2026-10-22 深石さん指示・事前承認済み。「文字起こしどこ？」と毎回聞かれるため）
    - 投稿先は案件チャンネル（チャンネル名は案件番号で `slack_search_channels`。同じ案件で複数あれば、メンバーが普段質問しているほう）。文面は短く: 「◯/◯の◯◯の文字起こしを案件フォルダに入れました → `共有ドライブ nsketch/<案件フォルダ>/06_Recording/<ファイル名>`」。Notionの議事録ページがあればリンクを添える
    - 案件チャンネルに**「📝 文字起こし・会議録の場所」canvas**が無ければ作ってリンクを投稿し、あれば「この案件の会議記録」表に1行足す（`slack_update_canvas`）。ひな形＝2610_GalleryWalkのcanvas（https://nsketchinc.slack.com/docs/T08ML4BM5/F0CAZ7K5TR9 ・ #2610_gallerywalk-培地最適化）：①案件フォルダの06_Recording ②まだならNotta_Inbox（カレンダーの会議名で探す・日付は着弾日） ③それでも無ければ深石さん ④この案件の会議記録の表 ⑤話者名は誤ることがある
-   - 背景: Notta_Inbox（Drive id `1GKIiPsh_4DwyO72_5H-4Zz-1-PbSdshA`）は深石さんのマイドライブにあり、2026-10-22時点で共有相手は深石さんだけだった（他メンバーは移す前の文字起こしを見られない）。社内（nsketch.com）への閲覧共有は深石さんが設定する（Drive MCPの share_file は「The caller does not have permission」で失敗。しかも share_file はドメイン共有に対応していない）。共有が済んだかは `get_file_permissions` で確認する
+   - 背景: Notta_Inbox（Drive id `1GKIiPsh_4DwyO72_5H-4Zz-1-PbSdshA`）は深石さんのマイドライブにある。2026-10-22まで共有相手は深石さんだけで、他メンバーは移す前の文字起こしを見られなかった → **2026-10-22 深石さんが「一般的なアクセス＝nsketch.com・閲覧者」に設定済み**（`get_file_permissions` で domain/reader を確認）。リンクを知っている社内メンバーが見られる形なので、canvasにフォルダのリンクを必ず載せる。Drive MCPの share_file は権限変更できない（「The caller does not have permission」・ドメイン共有にも非対応）ので、共有設定を変える時は深石さんに頼む
 7. 案件固有の後続処理（Notion議事録・KB反映など）は各案件のナレッジベース・プロジェクトメモリに従う
 
 ## フォールバック

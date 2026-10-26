@@ -76,6 +76,8 @@
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__get_draft",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__create_draft",
       "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__update_draft",
+      "mcp__claude_ai_Gmail__send_message",
+      "mcp__e82bc7a3-f223-413c-9fa5-7b4e76039be7__send_message",
       "mcp__notion__notion-search",
       "mcp__notion__notion-fetch",
       "mcp__notion__notion-query-data-sources",
@@ -126,7 +128,6 @@
       "mcp__*__archive_items",
       "mcp__*__merge_items",
       "mcp__*__reconcile_items",
-      "mcp__*__send_message",
       "mcp__*__reply",
       "mcp__*__forward"
     ],

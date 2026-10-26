@@ -50,6 +50,7 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
 【手順】
 0. **返信の取り込み（双方向）**: 実行冒頭に Slack #log_fukaishi（channel_id `C03119VSJGK`）の直近(~20件・スレッド含む)を読み、前回までの保留質問への深石さんの返信（「①OK」「○○作成して」等の明確な承認）があれば、その新規顧客のフォルダ作成＋取込＋（新規なら）総合AIプロファイル生成を今回の実行で行い、当該スレッドに「✅ご返信を受けて取込みました」と報告する。曖昧・否定・無返信は実行しない。
 1. Googleカレンダー（list_events, primary=fukaishi@nsketch.com, timeZone=Asia/Tokyo, orderBy=startTime）で「約3日前〜現在」のイベントを取得する。
+1.5. **相談後の自動処理と重ねない（2026-10-26〜）**: `[nanco]在庫管理アプリnanco オンライン相談` と `[レディクル]` の予定は、30分おきの `nanco-consult-followup` が取り込む。台帳 `~/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/claude-shared/consult-post-ledger.md` に同じ予定IDの行があれば、その予定はこの回では飛ばす（台帳に無い、または「文字起こしが見つからない」で終わっている予定だけ、従来どおり扱う）
 2. 各会議を判別（大原則＝nanco顧客の積極的証拠があるものだけ取込・疑わしきはスキップ）:
    - 出席者メールが全員 @nsketch.com かつタイトルに顧客名プレフィクスが無い → 社内会議＝スキップ。タイトルに 朝会/N朝会/週次/定例/[nanco]/【nanco】 も社内＝スキップ。
    - 外部出席者ドメインが顧客マスタ（共有ドライブ「Nanco」内 カスタマー/00_顧客マスタ.md の社名）に一致、またはタイトルが「在庫管理アプリnanco オンライン相談」「在庫管理アプリnanco」「[顧客名]」 → 取込候補。

@@ -1,6 +1,6 @@
 ---
 name: nanco-consult-followup-dispatch
-description: 平日9:00・13:00に今日のカレンダーを見て、nancoオンライン相談・レディクル面談の「終了30分後」に nanco-consult-followup を1回限りで予約する（無人・Slack投稿なし）
+description: 【停止中 2026-10-29】予約方式をやめ、相談後処理を決まった時刻（12:30・14:00・15:30・17:00・18:30）で動かす方式に変えたため無効化
 ---
 
 # nanco相談後処理の予約係

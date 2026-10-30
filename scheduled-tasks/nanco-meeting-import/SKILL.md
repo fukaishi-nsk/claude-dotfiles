@@ -92,7 +92,9 @@ description: 平日18:00にnanco顧客会議録を自動取込→KB差分案をS
    - 手順（agent-browserは**全コマンドに専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を毎回付ける**・実チェックは読み取りのみで送信しない）:
      - ⚠️2026-09-07〜専用永続プロファイル方式。旧 `--profile Default`（実Chromeコピー起動）はそのPCの実Chromeのログインを失効させるため廃止（フォールバックもしない）。MacBook・Mac miniとも2026-09-07にログイン済み（Mac mini=Google/Teams/LINE OAM）。`$HOME/.agent-browser/profiles/gmail` が無いPCで走った場合や、開いた結果がLINEのサインインページだった場合は、この工程を打ち切って「⚠️専用プロファイル未設定またはセッション失効（要: 専用プロファイルへの本人ログイン）」を「⚠️権限スキップ」欄に記録して先へ進む
      1. `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" open https://chat.line.biz/` → `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" wait --load networkidle`
-     2. `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" snapshot -i` でチャット一覧を出し、「在庫nanco⇔GREENING」を `click @eN` で開いて `snapshot` で本文を読む
+     2. `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" snapshot -i` でチャット一覧を出し、「在庫nanco⇔GREENING」を開いて本文を読む
+        - 🚨 **一覧のプレビューだけで「新着なし」と判断しない**（2026-10-21便でプレビューだけ見て「新着なし（最後は10/8）」と報告し、10/29 深石さんに「嘘つかないで」と指摘された。結果は合っていたが本文を開いていなかった）。必ずチャットを開き、**最後の発言の日時と送信者を本文から書き写して**報告する
+        - 一覧の `click` はチャットが開かないことがある（2026-10-29 実測）。開かなければ URL を直接開く: `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" open https://chat.line.biz/U0b5dfbeab436d99e8b517b52659b694f/chat/C264a4a2bf231c76894a23c4da37e4bb1` → `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" get text main` で本文を読む
      3. 前回実行（前営業日夕方）以降の新着のうち、**送信者が「Unknown」の発言**を拾う（名前付き送信者の分はline-relayがSlack転写済み＝二重報告しない）
      4. 拾った発言は日時＋全文をSlack報告のLINE巡回欄に **「GREENING OAM直読み（Slack転写外）」** と明記して載せる。新着ゼロなら「GREENING OAM直読み: 新着なし（最終メッセージ: <日時>）」と最終メッセージ時刻を根拠付きで書く
      5. 終わったら `agent-browser --profile "$HOME/.agent-browser/profiles/gmail" close`（失敗しても無視してよい）

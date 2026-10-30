@@ -48,6 +48,7 @@ EOF
   - Parsec アプリの再起動（`osascript -e 'tell application "Parsec" to quit'` → `open -a Parsec`）では**直らなかった**。本体の再起動（手順2・承認要）で直った。次に同じ症状が出たら、Parsec の再起動は飛ばして、本体の再起動の承認を取ってよい
   - -6023 は公式では「P2P 接続を何かが邪魔している（NAT・ファイアウォール等）」。-11003 は公式の資料で見つからず意味は不明
 - **parsecd が無い** → `ssh macmini 'open -a Parsec'` で起動して手順3へ
+  - **macOS のメジャー更新の後は、ログイン項目が1つも起動しない**（2026-10-30 26.2→27.2 で実測）。自動ログインはされるが、更新後の案内画面（`pgrep -lf "Setup Assistant"` に `Setup Assistant Update` が出る・Finder／Dock も無い）で止まり、Parsec・Sunshine が起動しない。`open -a Parsec` と `open -b dev.lizardbyte.sunshine.wrapper` で起動でき、Parsec はサーバー接続まで通った。案内画面はその後 Parsec 越しに本人がクリックして進める
 - **Moonlightだけ見えない・sunshine が無い** → `ssh macmini 'open -b dev.lizardbyte.sunshine.wrapper'`（トレイからQuitされたまま。再ペアリング不要）
 - どれにも当てはまらない → 推測で再起動しない。診断結果を深石さんに報告して判断を仰ぐ
 

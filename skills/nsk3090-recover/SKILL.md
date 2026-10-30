@@ -79,7 +79,7 @@ rm -rf $D
 ssh Host3090 'shutdown /r /t 10 /c "remote restart by Claude"'
 ```
 
-- `nsketch` は管理者なので通る想定。⚠️ 2026-10-19 時点で**SSHからの再起動は未実施**。初回に使ったら結果を追記する
+- **2026-10-30 初実施で効いた**: 指示 14:33:06 → SSH 断 → 起動 14:34:00 → 14:34:16 に SSH 復帰（約1分）。自動サインイン（nsketch）・Parsec サービス自動起動・`successful /me`（14:34:15）まで確認、深石さんの接続も問題なし
 - 自動サインイン（nsketch・空パスワード）→ Parsec はサービスなので、サインイン前から自動で立ち上がる
 - 復帰待ち（起動時刻が変わったら再起動済み）:
 
@@ -87,6 +87,16 @@ ssh Host3090 'shutdown /r /t 10 /c "remote restart by Claude"'
 for i in $(seq 1 36); do r=$(ssh -o ConnectTimeout=4 Host3090 'powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).LastBootUpTime.ToString(\"s\")"' 2>&1 | tail -1); echo "$(date +%H:%M:%S) $r"; sleep 10; done
 ```
 （起動時刻の表示が再起動前と変わった行が出たら Ctrl+C 相当で打ち切ってよい。ループは最大6分）
+
+## 3b. Windows Update を SSH から当てる（⚠️ 実行前に承認。再起動を伴う）
+
+深石さんの方針は「アップデートは積極的に当てる」（2026-10-30）。
+- 未適用の確認は SSH から直接できる（`Microsoft.Update.Session` の `CreateUpdateSearcher().Search("IsInstalled=0 and IsHidden=0")`）。再起動待ちは `Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired'`
+- **ダウンロード／インストールは SSH から直接だと `0x80070005 (E_ACCESSDENIED)` で拒否される**（2026-10-30 実測）。一時的な SYSTEM タスク経由なら通る:
+  1. 検索→`CreateUpdateDownloader().Download()`→`CreateUpdateInstaller().Install()` をする .ps1（ASCII のみ）と、それを `> log 2>&1` で実行して最後に `DONE` を書く .cmd を scp で送る
+  2. `schtasks /create /tn nsk-wuinst /tr C:\Users\nsketch\wurun.cmd /sc once /st 23:59 /ru SYSTEM /rl HIGHEST /f && schtasks /run /tn nsk-wuinst`（`/tr` に引用符入りの powershell 行を直書きすると cmd に壊される＝.cmd を挟む）
+  3. ログに `DONE` が出るまで待つ（10-30 は6件で約3分）。ResultCode 2 = 成功
+  4. `schtasks /delete /tn nsk-wuinst /f` と送ったファイルを消してから、手順3で再起動 → 手順4で確認（未適用 0 件・再起動待ち False も見る）
 
 ## 4. 復旧確認
 

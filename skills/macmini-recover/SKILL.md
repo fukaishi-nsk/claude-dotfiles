@@ -49,6 +49,7 @@ EOF
   - -6023 は公式では「P2P 接続を何かが邪魔している（NAT・ファイアウォール等）」。-11003 は公式の資料で見つからず意味は不明
 - **parsecd が無い** → `ssh macmini 'open -a Parsec'` で起動して手順3へ
   - **macOS のメジャー更新の後は、ログイン項目が1つも起動しない**（2026-10-30 26.2→27.2 で実測）。自動ログインはされるが、更新後の案内画面（`pgrep -lf "Setup Assistant"` に `Setup Assistant Update` が出る・Finder／Dock も無い）で止まり、Parsec・Sunshine が起動しない。`open -a Parsec` と `open -b dev.lizardbyte.sunshine.wrapper` で起動でき、Parsec はサーバー接続まで通った。案内画面はその後 Parsec 越しに本人がクリックして進める
+  - ⚠️ 27.2 の案内画面には **FileVault を有効にする画面（復旧キーの表示）** が出る。**Mac mini では有効にしない**（有効にすると再起動のたびに起動前のロック解除画面で止まり、SSH・Parsec・自動ログインが全部使えなくなる＝月次再起動で遠隔から戻れなくなる）。2026-10-30 は案内画面を終えた後も `fdesetup status` が Off のままだった（遅延有効化の表示も無し）。進めた後は必ず `fdesetup status` で Off を確かめる
 - **Moonlightだけ見えない・sunshine が無い** → `ssh macmini 'open -b dev.lizardbyte.sunshine.wrapper'`（トレイからQuitされたまま。再ペアリング不要）
 - どれにも当てはまらない → 推測で再起動しない。診断結果を深石さんに報告して判断を仰ぐ
 

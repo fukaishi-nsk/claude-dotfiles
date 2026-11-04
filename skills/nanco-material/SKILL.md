@@ -102,6 +102,17 @@ description: nanco顧客向けの紹介資料（Figma Slides）を、オンラ�
 - ファイル名はプラグインAPIで変えられない（`Setting the document name is currently not supported`）→ Claude in Chrome で Figma を開き、左上のファイル名をダブルクリックして変える
 - 生成画像（generate_image）はスライドの外のキャンバスに置かれる。使わなかったら消す
 
+## アプリの画面をシミュレーターで撮る（2026-11-04 和嶋さま資料で確立）
+
+- 場所: Mac mini（Tailscale `fukaishi_macmini@100.110.187.46`）の iPhone 17 シミュレーター（iOS 26.5・UDID `3B476E7C-A458-4100-BBB2-12231F636F4B`）。nanco 1.11.1 の本番向けビルドは `~/nanco_dd/Build/Products/Debug-production-iphonesimulator/Runner.app`。Xcode 27 は Simulator.app が無く、画面は `DeviceHub.app`（Xcode.app/Contents/Applications）。iOS 27 では nanco が起動直後に落ちる
+- 操作は axe（`/opt/homebrew/bin/axe`）。**`axe tap` は押す時間が短くアプリが反応しないことがある → `axe touch -x X -y Y --down --up --delay 0.12`**。位置は `axe describe-ui` の frame から取る（ラベル名だけで押さない）
+- **文字入力は `axe type` が届かない**。画面上のキーボードを1キーずつ押す `~/nanco_sim/kbtype.py`（標準入力から読む）を使う。日本語のかなキーボードのときは使えない（英字キーボードに切り替える）
+- **ログインは深石さんにパスワードを入れてもらう**（Claude はパスワードを扱わない）: メール欄に `kbtype.py` でアドレスを入れたあと、深石さんがアプリのターミナルで `ssh -t fukaishi_macmini@100.110.187.46 '~/nanco_sim/password.sh'` を実行。パスワード欄へ入れ、メール欄の中身が変わっていたら消して止める安全装置つき。⚠ 2026-11-04 に欄の指定ずれでパスワードがメール欄に表示される事故があった → この形に作り直した
+- ログイン状態はシミュレーターに残るので、次からは Claude が `touch` で移動して `xcrun simctl io <UDID> screenshot ~/nanco_shots/xxx.png` で撮り、scp で取ってくる。**画像を ~/Downloads に置かない**
+- アプリの「メールで招待」は管理者だけ。テスト用アカウント: `fukaishi+invite1104c@nsketch.com`（nnテスト２・管理者・表示名 nanco花子）
+- 撮った画面の名前・アドレス・コードは、PIL で白く塗ってサンプル値に描き直す（位置は画素で測る）
+- erase すると「なぞり入力」の初回案内がキーボードをふさぎ、言語も英語に戻る。Return キーを送ったあと入力が効かなくなったことがある（原因不明）
+
 ## 書き出しと共有
 
 1. 表示中の頁を `get_screenshot`（maxDimension 1920）で1枚ずつPNGにする（URLは短命なのですぐ curl）。頁IDの順は `use_figma` で SLIDE_ROW の子（非表示を除く）から取り、10頁ずつ並行で呼んで、その都度 curl する（2026-10-20 デンケン30頁で実施）。書き出したら縮小一覧を1枚作って、全頁を目で確かめてからPDFにする

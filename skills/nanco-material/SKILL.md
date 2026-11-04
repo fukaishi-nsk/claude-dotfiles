@@ -118,7 +118,8 @@ description: nanco顧客向けの紹介資料（Figma Slides）を、オンラ�
 1. 表示中の頁を `get_screenshot`（maxDimension 1920）で1枚ずつPNGにする（URLは短命なのですぐ curl）。頁IDの順は `use_figma` で SLIDE_ROW の子（非表示を除く）から取り、10頁ずつ並行で呼んで、その都度 curl する（2026-10-20 デンケン30頁で実施）。書き出したら縮小一覧を1枚作って、全頁を目で確かめてからPDFにする
 2. PIL で PDF（quality=95・subsampling=0）にまとめ、pypdf で予約URLなどにリンク注釈を付ける（スクリプト例は下）。**文字は画像なので選択できない**ことを報告に書く
 3. `01_File_to/nancoご紹介資料_<社名>様.pdf` に保存。**作り直すときは `cat new.pdf > 既存ファイル` で上書き**するとDriveのファイルIDが変わらず、送ったリンクがそのまま使える
-4. Driveの共有を「リンクを知っている全員・閲覧者」にする: Driveコネクタの share_file では設定できないので、agent-browser（`--profile "$HOME/.agent-browser/profiles/gmail"`）で共有ダイアログ→一般的なアクセス→リンクを知っている全員
+4. **送る資料は共有ドライブ `Nanco/顧客送付用（リンク公開）/` にもコピーする**（2026-11-04〜・深石さん「Drive の共有：これ毎回面倒」）。このフォルダは「リンクを知っている全員・閲覧者」にしてあり、中のファイルに共有が引き継がれるので、ファイルごとの共有の切り替えは要らない。原本は案件の 01_File_to に残す。**お客さまに渡してよいものだけ入れる**（リンクを知っていれば誰でも見られる）。Claude による共有設定の変更は権限の判定で止められる（2026-11-04 実測）ので、この形にした
+   - 旧手順（フォルダを使わないとき）: Driveの共有を「リンクを知っている全員・閲覧者」にする: Driveコネクタの share_file では設定できないので、agent-browser（`--profile "$HOME/.agent-browser/profiles/gmail"`）で共有ダイアログ→一般的なアクセス→リンクを知っている全員
    - 通った手順（2026-10-20）: ファイルIDは Drive コネクタの search_files（`title contains '<ファイル名>'`）で取る（保存から1分ほどで同期済み）→ `agent-browser open https://drive.google.com/file/d/<ID>/view` → snapshot の「共有します。…」ボタン → 「制限付き: 一般的なアクセスを変更」→ menuitemradio「リンクを知っている全員」→ 役割が「閲覧者」になっていることを snapshot で確かめる → 「完了」→ close。`AGENT_BROWSER_SESSION` に専用の名前を付ける
 5. 確認: `get_file_permissions` に anyone/reader があること、未ログインの `curl "https://drive.google.com/uc?export=download&id=<ID>&confirm=t"` がローカルとバイト一致すること
 

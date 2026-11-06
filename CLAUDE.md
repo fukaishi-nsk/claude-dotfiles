@@ -30,6 +30,13 @@
 - **nanco顧客向けの資料を作る・改定する時**（オンライン相談・レディクル面談の後の資料送付など） → `/nanco-material` を起動する（2026-10-19〜）
 - **nanco顧客とのやりとりが動いた時**（会議・メール/LINE送信・Linearの起票/完了・離脱や契約など） → `/nanco-status-update` で Notion「🫂 Customers」の該当行を更新する（2026-10-08〜・事前承認済み）
 
+## nanco顧客の利用状況を見る（2026-11-06制定）
+- 方針: 集計の仕組みは作らない。**深石さんに頼まれた時に、AIが見られればいい**
+- **nanco-analytics** という社内の利用分析がすでにある（github.com/nanco-service/nanco-analytics・private）。社内PC nsketch-minisforum で毎晩21時に全社の「使った人・使った日（直近30日）・経路（Web/アプリ/API）・端末」を集計し、画面は会社の Tailscale 網 `https://nsketch-minisforum.tail42e750.ts.net` にある。**時間帯・曜日・品目単位は無い**。新しい集計の仕組みやイシューを提案する前に、まずこれで足りないか確かめる（2026-11-06、存在を知らずにAPIキーのイシューを書いて書き直しになった）
+- ⚠️ MacBook は個人の Tailscale 網（fukaishi.com）なので nanco-analytics に届かない（2026-11-06実測）。Mac mini は未確認。網への参加は深石さんの判断
+- 1社を細かく（誰が・何曜の何時台に）見る時は、実Chrome（claude-in-chrome）の support@ ログインで管理画面 `app.nanco.io/admin/workspaces?search=<社名|ドメイン>` → 更新履歴 `app.nanco.io/<WSのID>/activity` をページ送りで読む（1ページ20件・`?page=N`）。⚠️ 先頭ページを開くと support@ の既読カーソルが進む（顧客データは変わらない・NANCO-2922）。「閲覧のみ」と言われた時は報告に書く
+- 使えない手段: 外部API（nanco MCP の ext/v1）は社内テストWSに固定でWS全体の履歴の口が無い。ログイン中のトークンの流用は安全確認で拒否される（再試行しない）。共有ドライブ `カスタマー/01_analytics/` は2026年4月の古い写し
+
 ## メール文体の継続学習（全案件・全セッション共通 / 2026-07-29制定）
 - ゴール: 深石さんが**無修正で送れる下書き**を安定して出すこと。最終的にはClaudeが送信まで担う日を目指す（送信は都度承認の上で）
 - メール文面への添削・修正・フィードバックを受けたら、どの案件のセッションでも**必ずその場で email-draft スキルに追記**して型を育てる（AI案→送信版のdiffから学ぶ）。正本は `~/claude-dotfiles/skills/email-draft/SKILL.md`（`~/.claude/skills/...` はシンボリックリンク。編集は正本パスへ）

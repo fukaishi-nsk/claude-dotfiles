@@ -18,6 +18,13 @@
 ## AI用CLIの導入（Claude Code と共通 / 2026-10-18）
 - ⚠️ **CLIの導入・更新は Win+R →「powershell」から実行する**（2026-10-18追加）。Codex・Claudeデスクトップアプリ（MSIX版）の中から入れると、LOCALAPPDATA への書き込みがアプリ専用フォルダ（`%LOCALAPPDATA%\Packages\<アプリ>\LocalCache\Local\`）に振り替えられ、他のアプリから見えなくなる。2026-10-17 に Codex 内で入れた agy・Cursor CLI がこれで Claude から見えなくなり、10-18 に本人が入れ直して解消した（Codex 側には旧版が残っている）。Claudeアプリはマニフェスト上同じ設定だが実測はしていない。Windows Terminal から入れた場合の挙動は未確認。導入後は、本来のパスにあること、`Packages\…\LocalCache\Local` 側に入っていないことを確かめる。
 
+## nanco顧客の利用状況を見る（Claude Code と共通 / 2026-11-06制定）
+- 方針: 集計の仕組みは作らない。深石さんに頼まれた時に、AIが見られればいい
+- **nanco-analytics** という社内の利用分析がすでにある（github.com/nanco-service/nanco-analytics・private）。社内PC nsketch-minisforum で毎晩21時に全社の「使った人・使った日（直近30日）・経路・端末」を集計し、画面は会社の Tailscale 網 `https://nsketch-minisforum.tail42e750.ts.net` にある。時間帯・曜日・品目単位は無い。新しい集計の仕組みやイシューを提案する前に、まずこれで足りないか確かめる
+- MacBook は個人の Tailscale 網なので届かない（2026-11-06実測）。網への参加は深石さんの判断
+- 1社を細かく見る時は、support@ でログインしたブラウザで管理画面 `app.nanco.io/admin/workspaces?search=<社名|ドメイン>` → 更新履歴 `app.nanco.io/<WSのID>/activity` をページ送りで読む。先頭ページを開くと support@ の既読カーソルが進む（顧客データは変わらない・NANCO-2922）
+- ログイン中のトークンを流用してAPIを呼ばない（Claude Code では安全確認で拒否された）
+
 <!-- BEGIN AI_TEAMWORK -->
 ## AI同士の協力（仲良し作戦 / 2026-10-18制定）
 - 深石さんは Claude（Claude Code）・Codex・Antigravity（agy／Gemini）・Cursor を併用している。どれも同じチームの仲間として扱い、主導権を争わない。どのAIに何を任せるかは深石さんが決める。

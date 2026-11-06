@@ -67,6 +67,15 @@ cd ~/src/nanco_illust && .venv/bin/python nanco_generate_fal.py "<English subjec
   - Kontext は nanco の LoRA を通さない。絵柄は入力画像から受け継ぐだけなので、毎回同じになるとは限らない。**商用利用の条件は未確認**（下の利用規約と同じ扱い）
   - 今回のスクリプトはセッションの一時フォルダに置いただけ。繰り返し使うなら `nanco_generate_fal.py` に `--edit-from <画像> --edit "<指示文>"` のような形で取り込む（未実装）
 
+## 資料の絵で通った描き方（2026-11-06 愛豊電機・nanco-material の添削から）
+
+- **人物は描かない。物のメタファーで描く**。人物の絵は「具体的すぎる、AIっぽすぎる」と全部だめになった（例: いま＝もつれた糸、あと＝糸巻き、現場＝スマホとバーコード、事務所＝グラフの出たノートPC、アラート＝ベル）
+- アイコンのお題は `--extra "no people, no hands, object only, icon, large in frame, centered, minimal, extremely few strokes"`・`--only lv02 --seeds 3`。**`large in frame` を付けないと絵が小さく描かれ**、資料の大きさに拡大すると線が太く荒れる
+- 1つの資料の絵は同じ段階（lv02 など）でそろえる。lv03 は緑の塗りが入り、文字の後ろに敷くと読みにくい（塗りを抜いて線だけにした）
+- 「見せない」のような否定は描けない（「closed eye」でも開いた目が出た）。描いた絵に PIL で斜線を描き込む
+- 余計な線（糸くず・切れ端）は、拡大して境目の座標を測ってから消す。四角く消すと本体の縁が欠ける
+- 透過PNGでも、外側にうすい点が残って余白が詰まらないことがある。余白はアルファのしきい値 120 前後で測って切る
+
 ## 描いた絵の置き場所と自動の片付け（2026-10-20〜）
 
 - `generated/` 直下のフォルダは、**描いてから30日たつと毎日4:30にMacのゴミ箱へ移る**（launchd `com.nsketch.nanco-illust-cleanup`・正本 `~/claude-dotfiles/launchd/nanco-illust-cleanup/`）。直下のファイル（`fal_usage.csv` など）は残る

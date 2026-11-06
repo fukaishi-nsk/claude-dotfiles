@@ -22,7 +22,8 @@ description: 顧客向けメール（nancoサポート・Nスケッチ）の下�
    - **下書きは `~/claude-dotfiles/scripts/gmail_draft.py` で作り、From をAIが決めて入れる（2026-10-19〜）**。Gmail コネクタの create_draft は From を指定できず、いつも fukaishi@ 名義になり、深石さんの手動切替が漏れていた（9/18 サンコダ・10/19 吟優舎）。nanco 顧客宛ては `--from support@nanco.io`、受託案件（島津・千葉大など）とレディクル初回など Nスケッチ名義は `--from fukaishi@nsketch.com`
    - 使い方: 本文を HTML ファイルに書き（`<br>` と `<a href>`、署名も含める）→ `python3 -W ignore gmail_draft.py create --from <送信元> --to <宛先> --cc <CC…> --html-file <本文> --reply-to <返信先の Gmail message id>`。返信なら元のスレッドに入り、件名「Re: 〜」・In-Reply-To・元メールの引用が付く。新規メールは `--subject` を指定し `--reply-to` を外す
    - ⚠ CC が複数のときは `--cc a@x b@y` と1つの `--cc` の後ろに並べる。`--cc a --cc b` と繰り返すと最後の1件だけになる（2026-10-19 台和で姉崎さんが落ちた）
-   - 作ったら `gmail_draft.py show <draftId>` で From・To・Cc・件名・threadId を確かめてから報告する。報告で「From を切り替えてください」とは書かない（切り替え不要になったため）
+   - **nanco 顧客宛て（From support@）は CC に support@nanco.io を必ず入れる**。入れないと共有インボックスと Slack #nanco_カスタマーお問い合わせ に飛ばない（2026-11-06 富双シート 久保さま `1a1ae7770e38135d` で Grok Bot が漏らし、深石さんが指摘・grok-feedback.md より取込）
+  - 作ったら `gmail_draft.py show <draftId>` で From・To・Cc・件名・threadId を確かめてから報告する。報告で「From を切り替えてください」とは書かない（切り替え不要になったため）
    - 認証は `~/.config/claude-gmail/`（client_secret.json・token.json・権限600・dotfiles 外）。Google Cloud プロジェクト「claude-gmail」（ID enhanced-tuner-512103-e3・組織 nsketch.com・OAuth は「内部」・デスクトップクライアント）。権限は下書き作成・メール閲覧・送信元一覧の閲覧だけで、送信の権限は無い。**MacBook・Mac mini とも使える**（2026-10-19。Mac mini は Google のライブラリを pip --user で入れ、MacBook の client_secret.json と token.json を Tailscale の scp でコピー。`send-as` で送信元2つが取れることを確認）。Windows 機など別のPCで使うときは、同じようにライブラリと2ファイルを置く。認証が切れたら `gmail_draft.py auth`（ブラウザで深石さんが許可）
    - スクリプトが使えないとき（認証切れなど）はコネクタの create_draft に戻り、報告で From の切り替えを頼む
 3. 対応報告を含む場合、**実作業が完了してから送る**順序になっているか確認する（完了形で書くため）
@@ -45,7 +46,7 @@ description: 顧客向けメール（nancoサポート・Nスケッチ）の下�
 8. **Grok Bot の添削ログを取り込む（2026-10-16〜）**: Grok Bot（受信トレイ番）も、このファイルの Drive コピー（`マイドライブ/claude-shared/email-draft/SKILL.md`・setup.sh の `GROK_SHARED_SKILLS` で自動更新）を読んで返信案を書いている。深石さんが Grok Bot の案を直して（または無修正で）送ると、Bot が同じフォルダの `grok-feedback.md` に「使った型／元の案／送った文面／直したところ」を1件ずつ下に足していく
    - このスキルを使うときは、まず `~/Library/CloudStorage/GoogleDrive-fukaishi@nsketch.com/My Drive/claude-shared/email-draft/grok-feedback.md` を読み、下の「取込済み」より新しいエントリがあれば、Claude の添削と同じ扱いで該当の型に追記する（無修正なら成功例として記録）
    - `grok-feedback.md` は **Bot だけが書くファイル**。Claude は読むだけで編集しない（Drive の同時編集の競合を避けるため）。どこまで取り込んだかは、下の行を更新して記録する
-   - 取込済み: 2026-11-06 10:27 のエントリ（富双シート・久保さま）まで（2026-11-06 確認・11/6 湯本電機・11/6 富双 久保さまの2件を取り込み）
+   - 取込済み: 2026-11-06 10:29 のエントリ（富双シート・久保さま CC漏れ）まで（2026-11-06 確認）
    - Grok Bot の送信カードは fukaishi@ から直送される。nanco 顧客宛て（support@ が型）は Bot が文面だけ用意する約束（Bot 説明欄の「守ること」）。Bot 由来の送信で From が fukaishi@ になっていたら、切替漏れとして記録する
 
 9. **「送った、確認して」は、送信確認→添削差分の照合→学習記録まで行う（2026-10-16 豊田さんの送信確認漏れを受けて明文化）**

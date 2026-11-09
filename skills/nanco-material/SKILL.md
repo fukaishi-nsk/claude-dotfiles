@@ -140,6 +140,8 @@ description: nanco顧客向けの紹介資料（Figma Slides）を、オンラ�
 - フッターのロゴ（`Frame 3`）を `findAll` で探すと、カードの中に複製したロゴより先にフッターのものが当たる。親が GROUP かどうかで見分ける
 - ファイル名はプラグインAPIで変えられない（`Setting the document name is currently not supported`）→ Claude in Chrome で Figma を開き、左上のファイル名をダブルクリックして変える
 - 生成画像（generate_image）はスライドの外のキャンバスに置かれる。使わなかったら消す
+- **作ったばかりの文字の `absoluteRenderBounds` は、同じ `use_figma` の呼び出しの中では null になる**（2026-11-09 JO 操作ガイドで、見出しの下線を引くところで止まった）。頁を組む呼び出しと、下線を引く呼び出しを分ける。止まった呼び出しは何も残らなかった
+- Web 画面の撮影は、agent-browser の `eval` で「DOM の文字を見本に置き換える」→ `screenshot` →「目的の文字を含む要素の、いちばん近いボタン・リンク・セルの `getBoundingClientRect()`×2」を返す、を1つのスクリプトにまとめると、オレンジ枠の位置が撮った画面とずれない（2026-11-09。作業用のスクリプトはセッションの一時フォルダにあり、残していない）
 
 ## アプリの画面をシミュレーターで撮る（2026-11-04 和嶋さま資料で確立）
 

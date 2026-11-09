@@ -61,6 +61,12 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 
 ## フォールバック
 
+- **まず公式CLI `notta` を使う**（2026-11-09 存在を確認・この手順書に未記載だったためブラウザで遠回りした）。`@notta-labs/notta-cli` 1.0.8（MacBookに2026-09-24導入・`/opt/homebrew/bin/notta`）。認証済みでNSKワークスペース（7206228075381755904）に繋がる。`notta auth status` の `expires_at` が過去日でも、検索などの呼び出しは通った（2026-11-09実測）。Mac mini・Windows機に入っているかは未確認
+  - 探す: `notta record search "<会議名の一部>"` → record_id
+  - 本文: `notta record view <record_id>`
+  - 録画・録音を落とす: `notta export create <record_id> --type media` → `notta export status <task_id>` → `notta export download <task_id>`（txt/docx/pdf/srt/excel も可。⚠️ media の書き出しは未実行＝手順は `--help` 由来で未検証）
+  - ⚠️ `record trash` / `record delete` もあるので、読み取り以外は叩かない
+  - Nottaのボット録音は**画面共有の映像つき mp4**（1280×720・音声aac）で残っていることがある（2026-11-09 島津GalleryWalk第3回で確認）。「動画撮ってない？」と聞かれたら Drive だけでなく Notta を見る
 - ログイン状態のブラウザで app.notta.ai を開いて本文を取得する（agent-browser の専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を想定。MacはこのプロファイルでNottaログイン済み（2026-09-07・ヘッドレスでdashboard表示を確認）。本文取得の手順自体は未検証。旧 `--profile Default` は2026-09-07廃止）
 - ⚠️ **Nottaの業務アカウントは `dev@nsketch.com`**（2026-09-30 深石さん確認）。NSKワークスペース（`https://app.notta.ai/7206228075381755904/dashboard`・Business Plan）はこのアカウントで入る。`fukaishi@nsketch.com` で「Continue with Google」すると個人の「fukaishi’s Workspace（Free Plan）」に入ってしまい、NSKワークスペースURLを開いても個人側へリダイレクトされる。gmailプロファイルには2026-09-30に dev@ でログイン済み（MacBook）。Googleアカウント選択画面の「Notta.ai」はアプリ名表示でアカウントではない
 

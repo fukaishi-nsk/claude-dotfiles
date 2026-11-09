@@ -42,7 +42,7 @@ for p in parts:
     if t.startswith('"'): t=json.loads(t)
     buf+=base64.b64decode(t)
 magic=bytes(buf[:4]).hex()
-ok=len(buf)==N and (magic.startswith('89504e47') or magic.startswith('ffd8'))
+ok=len(buf)==N and (magic.startswith('89504e47') or magic.startswith('ffd8') or (magic.startswith('25504446') and b'%%EOF' in bytes(buf[-1024:])))
 print(f"decoded={len(buf)} expected={N} magic={magic} OK={ok}")
 open(out if ok else out+'.BAD','wb').write(buf); sys.exit(0 if ok else 1)
 PY

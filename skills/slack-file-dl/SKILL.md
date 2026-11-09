@@ -99,6 +99,7 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 
 - 上の手順1〜4をそのまま `~/claude-dotfiles/skills/slack-file-dl/scripts/slack_files_batch_dl.sh` に定型化した（⚠️`~/.claude/skills/slack-file-dl/` はSKILL.mdだけのsymlinkなので、スクリプトは正本パスで呼ぶ）。**枚数が多いときはまずこれ**（引数＝`/messages/`形式パーマリンク・リストファイル（`FILE_ID<TAB>保存名[<TAB>元ファイル名]`）・出力先）。direct fetchが落ちたら自動で「タブをfiles-priへ遷移」モードに切り替え、各ファイルをサイズ一致＋PNG/JPEGマジックで検証してから保存する（不一致は `.BAD` 付きで残す）
 - **保存名の時刻は `slack_search_public_and_private`（`content_types=files`）の Created を使う**＝各ファイルの貼り付け時刻。1メッセージに10枚まとめて貼られても1枚ずつ時刻が付くので、`slack_read_channel` のメッセージ投稿時刻より細かい（第五回の投稿時刻ベース命名より正確）
+- **PDFも通る**（2026-11-09 島津GW第4回事前資料 PDF 2点・4.8MB/138KBで実証・md5一致）。検証は先頭 `%PDF`＋末尾1KB内の `%%EOF`。自社WSの投稿でも PDF は direct fetch が落ち、自動の「files-priへ遷移」モードで取れた。日本語名は `slack_search_public_and_private` の Permalink 末尾のサニタイズ名（`___…`）をそのまま3列目に入れればよい
 - 実測: direct fetchで1ファイル2〜3秒（2.5MB・120KBチャンク×21）。フォールバックは不要だった。実行はバックグラウンド（`run_in_background`）で回し、ログの `OK=True` 行数で完了を判定する
 
 ## 落とし穴

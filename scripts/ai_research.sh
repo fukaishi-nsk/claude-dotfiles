@@ -16,7 +16,8 @@
 #   ~/.gemini/antigravity-cli/settings.json (without it, agy prints NOTHING and the reason is only on stderr).
 #   Always pass --model: agy's default model is not necessarily Gemini (the list also has Claude / GPT-OSS).
 #   Grok CLI: installed on the MacBook on 2026-11-10 (~/.grok/bin/grok, web-search answer verified in 18 s).
-#   Not on the Mac mini: there, ask Grok through the grok MCP (mcp__grok__ask_grok) instead.
+#   Also on the Mac mini since 2026-11-10 (1.0.77, ~/.grok/bin/grok, web-search answer verified in 17 s).
+#   On a machine without the CLI, ask Grok through the grok MCP (mcp__grok__ask_grok) instead.
 #   On the Mac this file is not executable: run it as `bash scripts/ai_research.sh ...`.
 #   macOS has no `timeout`; the script then relies on --print-timeout only.
 set -euo pipefail

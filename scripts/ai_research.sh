@@ -15,7 +15,9 @@
 # Mac (2026-10-19, Mac mini): agy is ~/.local/bin/agy and needs the same read_url allow-rule in its own
 #   ~/.gemini/antigravity-cli/settings.json (without it, agy prints NOTHING and the reason is only on stderr).
 #   Always pass --model: agy's default model is not necessarily Gemini (the list also has Claude / GPT-OSS).
-#   There is no Grok CLI on the Mac: ask Grok through the grok MCP (mcp__grok__ask_grok, web+X search) instead.
+#   Grok CLI: installed on the MacBook on 2026-11-10 (~/.grok/bin/grok, web-search answer verified in 18 s).
+#   Not on the Mac mini: there, ask Grok through the grok MCP (mcp__grok__ask_grok) instead.
+#   On the Mac this file is not executable: run it as `bash scripts/ai_research.sh ...`.
 #   macOS has no `timeout`; the script then relies on --print-timeout only.
 set -euo pipefail
 provider="${1:?grok|gemini}"; prompt_file="${2:?prompt file}"; minutes="${3:-14}"
@@ -27,7 +29,7 @@ first_exe() { for p in "$@"; do [ -x "$p" ] && { echo "$p"; return; }; done; ret
 case "$provider" in
   grok)
     grok_exe="$(first_exe "$HOME/.grok/bin/grok.exe" "$HOME/.grok/bin/grok")" \
-      || { echo "no Grok CLI here (Mac: use the grok MCP)" >&2; exit 3; }
+      || { echo "no Grok CLI here (install it, or use the grok MCP)" >&2; exit 3; }
     limit "$grok_exe" --no-subagents --permission-mode plan \
       --max-turns 40 --output-format json -p "$prompt" < /dev/null \
       | "$(command -v python || command -v python3)" -I -X utf8 -c "import json,sys; d=json.load(sys.stdin); print(d.get('text') or d)"

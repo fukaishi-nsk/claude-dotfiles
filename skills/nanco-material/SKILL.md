@@ -154,6 +154,10 @@ description: nanco顧客向けの紹介資料（Figma Slides）を、オンラ�
 
 - 場所: Mac mini（Tailscale `fukaishi_macmini@100.110.187.46`）の iPhone 17 シミュレーター（iOS 26.5・UDID `3B476E7C-A458-4100-BBB2-12231F636F4B`）。nanco 1.11.1 の本番向けビルドは `~/nanco_dd/Build/Products/Debug-production-iphonesimulator/Runner.app`。Xcode 27 は Simulator.app が無く、画面は `DeviceHub.app`（Xcode.app/Contents/Applications）。iOS 27 では nanco が起動直後に落ちる
 - ⚠️ **2026-11-11 時点、このシミュレーターの nanco 1.11.1 は起動すると「アップデートのお願い」の画面で止まり、先へ進めない**（「再読み込み」でも変わらない。App Store の本番は 1.12.0）。Mac mini の手元のソースは 1.11.1 のままで、GitLab に繋がらないので新しい版をビルドできない。実機の iPhone 12（nanco's iPhone・本番 nanco 1.12.0）は `xcrun devicectl device process launch --device <UDID> io.nanco.nanco` と `capture screenshot` で開けて撮れるが、本番アプリは未ログインだった（ログインは深石さんに頼む）
+  - **回避できた（2026-11-11・深石さんの許可を得て実施）**: 判定は「アプリの版」と Firebase Remote Config の `minVersion` の比較（`lib/state/firebase/maintenance_provider.dart`）。ビルドを作業フォルダに写し、写しの Info.plist の `CFBundleShortVersionString` だけを 1.12.0 に書き換えて `xcrun simctl install` → `launch` したら通り、ログインも残っていた（元のビルドとソースは触らない。中身は 1.11.1 のまま）。この操作は最初、権限の判定で止められた → 深石さんに一言断ってから実行する
+  - シミュレーターのアカウント（fukaishi+invite1104c）は、Web の「設定→メンバー→コードで招待」で出したコードを、アプリの「マイページ→ワークスペース→招待コードで参加」に入れて「サンプル商店」に入れた（表示名は 20 文字まで。メールアドレスのままだと超えるので「やまだ」にした）。使い終わったコードは Web の「再発行」で無効にする
+  - `kbtype.py` はキーを見つけられなかった。キーボードの画像から座標を読んで `axe touch` で1つずつ押した（幅 414 に縮めた画像の座標 ×0.971＝pt）
+  - **スキャンの画面は「カメラを起動できませんでした」と出る**（シミュレーターにカメラが無い）ので資料には使えない。資料には、ホーム（下の「バーコード」ボタン）・フォルダ内の一覧・アイテムの詳細（＋−）の3画面を並べた
 - 操作は axe（`/opt/homebrew/bin/axe`）。**`axe tap` は押す時間が短くアプリが反応しないことがある → `axe touch -x X -y Y --down --up --delay 0.12`**。位置は `axe describe-ui` の frame から取る（ラベル名だけで押さない）
 - **文字入力は `axe type` が届かない**。画面上のキーボードを1キーずつ押す `~/nanco_sim/kbtype.py`（標準入力から読む）を使う。日本語のかなキーボードのときは使えない（英字キーボードに切り替える）
 - **ログインは深石さんにパスワードを入れてもらう**（Claude はパスワードを扱わない）: メール欄に `kbtype.py` でアドレスを入れたあと、深石さんがアプリのターミナルで `ssh -t fukaishi_macmini@100.110.187.46 '~/nanco_sim/password.sh'` を実行。パスワード欄へ入れ、メール欄の中身が変わっていたら消して止める安全装置つき。⚠ 2026-11-04 に欄の指定ずれでパスワードがメール欄に表示される事故があった → この形に作り直した

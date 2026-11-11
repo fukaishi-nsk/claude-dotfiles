@@ -153,6 +153,7 @@ description: nanco顧客向けの紹介資料（Figma Slides）を、オンラ�
 ## アプリの画面をシミュレーターで撮る（2026-11-04 和嶋さま資料で確立）
 
 - 場所: Mac mini（Tailscale `fukaishi_macmini@100.110.187.46`）の iPhone 17 シミュレーター（iOS 26.5・UDID `3B476E7C-A458-4100-BBB2-12231F636F4B`）。nanco 1.11.1 の本番向けビルドは `~/nanco_dd/Build/Products/Debug-production-iphonesimulator/Runner.app`。Xcode 27 は Simulator.app が無く、画面は `DeviceHub.app`（Xcode.app/Contents/Applications）。iOS 27 では nanco が起動直後に落ちる
+- ⚠️ **2026-11-11 時点、このシミュレーターの nanco 1.11.1 は起動すると「アップデートのお願い」の画面で止まり、先へ進めない**（「再読み込み」でも変わらない。App Store の本番は 1.12.0）。Mac mini の手元のソースは 1.11.1 のままで、GitLab に繋がらないので新しい版をビルドできない。実機の iPhone 12（nanco's iPhone・本番 nanco 1.12.0）は `xcrun devicectl device process launch --device <UDID> io.nanco.nanco` と `capture screenshot` で開けて撮れるが、本番アプリは未ログインだった（ログインは深石さんに頼む）
 - 操作は axe（`/opt/homebrew/bin/axe`）。**`axe tap` は押す時間が短くアプリが反応しないことがある → `axe touch -x X -y Y --down --up --delay 0.12`**。位置は `axe describe-ui` の frame から取る（ラベル名だけで押さない）
 - **文字入力は `axe type` が届かない**。画面上のキーボードを1キーずつ押す `~/nanco_sim/kbtype.py`（標準入力から読む）を使う。日本語のかなキーボードのときは使えない（英字キーボードに切り替える）
 - **ログインは深石さんにパスワードを入れてもらう**（Claude はパスワードを扱わない）: メール欄に `kbtype.py` でアドレスを入れたあと、深石さんがアプリのターミナルで `ssh -t fukaishi_macmini@100.110.187.46 '~/nanco_sim/password.sh'` を実行。パスワード欄へ入れ、メール欄の中身が変わっていたら消して止める安全装置つき。⚠ 2026-11-04 に欄の指定ずれでパスワードがメール欄に表示される事故があった → この形に作り直した

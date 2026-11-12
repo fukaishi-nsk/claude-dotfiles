@@ -1,5 +1,10 @@
 # Codex 共通指示（正本: ~/claude-dotfiles/codex/AGENTS.md → setup.sh が ~/.codex/AGENTS.md へ実ファイルコピー）
 
+## 現在のWindows GPU環境（2026-11-12 本人確認）
+- **RTX 5090機（NSKETCH5090）はレンタル品で、すでに返却済み。現在の利用可能な機材として扱わない。**
+- **現在使っているWindows GPU機はRTX 3090機**。2026-11-12の実機確認: RTX 3090 24GB / Ryzen 9 5950X / ASRock X570 Phantom Gaming 4 / Windows 11 Home。
+- 以下に残る5090機の設定・導入状況・実測記録は返却前の履歴。3090機の現在の設定や認証状態へ流用・推定しない。別PCでの作業時も、実行環境を確認して区別する。
+
 ## agent-browser（ブラウザ自動化・Claude Code と共用ツール）
 - ログイン状態が必要な操作は、専用永続プロファイル `--profile "$HOME/.agent-browser/profiles/gmail"` を**全コマンドに毎回**付ける（Mac/Windows共通・2026-09-07制定）。付け忘れると別セッションの about:blank に飛ぶ。連続作業は `export AGENT_BROWSER_PROFILE="$HOME/.agent-browser/profiles/gmail"` でもよい
 - サインインページに飛んだら `--headed` で開き直し、**本人にログインしてもらう**（メールアドレス欄までは代行可・パスワード以降は本人）。パスワードや認証コードを自分で入力しない

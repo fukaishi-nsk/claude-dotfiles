@@ -11,7 +11,7 @@ description: 平日毎朝8:30に、Notion「🫂 Customers」の動いている�
 - DB: https://app.notion.com/p/2ecb60a44ee84e88adc236122ccb9771 ／ data source `collection://842d7d57-058d-4df8-a229-9cea0a2eadaf`
 - 報告先: Slack `#log_fukaishi`（channel_id `C03119VSJGK`）。冒頭に `<@U02PBGQ62BB>`
 - LINE 転写: Slack `#nanco_line`（C0C5Z16821X）。`oldest` を付けず limit=100 で最新から読む
-- 管理画面のトライアル一覧: `https://app.nanco.io/admin/workspaces?status=trial`（support@ ログインが要る。読めなければ「未確認」で先へ進む）
+- 管理画面のトライアル一覧: `https://app.nanco.io/admin/workspaces?status=trial`（fukaishi@nsketch.com の Google ログインで入る・2026-11-16〜。support@ は段階的に廃止。読めなければ「未確認」で先へ進む）
 
 ## ボールの基準（要点）
 会話の上で次に動くのは誰か。こちら（深石／姉崎）＝先方がこちらの返信・成果物を待っている。先方＝こちらが最後に送り、先方の返事・行動待ち。打合せ予定＝次の打合せ日が決まっている。様子見＝どちらも動かない。社内の Linear タスクが残っているだけでは「こちら」にしない。「できたら連絡します」の約束は次のアクションに書く。

@@ -39,7 +39,8 @@
 - 方針: 集計の仕組みは作らない。**深石さんに頼まれた時に、AIが見られればいい**
 - **nanco-analytics** という社内の利用分析がすでにある（github.com/nanco-service/nanco-analytics・private）。社内PC nsketch-minisforum で毎晩21時に全社の「使った人・使った日（直近30日）・経路（Web/アプリ/API）・端末」を集計し、画面は会社の Tailscale 網の中にある（アドレスは nanco-analytics の README）。**時間帯・曜日・品目単位は無い**。新しい集計の仕組みやイシューを提案する前に、まずこれで足りないか確かめる（2026-11-06、存在を知らずにAPIキーのイシューを書いて書き直しになった）
 - ⚠️ MacBook は個人の Tailscale 網（fukaishi.com）なので nanco-analytics に届かない（2026-11-06実測）。Mac mini は未確認。網への参加は深石さんの判断
-- 1社を細かく（誰が・何曜の何時台に）見る時は、実Chrome（claude-in-chrome）の support@ ログインで管理画面 `app.nanco.io/admin/workspaces?search=<社名|ドメイン>` → 更新履歴 `app.nanco.io/<WSのID>/activity` をページ送りで読む（1ページ20件・`?page=N`）。⚠️ 先頭ページを開くと support@ の既読カーソルが進む（顧客データは変わらない・NANCO-2922）。「閲覧のみ」と言われた時は報告に書く
+- **管理画面（app.nanco.io/admin）は fukaishi@nsketch.com の Google ログインで入る**（2026-11-16 深石さん指示「support@nanco は段階的に廃止するから、fukaishi@nsketch.com の google ログインで入って変更する運用にする」）。トライアル延長などの変更もこのアカウントで行う。support@ でのログインを前提にしない・深石さんに support@ で入り直すよう頼まない。実Chrome（claude-in-chrome）で `/admin/…` を開くと、いったん `/admin/login` に「管理者セッションを準備しています…」と出てから数秒で管理画面に入る（2026-11-16 実測。ログイン画面に戻されたと早合点しない・8秒ほど待ってから開き直す）
+- 1社を細かく（誰が・何曜の何時台に）見る時は、実Chrome（claude-in-chrome）で管理画面 `app.nanco.io/admin/workspaces?search=<社名|ドメイン>` → 更新履歴 `app.nanco.io/<WSのID>/activity` をページ送りで読む（1ページ20件・`?page=N`）。⚠️ 先頭ページを開くと、ログイン中のアカウントの既読カーソルが進む（support@ で確認・顧客データは変わらない・NANCO-2922。fukaishi@ では未確認）。「閲覧のみ」と言われた時は報告に書く
 - 使えない手段: 外部API（nanco MCP の ext/v1）は社内テストWSに固定でWS全体の履歴の口が無い。ログイン中のトークンの流用は安全確認で拒否される（再試行しない）。共有ドライブ `カスタマー/01_analytics/` は2026年4月の古い写し
 
 ## メール文体の継続学習（全案件・全セッション共通 / 2026-07-29制定）

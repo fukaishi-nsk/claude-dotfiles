@@ -13,13 +13,18 @@ From に入れた下書きを作る。返信なら元のスレッドに入れ、
   gmail_draft.py auth                         # 初回だけ。ブラウザで許可する
   gmail_draft.py send-as                      # 使える送信元の一覧
   gmail_draft.py create --from support@nanco.io --to a@example.com [--cc b@example.com ...] \
-      --subject "件名" --html-file body.html [--text-file body.txt] [--reply-to <Gmailのmessage id>]
-  gmail_draft.py show <draft id>              # 下書きの From・To・Cc・件名・threadId を表示
+      --subject "件名" --html-file body.html [--text-file body.txt] [--reply-to <Gmailのmessage id>] \
+      [--attach 添付ファイル ...] [--update-draft <draft id>]
+  gmail_draft.py show <draft id>              # 下書きの From・To・Cc・件名・threadId・添付を表示
+
+--attach は添付ファイルを付ける（複数は1つの --attach の後ろに並べる）。
+--update-draft は新しい下書きを作らず、既存の下書きを同じ内容で置き換える（添付の追加・本文の直し用）。
 """
 import argparse
 import base64
 import html
 import json
+import mimetypes
 import os
 import sys
 from email.message import EmailMessage
@@ -145,21 +150,40 @@ def cmd_create(a):
 
     msg.set_content(text_body or "")
     msg.add_alternative(html_body, subtype="html")
+    for path in a.attach:
+        ctype = mimetypes.guess_type(path)[0] or "application/octet-stream"
+        maintype, subtype = ctype.split("/", 1)
+        with open(path, "rb") as f:
+            msg.add_attachment(f.read(), maintype=maintype, subtype=subtype,
+                               filename=os.path.basename(path))
     raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
     body = {"message": {"raw": raw}}
     if thread_id:
         body["message"]["threadId"] = thread_id
-    d = svc.users().drafts().create(userId="me", body=body).execute()
+    if a.update_draft:
+        d = svc.users().drafts().update(userId="me", id=a.update_draft, body=body).execute()
+    else:
+        d = svc.users().drafts().create(userId="me", body=body).execute()
     print(json.dumps({"draftId": d["id"], "messageId": d["message"]["id"],
                       "threadId": d["message"].get("threadId")}, ensure_ascii=False))
 
 
 def cmd_show(a):
     svc = service()
-    d = svc.users().drafts().get(userId="me", id=a.draft_id, format="metadata").execute()
+    d = svc.users().drafts().get(userId="me", id=a.draft_id, format="full").execute()
     m = d["message"]
     out = {k: _header(m, k) for k in ("From", "To", "Cc", "Subject", "In-Reply-To")}
     out["threadId"] = m.get("threadId")
+    out["messageId"] = m.get("id")
+
+    def walk(p):
+        yield p
+        for c in p.get("parts", []) or []:
+            yield from walk(c)
+
+    out["attachments"] = [{"filename": p["filename"], "mimeType": p.get("mimeType"),
+                           "size": p.get("body", {}).get("size")}
+                          for p in walk(m["payload"]) if p.get("filename")]
     print(json.dumps(out, ensure_ascii=False, indent=1))
 
 
@@ -177,6 +201,8 @@ def main():
     c.add_argument("--text-file")
     c.add_argument("--reply-to", help="返信先の Gmail message id")
     c.add_argument("--no-quote", action="store_true", help="元メールを引用しない")
+    c.add_argument("--attach", nargs="*", default=[], help="添付ファイル（複数は並べる）")
+    c.add_argument("--update-draft", help="この draft id の下書きを置き換える（新規作成しない）")
     c.set_defaults(fn=cmd_create)
     s = sub.add_parser("show")
     s.add_argument("draft_id")

@@ -24,6 +24,8 @@ description: 顧客向けメール（nancoサポート・Nスケッチ）の下�
    - ⚠ CC が複数のときは `--cc a@x b@y` と1つの `--cc` の後ろに並べる。`--cc a --cc b` と繰り返すと最後の1件だけになる（2026-10-19 台和で姉崎さんが落ちた）
    - **nanco 顧客宛て（From support@）は CC に support@nanco.io を必ず入れる**。入れないと共有インボックスと Slack #nanco_カスタマーお問い合わせ に飛ばない（2026-11-06 富双シート 久保さま `1a1ae7770e38135d` で Grok Bot が漏らし、深石さんが指摘・grok-feedback.md より取込）
   - 作ったら `gmail_draft.py show <draftId>` で From・To・Cc・件名・threadId を確かめてから報告する。報告で「From を切り替えてください」とは書かない（切り替え不要になったため）
+   - **添付もスクリプトで付けられる（2026-11-16〜・深石さん「貼付も頑張ってみて」で追加）**: `--attach <ファイル> [<ファイル> ...]`（複数は1つの `--attach` の後ろに並べる）。`show` は `messageId` と `attachments`（ファイル名・種類・サイズ）も返すので、サイズが元ファイルと同じかまで確かめる。日本語のファイル名もそのまま通った（JO 小野田さま宛て・PNG 67,717 バイト）。**添付の名前は相手に見える**ので、Linear の番号など社内の呼び名を入れない。5MB を超える添付は今までどおり Drive リンクにする
+   - **作った下書きを直すときは `--update-draft <draftId>` で同じ下書きを置き換える**（create と同じ引数をもう一度全部渡す）。draftId・スレッド・宛先は変わらず、下書きは1つのまま（2026-11-16 実測・`drafts.list` で1件を確認）。古い下書きが残らないので、破棄の依頼が要らない。置き換える前に `show` の `messageId` が作成時と同じか見る（違っていたら深石さんが Gmail で編集している＝上書きせず確認する）。下の5「update_draft を使わない」は Gmail コネクタの話で、このスクリプトの置き換えは別物
    - 認証は `~/.config/claude-gmail/`（client_secret.json・token.json・権限600・dotfiles 外）。Google Cloud プロジェクト「claude-gmail」（ID enhanced-tuner-512103-e3・組織 nsketch.com・OAuth は「内部」・デスクトップクライアント）。権限は下書き作成・メール閲覧・送信元一覧の閲覧だけで、送信の権限は無い。**MacBook・Mac mini とも使える**（2026-10-19。Mac mini は Google のライブラリを pip --user で入れ、MacBook の client_secret.json と token.json を Tailscale の scp でコピー。`send-as` で送信元2つが取れることを確認）。Windows 機など別のPCで使うときは、同じようにライブラリと2ファイルを置く。認証が切れたら `gmail_draft.py auth`（ブラウザで深石さんが許可）
    - スクリプトが使えないとき（認証切れなど）はコネクタの create_draft に戻り、報告で From の切り替えを頼む
 3. 対応報告を含む場合、**実作業が完了してから送る**順序になっているか確認する（完了形で書くため）

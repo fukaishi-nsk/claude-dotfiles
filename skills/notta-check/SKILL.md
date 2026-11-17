@@ -81,3 +81,4 @@ description: 会議の文字起こし（Notta）の確認・回収方法。「�
 ## 注意
 
 - ⚠️ Nottaの話者ラベルは誤ることがある（実績: 別人の発言が藤波さん名義になった例あり）。文脈と矛盾する発言は話者を断定せず「〜と思われる」で記録する
+- ⚠️ **Nottaは数字・時刻の聞き取りを誤ることがある。日時をカレンダーに入れる・人に伝える前に、録音で確かめる**（2026-11-17 島津: Nottaは「一時三十分とかにしますか」、録音を whisper で起こし直すと「1時、3時とかにしますか？」で、13:30開始と誤ってカレンダー登録→深石さんの「13時開始じゃないの？」で訂正）。手順: `notta export create <record_id> --type media` → download → `ffmpeg -ss <前> -to <後> -i 録画.mp4 -vn -ac 1 -ar 16000 clip.wav` → `whisper-cli -m ~/whisper-models/ggml-large-v3-turbo.bin -l ja -f clip.wav`（2分なら数十秒）。2つの起こしが食い違う時は、食い違ったまま報告し、どちらかに決めつけない

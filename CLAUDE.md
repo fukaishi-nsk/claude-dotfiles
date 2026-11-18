@@ -62,6 +62,7 @@
 - **案件切り替え時は `/clear` を叩く**: 別案件の文脈を混ぜない
 - **長いセッションでは `/usage` でコンテキスト消費を確認**: 必要に応じて `/clear` または `/compact` する
 - **`.env` の読み書きは両方OK**（2026-08-15制定）: APIキーの追記・編集をClaudeが直接行ってよい。ただし既存の値を消さない・上書き前に現状を読むこと
+- **見積書・請求書はいつも freee請求書（invoice.secure.freee.co.jp）で作る**（2026-11-18 深石さん指示）: HTMLやPDFを自作しない（社印・番号・社内メモはfreeeで管理）。実Chrome（claude-in-chrome）で開き、ログインは1Password（request_credentials→autofill_credential）。同じ取引先の過去の見積・請求を「その他→複製」して件名・番号・明細を書き換え、社内メモに根拠を書いて保存する。保存は「送付待ち」のままにし、送付は深石さんの確認後
 
 ## dotfiles運用（git管理・複数PC同期 / 2026-07-30制定）
 - この CLAUDE.md・settings.json・主要スキルの**正本は `~/claude-dotfiles`**（github.com/fukaishi-nsk/claude-dotfiles・プライベート）。`~/.claude/` 配下はシンボリックリンク

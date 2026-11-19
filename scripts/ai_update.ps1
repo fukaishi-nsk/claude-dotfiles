@@ -80,20 +80,25 @@ function To-Version([string]$v) {  # 比較用（4つまで）
 function Short([string]$s) { $t = ($s -replace '\s+', ' ').Trim(); if ($t.Length -gt 200) { $t.Substring($t.Length - 200) } else { $t } }
 
 # ---- CLI ----
-function Update-Cli([string]$name, [scriptblock]$getVer, [scriptblock]$doUpdate) {
+# $isInstalled: コマンド本体があるか。$getVer: 起動して版を読む（起動できなければ空）
+# 2026-11-19: 11-18 に npm の更新で Codex CLI の部品（@openai/codex-win32-x64）が入らず起動できなくなったのに
+#   「更新: 0.169.0 → （空）」と出て気づけず、翌日は「入っていない」と出た。どちらも「失敗:」にする。
+function Update-Cli([string]$name, [scriptblock]$isInstalled, [scriptblock]$getVer, [scriptblock]$doUpdate) {
+  if (-not (& $isInstalled)) { Say "注意: $name は入っていない（飛ばした）"; return }
   $before = & $getVer
-  if (-not $before) { Say "注意: $name は入っていない（飛ばした）"; return }
+  if (-not $before) { Say "失敗: $name は入っているが起動できない（版が読めない・更新しなかった。入れ直しが必要）"; return }
   $out = & $doUpdate 2>&1 | Out-String
   $code = $LASTEXITCODE
   $after = & $getVer
   if ($code -ne 0) { Say "失敗: $name の更新（$before のまま・終了コード $code）: $(Short $out)"; return }
+  if (-not $after) { Say "失敗: $name の更新後に起動できない（$before から・版が読めない。入れ直しが必要）: $(Short $out)"; return }
   if ($before -ne $after) { Say "更新: $name $before → $after" } else { Say "変化なし: $name $before" }
 }
 
 $ClaudeExe = Join-Path $env:USERPROFILE '.local\bin\claude.exe'
 Say '== CLI =='
-Update-Cli 'Claude Code' { if (Test-Path $ClaudeExe) { Get-Ver ((& $ClaudeExe --version 2>$null) -join ' ') } } { & $ClaudeExe update }
-Update-Cli 'Codex CLI' { if (Get-Command codex.cmd -ErrorAction SilentlyContinue) { Get-Ver ((& codex.cmd --version 2>$null) -join ' ') } } { & npm.cmd i -g '@openai/codex@latest' }
+Update-Cli 'Claude Code' { Test-Path $ClaudeExe } { Get-Ver ((& $ClaudeExe --version 2>$null) -join ' ') } { & $ClaudeExe update }
+Update-Cli 'Codex CLI' { [bool](Get-Command codex.cmd -ErrorAction SilentlyContinue) } { Get-Ver ((& codex.cmd --version 2>$null) -join ' ') } { & npm.cmd i -g '@openai/codex@latest' }
 
 # remote-control が旧版のまま動いていないか（起動時刻が Claude Code の入れ替えより前なら旧版）
 $verDir = Join-Path $env:USERPROFILE '.local\share\claude\versions'

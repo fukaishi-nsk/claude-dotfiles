@@ -100,5 +100,6 @@ description: nancoオンライン相談・レディクル面談・[nanco]付き�
   - `nanco-consult-followup`: 平日 12:30・15:30・18:30（`30 12,15,18 * * 1-5`）
   - `nanco-consult-followup-b`: 平日 14:00・17:00（`0 14,17 * * 1-5`）。中身は「この正本を読んで実行せよ」の案内だけ
   - 2つは時刻が重ならない。台帳の予定IDで、同じ相談を二度処理しない
-- 予約係 `nanco-consult-followup-dispatch` は 2026-10-29 に止めた（無効化）
+- 2026-11-19〜 実際に動いている登録は `nanco-consult-followup-v2`・`nanco-consult-followup-b-v2`（共有ドライブ整理で作業フォルダが変わり作り直した。中身はこの正本を読む案内だけ。旧IDの2本は「（旧・11/19停止）」で無効化済み）。この正本のフォルダ名は旧IDのまま
+- 予約係 `nanco-consult-followup-dispatch` は 2026-10-29 に止めた（無効化）。⚠️ 再開するなら、更新先の taskId を `nanco-consult-followup-v2` に直してから（旧IDは止めてある）
 - 18時の `nanco-meeting-import` も同じ相談を拾う。そちらは、この台帳に予定IDがある相談を飛ばす

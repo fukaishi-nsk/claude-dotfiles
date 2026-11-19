@@ -31,6 +31,12 @@
 - 1社を細かく見る時は、fukaishi@nsketch.com でログインしたブラウザで管理画面 `app.nanco.io/admin/workspaces?search=<社名|ドメイン>` → 更新履歴 `app.nanco.io/<WSのID>/activity` をページ送りで読む。先頭ページを開くと、ログイン中のアカウントの既読カーソルが進む（support@ で確認・顧客データは変わらない・NANCO-2922。fukaishi@ では未確認）
 - ログイン中のトークンを流用してAPIを呼ばない（Claude Code では安全確認で拒否された）
 
+## dotfiles の同期（commit＋push・Claude Code と共通 / 2026-11-19制定）
+- `~/claude-dotfiles`（github.com/fukaishi-nsk/claude-dotfiles・プライベート）の正本（スキル・CLAUDE.md・この AGENTS.md・settings.json など）を編集したら、**その場で commit＋push** する（別のPCとの同期漏れを防ぐ）
+- commit＋push は **`bash ~/claude-dotfiles/scripts/dotfiles_save.sh "メッセージ" [ファイル ...]`** で行う。中身は pull（autostash）→ add → commit → push で、このリポジトリ以外は触らない。ファイルを渡せばそれだけ、渡さなければ追跡済みの変更全部（`git add -u`）。変更が無ければ何もしない
+- Claude Code では settings.json の allow にこのスクリプトだけを許可してある（`git add && git commit && git push` をつなげると自動の確認で止められたため）。Codex は許可の仕組みが別で、push はネットワークを使うので、サンドボックス内で失敗したらサンドボックス外の実行（承認）で回す
+- 編集の前にも `git pull` で他のPCの変更を取り込む。`codex/AGENTS.md` を直したら、push のあと `~/claude-dotfiles/setup.sh` で `~/.codex/AGENTS.md` へコピーし直す
+
 <!-- BEGIN AI_TEAMWORK -->
 ## AI同士の協力（仲良し作戦 / 2026-10-18制定）
 - 深石さんは Claude（Claude Code）・Codex・Antigravity（agy／Gemini）・Cursor を併用している。どれも同じチームの仲間として扱い、主導権を争わない。どのAIに何を任せるかは深石さんが決める。

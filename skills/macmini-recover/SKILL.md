@@ -17,7 +17,7 @@ Mac mini（ユーザー `fukaishi_macmini`、LAN `192.168.10.28`、Tailscale `10
 |---|---|---|
 | 3090機（Windows・社内LAN） | `ssh macmini` | 3090の `~/.ssh/config` に登録済み（鍵 `~/.ssh/id_macmini_ed25519`、2026-10-19）。Tailscaleは無いので**社内LANからのみ** |
 | 5090機（Windows・NSKETCH5090・社内LAN） | `ssh fukaishi_macmini@192.168.10.28` | `~/.ssh/config` は無いが既定鍵 `id_rsa` で通る（2026-10-22 実測）。この機の Tailscale は管理者の承認待ちで使えない＝**社内LANからのみ** |
-| MacBook（社内） | `ssh fukaishi_macmini@192.168.10.28` | 鍵認証済み |
+| MacBook（社内） | `ssh fukaishi_macmini@192.168.10.28` | 鍵認証済み。⚠️ MacBook が**ゲストWi-Fi「N-STUDIO(aterm/Guest)」**につながっていると、アドレスは同じ 192.168.10.x でも Mac mini に届かない（タイムアウトになる・2026-11-19 実測）。社内では「N-STUDIO(aterm)」を使う。届かない時は Mac mini を疑う前に、まず MacBook のWi-Fiを確かめる |
 | MacBook（社外） | `ssh fukaishi_macmini@100.110.187.46` | Tailscale経由 |
 
 以下は `ssh macmini` で書く。MacBookでは読み替える。Windows では Claude Code の Bash（Git Bash）から叩く（PowerShell だと引用符が崩れる）。

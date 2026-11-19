@@ -134,11 +134,26 @@ function Pending-Cursor {
     ForEach-Object { Get-Ver $_.Name })
 }
 
+# 2026-11-19: Antigravity が 2.31.2 → 2.33.0 とアプリ自身の更新で上がっていたのに、毎回「変化なし」としか出なかった。
+#   前回の実行の版を state.json に残し、変わっていれば「更新:」と出す（Report-Only と同じ考え方）。
 function Handle-App([string]$name, [string]$exe, [scriptblock]$getPending) {
   if (-not (Test-Path $exe)) { return }
+  $prev = $State[$name]
+  $now = Get-ExeVer $exe
+  $selfUpdated = [bool]($prev -and $now -and ($prev -ne $now))
+  if ($selfUpdated) { Say "更新: $name $prev → $now（アプリ自身が入れた・前回の実行から）" }
+  Restart-IfPending $name $exe $getPending $selfUpdated
+  $v = Get-ExeVer $exe
+  if ($v) { $State[$name] = $v }
+}
+
+function Restart-IfPending([string]$name, [string]$exe, [scriptblock]$getPending, [bool]$selfUpdated) {
   $before = Get-ExeVer $exe
   $pending = & $getPending
-  if (-not $pending -or (To-Version $pending) -le (To-Version $before)) { Say "変化なし: $name $before（更新待ちなし）"; return }
+  if (-not $pending -or (To-Version $pending) -le (To-Version $before)) {
+    if (-not $selfUpdated) { Say "変化なし: $name $before（更新待ちなし）" }
+    return
+  }
   if ($NoRestart) { Say "更新待ち: $name $before → $pending（再起動していない）"; return }
   if ((Get-Running $exe).Count -eq 0) { Say "更新待ち: $name $before → $pending（起動していないので触っていない）"; return }
   # ウィンドウを閉じて終了させる（強制終了はしない。強制終了だと更新が入らない）

@@ -21,7 +21,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$USERPROFILE/claude-dotfile
 スクリプトがすること（中身を変えたい時はスクリプトの正本 `~/claude-dotfiles/scripts/ai_update.ps1` を直す）:
 - Claude デスクトップの中から呼ばれると、書き込みがアプリ専用フォルダに振り替えられるため、自分自身を WMI で囲いの外に起動し直し、終わるのを待って結果を表示する（2026-11-12 実測による作り。結果のログは `~/.ai_update/run_*.log`）
 - CLI を最新にする: Claude Code（ネイティブ版・`claude update`）、Codex CLI（npm）
-- Antigravity・Grok Bot・Cursor のうち、**起動中で更新待ちのものだけ**をウィンドウを閉じて終了→更新の適用を待つ→起動し直す
+- Antigravity・Grok Bot・Cursor のうち、**起動中で更新待ちのものだけ**をウィンドウを閉じて終了→更新の適用を待つ→起動し直す。アプリ自身が更新を入れていた時も、前回の実行から版が変わっていれば「更新:」と出す（2026-11-19〜）
+- CLI が起動できない・更新後に版が読めなくなった時は「失敗:」と出す（2026-11-19〜）
 - ChatGPT（Codex アプリ・Store）と Claude デスクトップは更新待ちを見分けられないので、前回から版が変わった時に「更新:」と出すだけ
 - 出力は1行1件。先頭の語が種別（更新 / 変化なし / 再起動 / 更新待ち / 注意 / 失敗）
 

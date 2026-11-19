@@ -33,7 +33,7 @@ Notion「nanco営業データ」へのページ作成、「🫂 Customers」の�
 
 - **Gmail**: 予約者のアドレスと名前で `search_threads` → 見つかったスレッドは**全部 `get_thread`（PLAIN_TEXT）で読む**（search は1スレッド5件まで）。予約完了メール・予約のキャンセルと取り直し・先方の質問（ウェルカムメールへの返信、HubSpot など）・こちらの最後の返信・未返信の相手メールを確かめる。nanco の「更新まとめ」メール（件名 `【…の更新まとめ】<WS名> | nanco`）に予約者のアドレスが出ていれば、WS 名と更新された品目が分かる
 - **社名**: 相手のメールの署名・本文で名乗った表記を使う。メールドメイン（gmail 等）や WS 名から推定しない。分からなければ「氏名さん」
-- **顧客フォルダ**: 共有ドライブ `Nanco/カスタマー/` に社名・氏名を含むフォルダがあれば、KB（02_Plan）と 06_Recording の文字起こし全文、00_File_from を読む
+- **顧客フォルダ**: 共有ドライブ `Nanco/03_営業/00_顧客/カスタマー/` に社名・氏名を含むフォルダがあれば、KB（02_Plan）と 06_Recording の文字起こし全文、00_File_from を読む
 - **Notion**: Customers DB（`collection://842d7d57-058d-4df8-a229-9cea0a2eadaf`）で社名・氏名を検索。前回の面談ページがあれば読む
 - **Linear**（team `nanco`）: 社名・氏名で `list_issues`
 - **nanco管理画面**: 実Chrome（claude-in-chrome）で `https://app.nanco.io/admin/workspaces?search=<予約者のアドレス>` → ID・WS名・ユーザー数・アイテム数・作成日・最終操作・Next Date を読む。社名でも引き直す。開けない・ログインが切れているときは「未確認」と書いて先へ進む（ログインはしない）。開いたタブは最後に閉じる

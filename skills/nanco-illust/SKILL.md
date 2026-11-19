@@ -79,7 +79,7 @@ cd ~/src/nanco_illust && .venv/bin/python nanco_generate_fal.py "<English subjec
 ## 描いた絵の置き場所と自動の片付け（2026-10-20〜）
 
 - `generated/` 直下のフォルダは、**描いてから30日たつと毎日4:30にMacのゴミ箱へ移る**（launchd `com.nsketch.nanco-illust-cleanup`・正本 `~/claude-dotfiles/launchd/nanco-illust-cleanup/`）。直下のファイル（`fal_usage.csv` など）は残る
-- 資料に使った絵・使い回したい絵は、30日以内に共有ドライブ `Nanco/illust/nanco-illust_資料素材/` へ移す（透過版＋`元画像/`に元画像。`_一覧.png` も作り直す）。一覧は nanco-material の「素材と前例」
+- 資料に使った絵・使い回したい絵は、30日以内に共有ドライブ `Nanco/02_マーケ/02_アセット/illust/nanco-illust_資料素材/` へ移す（透過版＋`元画像/`に元画像。`_一覧.png` も作り直す）。一覧は nanco-material の「素材と前例」
 - セッションの一時フォルダ（scratchpad）で作った絵（Kontext の AFTER など）は、セッションが終わると消えるので、使ったらすぐ素材フォルダへ移す
 
 ## 気をつけること

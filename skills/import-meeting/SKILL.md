@@ -27,7 +27,8 @@ user-invocable: true
 ### 定数（環境固有）
 - **Meet Recordings フォルダID**: `1FeGWMGQgOc6TsDNptpjQ7T-mYlv_Nhmd`（owner: fukaishi@nsketch.com）。2026-08-26以降は「Google Meet」フォルダの配下に移り、ここには8/25までの成果物と秒付きタイムスタンプgdoc（Notta形式）だけが入る
 - **Google Meet フォルダは増える（2026-10-06時点で3つ）**: 元の `1AjNV0b5jnpHF8UESpIG0-ouPyESwu1_R`（2026-08-26〜10-01 19:06）／2つ目 `1SnCFtkyqkarrNBsGHANhlw8r_s2OS_SB`（10-01 19:06新設・ローカル表示 `Google Meet (1)`）／3つ目 `16masgN5PLTLh2xuI--c5KUxrcrHuocuH`（10-02 11:20新設・ローカル表示 `Google Meet (2)`。10/6 山下さん相談のTranscriptはここ）。**原因: Google Meet の保存フォルダの権限を変えると、Meet が新しい「Google Meet」フォルダを作り直す**（2026-10-06 深石さん）。→ IDを決め打ちしない。毎回 `search_files` で `title = 'Google Meet' and mimeType = 'application/vnd.google-apps.folder' and owner = 'me'` を引いて全部を対象にする。どれも直下に `<会議名> (recurring)/`（定例）か `<会議名> - YYYY MM DD HH:MM JST/`（単発）のサブフォルダがあり、その中に成果物が入る
-- **顧客ルート**: 共有ドライブ `Nanco / カスタマー`（このフォルダ直下に各顧客フォルダがある）
+- **顧客ルート**: 共有ドライブ `Nanco / 03_営業 / 00_顧客 / カスタマー`（このフォルダ直下に各顧客フォルダがある）
+  - ⚠️ 2026-11-19 の共有ドライブ整理で `Nanco/カスタマー` から今の場所へ移った。**共有ドライブ直下に `カスタマー` や顧客フォルダを作らない**（直下は 00〜06 の7フォルダだけ。ルールは Drive の「00_フォルダルール」doc_id `1HyFifJBrxnLr6_-ykyTbHZEf2sJAL5Fd7euql3axJlQ`）。顧客フォルダが見つからない時は、まず `00_顧客マスタ.md` と名前の揺れを確かめる
 - **顧客マスタ（照合辞書）**: `カスタマー/00_顧客マスタ.md` … 1列目「社名（フォルダ名と一致）」が正準フォルダ名
 - **Slack報告先**: チャンネル `#log_fukaishi`
 - **Googleカレンダー（起点）**: カレンダーMCPの `list_events` で本人カレンダー(primary=`fukaishi@nsketch.com`)を走査。各イベントは `attendees[].email`（外部顧客ドメイン含む）と `attachments`（録画 `～Recording`／Geminiメモのリンク・会議名＋日時JST付き）を持つ。※ルーティン実行環境にGoogleカレンダーMCPの接続が必要。

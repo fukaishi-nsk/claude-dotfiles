@@ -33,7 +33,8 @@ nanco顧客・レディクル案件の打合せ準備は、**Notionの面談ペ�
 
 - **Gmail**: 相手のドメイン・氏名で検索し、スレッドは必ず `get_thread`（PLAIN_TEXT）で全件読む（`search_threads` は1スレッド5件までしか返さない）。予約完了メール・こちらが最後に送った内容・**未返信の相手メール**を確認
 - **顧客フォルダ**（共有ドライブ Nanco/03_営業/00_顧客/カスタマー/会社名/）: KB（02_Plan）、06_Recording の文字起こし**全文**（要約は根拠にしない）、00_File_from の資料
-- **Notion**: 前回の面談ページ、Customers DB の行
+- **Notion**: 前回の面談ページ、Customers DB の行（Customers は1日1回の写し。いちばん新しい状況は下の Linear CRM で見る）
+- **Linear `NANCO-CRM`**（2026-11-20〜顧客の状況の正本）: 社名・shortId で `list_issues` → 「## 最新の状況」と、ボットの「## 自動の記録」（使った日・最終利用・推奨アクション）を読む
 - **Linear**（team `nanco`）: 会社名を含むイシューの状態。前回こちらが約束した件の進み具合
 - **nanco管理画面** `https://app.nanco.io/admin/workspaces?search=<社名>`: ワークスペースの有無・トライアル期限（Next Date）・アイテム数・ユーザー数・最終操作。プランの上限（1,500／5,000）に近ければ注意点に書く。agent-browser の gmail プロファイルは nanco 未ログイン。実Chrome（claude-in-chrome）なら管理者セッションで読める（初回はダッシュボードに飛ぶので同じURLを開き直す）
 - **カレンダー**: Meetリンク・出欠（姉崎さんの未回答など）・前後の予定

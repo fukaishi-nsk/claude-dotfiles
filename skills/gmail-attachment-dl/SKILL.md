@@ -55,6 +55,8 @@ description: Gmailメールの添付ファイルをagent-browserで自動ダウ�
 
 ## 落とし穴・フォールバック
 
+- **添付ではなく Google Drive のリンクで届いた時**（2026-11-22 豊田さん・東レ案件で実証）: Drive コネクタの `search_files`（`parentId = '<フォルダID>' and modifiedTime > '...'`、nextPageToken でページ送り必須＝1ページ目に全件出ない）で対象を特定 → `download_file_content` で取得すると、wav 等のバイナリは tool-results に**ファイルとして保存される**（本文に base64 が流れない。8MB まで実測）→ cp で格納し、サイズを Drive の fileSize と照合。agent-browser で drive.google.com のダウンロードを押すと Google の「本人確認」画面に飛ばされた（このプロファイルで発生）ので、Drive リンクはコネクタを先に使う
+
 - Driveマウント先へ直接置いた場合、リンク共有前にクラウド同期完了を確認する（Drive検索でファイルIDとサイズ一致を実体確認してからリンクを貼る）
 - agent-browserが不調なら `agent-browser doctor` で診断
 - 復旧不能時の旧手段: claude-in-chromeで該当タブを前面に出し、ダウンロードクリックだけユーザーに依頼→移動・検証はAI（2026-07-27時点でclaude-in-chromeのページ操作系は拡張競合で故障中・読み取り系は正常）

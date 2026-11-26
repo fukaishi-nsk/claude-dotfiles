@@ -106,4 +106,7 @@ Slackの `slack_read_file` はAIの画面に画像を**描画するだけ**で�
 
 - LINE転写ボット経由の画像は **2026-08-04 18時以降の投稿のみ**Slackに存在する。それ以前はLINE実機から（→ [[reference_line_desktop_image_capture]]）
 - `agent-browser download` が無応答になったらバックグラウンドに落ちて残るので、次の操作前に `eval '1+1'` でデーモンの生死を確認する
+- **Mac mini の `gmail` プロファイルは Slack・LINE OAM・Linear のログインが切れることがある**（2026-11-26 実測: 3つとも未ログイン）。Slack は `--headed open` で開くと Google のアカウント選択まで自動で進むので、本人に選んでもらい、`location.href` が `app.slack.com/client` になるまで待つ。Linear は未ログインのまま＝画面での目視ができない時は、保存後の本文で `![](…)` が `<linear-image>`（動画は `<linear-embed node-type="video">`）の署名付き URL に置き換わったことを確かめ、報告に「画面では未確認」と書く
+- **別のタブが前に出ていると、バッチスクリプトが「NOT on app.slack.com」で止まる**（2026-11-26: 先に開いた chat.line.biz のタブに eval が当たった）。`agent-browser … tab` で一覧を見て、余計なタブを `tab close tN` してからやり直す
+- **動画（mp4）は、バッチスクリプトの検証で `.BAD` になるが中身は正しい**（PNG・JPEG・PDF の頭しか見ていないため）。サイズの一致と先頭 `ftyp`（4〜8 バイト目）を自分で確かめて名前を戻す。中身は `ffmpeg -vf fps=1` でコマに分けて見る。Linear へは `prepare_file_upload`（video/mp4）で上げて本文に `![](assetUrl)` と書けば、動画の埋め込みになる（NANCO-3419 で実証）
 - 学びが出たらこのファイルに追記して型を育てる

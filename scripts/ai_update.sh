@@ -7,7 +7,8 @@
 #   ・agent-browser は 0.34.0 固定運用なので更新しない
 #   ・アプリを再起動するのは「起動中」かつ「更新待ちのプロセスがいる」ものだけ（無駄に落とさない）
 #   ・Claude デスクトップは定期実行そのものが中で動くので再起動しない（更新待ちを報告するだけ）
-#   ・claude remote-control は再起動しない（遠隔接続が切れるため。旧版のままなら報告するだけ）
+#   ・claude remote-control はここでは再起動しない。旧版のままなら報告だけして、再起動は
+#     launchd/rc-restart-on-update（10分ごと・作業中でない時だけ）に任せる（2026-11-26〜）
 # 出力: 1行1件。先頭の語で種別が分かる（更新 / 変化なし / 再起動 / 更新待ち / 注意 / 失敗）。終了コードは常に 0。
 # macOS の bash 3.2 で動く書き方にしてある。
 
@@ -58,7 +59,7 @@ if [ -f "$pkg" ]; then
     [ -n "$st" ] || continue
     st_t=$(date -j -f "%a %b %d %T %Y" "$st" +%s 2>/dev/null) || continue
     if [ "$st_t" -lt "$pkg_t" ]; then
-      echo "注意: claude remote-control（pid $pid・$(date -r "$st_t" '+%m/%d %H:%M') 起動）は旧版のまま。再起動していない"
+      echo "注意: claude remote-control（pid $pid・$(date -r "$st_t" '+%m/%d %H:%M') 起動）は旧版のまま（rc-restart-on-update が作業の切れ目で再起動する）"
     fi
   done
 fi

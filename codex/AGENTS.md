@@ -21,7 +21,7 @@
 - 資格情報（トークン・パスワード）は Codex が扱わない。サービスアカウントを使う場合の発行・保管は本人
 
 ## AI用CLIの導入（Claude Code と共通 / 2026-10-18）
-- ⚠️ **CLIの導入・更新は Win+R →「powershell」から実行する**（2026-10-18追加）。Codex・Claudeデスクトップアプリ（MSIX版）の中から入れると、LOCALAPPDATA への書き込みがアプリ専用フォルダ（`%LOCALAPPDATA%\Packages\<アプリ>\LocalCache\Local\`）に振り替えられ、他のアプリから見えなくなる。2026-10-17 に Codex 内で入れた agy・Cursor CLI がこれで Claude から見えなくなり、10-18 に本人が入れ直して解消した（Codex 側には旧版が残っている）。Claudeアプリでも同じことが起きる（2026-11-27 PUKAISHI_WIN で実測: 9/23 に Claude 内から `npm i -g` した agent-browser が `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\npm\` に入っていた。Roaming（`%APPDATA%`）も振り替えられる）。Windows Terminal から入れた場合の挙動は未確認。導入後は、本来のパスにあること、`Packages\…\LocalCache\Local` 側に入っていないことを確かめる。
+- ⚠️ **CLIの導入・更新は Win+R →「powershell」から実行する**（2026-10-18追加）。Codex・Claudeデスクトップアプリ（MSIX版）の中から入れると、LOCALAPPDATA への書き込みがアプリ専用フォルダ（`%LOCALAPPDATA%\Packages\<アプリ>\LocalCache\Local\`）に振り替えられ、他のアプリから見えなくなる。2026-10-17 に Codex 内で入れた agy・Cursor CLI がこれで Claude から見えなくなり、10-18 に本人が入れ直して解消した（Codex 側には旧版が残っている）。Claudeアプリでも同じことが起きる（2026-11-27 PUKAISHI_WIN で実測: 9/23 に Claude 内から `npm i -g` した agent-browser が `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\npm\` に入っていた。Roaming（`%APPDATA%`）も振り替えられる）。ただし同日、Claude アプリのターミナル画面から本人が実行した `npm install -g @openai/codex@latest` は本来の `%APPDATA%\npm` に入り、LocalCache 側には無かった。振り替えが起きる経路（Claude の Bash ツールか、ターミナル画面か）は未確定なので、導入後は必ず置き場所を確かめる。Windows Terminal から入れた場合の挙動は未確認。導入後は、本来のパスにあること、`Packages\…\LocalCache\Local` 側に入っていないことを確かめる。
 
 ## nanco顧客の利用状況を見る（Claude Code と共通 / 2026-11-06制定）
 - 方針: 集計の仕組みは作らない。深石さんに頼まれた時に、AIが見られればいい
